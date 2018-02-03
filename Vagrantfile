@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "winDev1712Eval-20180127"
+  config.vm.box = "WinDev1712Eval"
 
   config.vm.guest = :windows
   config.vm.communicator = "winrm"
