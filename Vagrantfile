@@ -38,7 +38,7 @@ Vagrant.configure("2") do |config|
     sudo apt-get update
 
     # bash setting
-    echo -e "\nif [ -f ~/.bashrc.local ]; then\n  . .bashrc.local\nfi\n" >> ~/.bashrc
+    echo -e "\nif [ -f ~/.bashrc.local ]; then\n  . ~/.bashrc.local\nfi\n" >> ~/.bashrc
     wget https://raw.githubusercontent.com/iimuz/dotfiles/master/.bashrc -O ~/.bashrc.local
 
     # tools for development tools
