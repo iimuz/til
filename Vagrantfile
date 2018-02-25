@@ -9,8 +9,8 @@ Vagrant.configure("2") do |config|
 
   config.vm.provider "virtualbox" do |vb|
     vb.gui = false
-    vb.memory = "4096"
-    vb.cpus = 2
+    vb.memory = "2048"
+    vb.cpus = 4
     vb.customize [
       "modifyvm", :id,
       "--vram", "8",
@@ -25,6 +25,13 @@ Vagrant.configure("2") do |config|
 
   if Vagrant.has_plugin?("vagrant-vbguest") then
     config.vbguest.auto_update = true
+  end
+
+  # プロキシ設定
+  if Vagrant.has_plugin?("vagrant-proxyconf")
+    config.proxy.http     = "#{ENV['HTTP_PROXY']}"
+    config.proxy.https     = "#{ENV['HTTP_PROXY']}"
+    config.proxy.no_proxy = "localhost,127.0.0.1"
   end
 
   config.vm.provision "shell", privileged: false, inline: <<-SHELL
