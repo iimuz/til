@@ -5,6 +5,7 @@ Vagrant.configure("2") do |config|
   config.vm.box = "debian/stretch64"
   config.vm.network :forwarded_port, guest: 22, host: 2222, id: "ssh", auto_correct: true
   config.vm.network :private_network, id: "private-network", type: "dhcp", ip: "192.168.34.0"
+  config.vm.synced_folder "~/src", "/home/vagrant/src", owner: "vagrant", group: "vagrant"
 
   config.vm.provider "virtualbox" do |vb|
     vb.gui = false
@@ -58,11 +59,15 @@ Vagrant.configure("2") do |config|
       rm -rf ghq ghq_linux_amd64.zip .wget-hsts && \
       echo -e "\n[ghq]\n  root = ~/src\n" >> ~/.gitconfig.local
 
-    # krypt for secure connection
+    # for gcp
     sudo apt-get install -y --no-install-recommends \
       curl \
-      ssh && \
-      curl https://krypt.co/kr -k | sh
+      ssh
+
+    # terraform
+    curl https://releases.hashicorp.com/terraform/0.11.3/terraform_0.11.3_linux_amd64.zip -O && \
+      unzip terraform_0.11.3_linux_amd64.zip && \
+      sudo mv terraform /usr/local/bin/
 
     sudo reboot
   SHELL
