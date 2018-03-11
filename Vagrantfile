@@ -62,7 +62,12 @@ Vagrant.configure("2") do |config|
     # for gcp
     sudo apt-get install -y --no-install-recommends \
       curl \
-      ssh
+      ssh && \
+      alias gscp='gcloud compute copy-files' && \
+      alias glist='gcloud compute instances list' && \
+      alias gssh='gcloud compute ssh' && \
+      alias gup='gcloud compute instances start' && \
+      alias gdown='gcloud compute instances stop'
 
     # terraform
     curl https://releases.hashicorp.com/terraform/0.11.3/terraform_0.11.3_linux_amd64.zip -O && \
