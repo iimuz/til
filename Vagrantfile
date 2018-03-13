@@ -63,16 +63,17 @@ Vagrant.configure("2") do |config|
     sudo apt-get install -y --no-install-recommends \
       curl \
       ssh && \
-      alias gscp='gcloud compute copy-files' && \
-      alias glist='gcloud compute instances list' && \
-      alias gssh='gcloud compute ssh' && \
-      alias gup='gcloud compute instances start' && \
-      alias gdown='gcloud compute instances stop'
+      echo "alias gscp='gcloud compute scp'" >> ~/.bashrc.local && \
+      echo "alias glist='gcloud compute instances list'" >> ~/.bashrc.local && \
+      echo "alias gssh='gcloud compute ssh'" >> ~/.bashrc.local && \
+      echo "alias gup='gcloud compute instances start'" >> ~/.bashrc.local && \
+      echo "alias gdown='gcloud compute instances stop'" >> ~/.bashrc.local
 
     # terraform
     curl https://releases.hashicorp.com/terraform/0.11.3/terraform_0.11.3_linux_amd64.zip -O && \
       unzip terraform_0.11.3_linux_amd64.zip && \
-      sudo mv terraform /usr/local/bin/
+      sudo mv terraform /usr/local/bin/ && \
+      rm terraform_0.11.3_linux_amd64.zip
 
     sudo reboot
   SHELL
