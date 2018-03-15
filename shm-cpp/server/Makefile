@@ -7,8 +7,8 @@ DEPS := $(OBJS:.o=.d)
 
 INC_FLAGS := $(addprefix -I,./include)
 CPPFLAGS := $(INC_FLAGS) -MMD -MP --std=c++14
-CXXFLAGS :=
-LDFLAGS :=
+CXXFLAGS := `pkg-config --cflags boost_regex`
+LDFLAGS := -lrt
 
 all: server
 
