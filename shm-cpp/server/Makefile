@@ -20,7 +20,7 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 format:
-	find ./src \( -name *.cpp \) | xargs clang-format -style=file -i
+	find ./src \( -name *.cpp \) | xargs clang-format -style=google -i
 
 run: $(BUILD_DIR)/server
 	$(BUILD_DIR)/server
