@@ -1,5 +1,5 @@
 SRC_DIRS ?= ./src
-BUILD_DIR ?= ../build/shm-cpp-client
+BUILD_DIR ?= ../../build/shm-cpp-client
 
 SRCS := $(shell find $(SRC_DIRS) -name *.cpp)
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
@@ -7,8 +7,8 @@ DEPS := $(OBJS:.o=.d)
 
 INC_FLAGS := $(addprefix -I,./include)
 CPPFLAGS := $(INC_FLAGS) -MMD -MP --std=c++14
-CXXFLAGS :=
-LDFLAGS :=
+CXXFLAGS := `pkg-config --cflags boost_regex`
+LDFLAGS := -lrt
 
 all: client
 
@@ -20,7 +20,7 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 format:
-	find ./src \( -name *.cpp \) | xargs clang-format -style=file -i
+	find ./src \( -name *.cpp \) | xargs clang-format -style=google -i
 
 run: client
 	$(BUILD_DIR)/client
