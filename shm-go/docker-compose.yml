@@ -1,0 +1,10 @@
+version: '2'
+services:
+  dev:
+    image: iimuz/golang-dev:v1.9.2-1.1.0
+    environment:
+      TZ: Asia/Tokyo
+    volumes:
+      - ..:/home/dev/src:rw
+    working_dir: /home/dev/src/shm-go
+    entrypoint: bash
