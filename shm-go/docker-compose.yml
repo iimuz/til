@@ -4,7 +4,11 @@ services:
     image: iimuz/golang-dev:v1.9.2-1.1.0
     environment:
       TZ: Asia/Tokyo
+      HTTP_PROXY: ${HTTP_PROXY}
+      http_proxy: ${HTTPS_PROXY}
+      HTTPS_PROXY: ${HTTP_PROXY}
+      https_proxy: ${HTTPS_PROXY}
     volumes:
-      - ..:/home/dev/src:rw
-    working_dir: /home/dev/src/shm-go
+      - ..:/go/src/github.com/iimuz/ipc-samples:rw
+    working_dir: /go/src/github.com/iimuz/ipc-samples/shm-go
     entrypoint: bash
