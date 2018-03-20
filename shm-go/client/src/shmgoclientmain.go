@@ -31,8 +31,8 @@ func main() {
 }
 
 func (c *cl) run(args []string) int {
-	fmt.Fprintf(c.OutStream, "start shared memory server using golang.\n")
+	fmt.Fprintf(c.OutStream, "start shared memory client using golang.\n")
 
-	fmt.Fprintf(c.OutStream, "end shared memory server using golang.\n")
+	fmt.Fprintf(c.OutStream, "end shared memory client using golang.\n")
 	return ExitCodeOK
 }
