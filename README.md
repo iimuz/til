@@ -40,3 +40,7 @@ Must be one of the following:
 * test: Adding missing or correcting existing tests
 * chore: Changes to the build process or auxiliary tools
     and libraries such as documentation generation
+
+# Directories
+
+Project layout follows [golang-standards/project-layout](this repositor://github.com/golang-standards/project-layout).
