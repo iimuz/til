@@ -2,6 +2,10 @@
 
 Example App using Go, Vue.js, Element, Axios
 
+# Abstruct
+
+this project recrates [mattn/go-vue-example](https://github.com/mattn/go-vue-example).
+
 # Commit
 
 For the commit message, follow the method of [angular](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commits).
@@ -43,4 +47,4 @@ Must be one of the following:
 
 # Directories
 
-Project layout follows [golang-standards/project-layout](this repositor://github.com/golang-standards/project-layout).
+Project layout follows [golang-standards/project-layout](https://github.com/golang-standards/project-layout).
