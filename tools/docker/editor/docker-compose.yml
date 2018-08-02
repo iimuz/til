@@ -1,0 +1,18 @@
+version: "2"
+services:
+  nvim:
+    image: localhost:neovim-go
+    environment:
+      USER_ID: ${USER_ID}
+      GROUP_ID: ${GROUP_ID}
+      TZ: ${TIME_ZONE}
+    volumes:
+      - src:/go/src/gitlab.com/iimuz/go-vue-example
+    working_dir: /go/src/gitlab.com/iimuz/go-vue-example
+
+volumes:
+  src:
+    driver_opts:
+      type: none
+      device: ${PWD}/../../../
+      o: bind
