@@ -11,9 +11,9 @@ SRCS    := $(shell find . -type f -name '*.go')
 all:
 
 ## Build.
-## Usage: make bulid/govue
-build/%: cmd/%/main.go $(SRCS)
-	go build -a -tags netgo -installsuffix netgo $(LDFLAGS) -o bin/$@ $<
+## Usage: make bin/govue
+bin/%: cmd/%/main.go $(SRCS)
+	go build -a -tags netgo -installsuffix netgo $(LDFLAGS) -o $@ $<
 
 ## Install dependencies.
 deps:
