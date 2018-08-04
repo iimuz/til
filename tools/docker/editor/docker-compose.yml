@@ -1,7 +1,7 @@
 version: "2"
 services:
   nvim:
-    image: localhost:neovim-go
+    image: localhost:neovim-go2
     environment:
       USER_ID: ${USER_ID}
       GROUP_ID: ${GROUP_ID}
