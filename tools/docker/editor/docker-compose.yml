@@ -1,14 +1,14 @@
 version: "2"
 services:
   nvim:
-    image: localhost:neovim-go2
+    image: iimuz/neovim:golang
     environment:
       USER_ID: ${USER_ID}
       GROUP_ID: ${GROUP_ID}
       TZ: ${TIME_ZONE}
     volumes:
-      - src:/go/src/gitlab.com/iimuz/go-vue-example
-    working_dir: /go/src/gitlab.com/iimuz/go-vue-example
+      - src:/go/src/github.com/iimuz/go-vue-example
+    working_dir: /go/src/github.com/iimuz/go-vue-example
 
 volumes:
   src:
