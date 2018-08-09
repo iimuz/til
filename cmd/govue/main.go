@@ -1,8 +1,8 @@
 package main
 
 import (
+	"github.com/iimuz/go-vue-example/pkg/controllers"
 	"github.com/labstack/echo"
-	"gitlab.com/iimuz/go-vue-example/pkg/controllers"
 )
 
 func main() {
