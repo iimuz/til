@@ -1,7 +1,7 @@
 version: "2"
 services:
   dev:
-    image: localhost:godev
+    image: iimuz/golang-dev:dev
     environment:
       USER_ID: ${USER_ID}
       GROUP_ID: ${GROUP_ID}
@@ -9,8 +9,8 @@ services:
     ports:
       - 127.0.0.1:4000:4000
     volumes:
-      - src:/go/src/gitlab.com/iimuz/go-vue-example
-    working_dir: /go/src/gitlab.com/iimuz/go-vue-example
+      - src:/go/src/github.com/iimuz/go-vue-example
+    working_dir: /go/src/github.com/iimuz/go-vue-example
     command: ash
 
 volumes:

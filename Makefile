@@ -15,8 +15,13 @@ all:
 bin/%: cmd/%/main.go $(SRCS)
 	go build -a -tags netgo -installsuffix netgo $(LDFLAGS) -o $@ $<
 
+## Clean build data.
+clean:
+	rm -rf bin/
+
 ## Install dependencies.
 deps:
+	dep ensure
 
 ## Run formatting.
 fmt:
@@ -32,4 +37,4 @@ lint:
 ## Run tests.
 test:
 
-.PHONY: all deps fmt help lint test
+.PHONY: all clean deps fmt help lint test

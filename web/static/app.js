@@ -7,7 +7,16 @@ var app = new Vue({
     loading: false,
   },
   created: function() {
-    this.loading = false;
+    this.loading = true;
+    axios.get('/tasks')
+      .then((response) => {
+        console.log(response);
+        this.loading = false;
+      })
+      .catch((error) => {
+        console.log(error)
+        this.loading = false;
+      })
   },
   methods: {
     addTask: function(task) {

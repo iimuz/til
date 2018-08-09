@@ -1,10 +1,10 @@
 # go-vue-example
 
+This project followed [mattn/go-vue-example](https://github.com/mattn/go-vue-example).
 Example App using Go, Vue.js, Element, Axios
 
-# Abstruct
-
-this project recrates [mattn/go-vue-example](https://github.com/mattn/go-vue-example).
+このプロジェクトは [mattn/go-vue-example](https://github.com/mattn/go-vue-example) を見て、
+作り方を勉強するために、手書きでコピーしたり、変更したりしています。
 
 # Commit
 
