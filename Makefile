@@ -21,6 +21,7 @@ clean:
 
 ## Install dependencies.
 deps:
+	dep ensure
 
 ## Run formatting.
 fmt:
