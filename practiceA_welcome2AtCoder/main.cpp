@@ -9,7 +9,11 @@ bool run(std::istream& is, std::ostream& os);
 }  // unnamed namespace
 
 /// @brief エントリポイント
+#ifdef _TEST
+static int run()
+#else
 int main()
+#endif
 {
   try {
     if (run(std::cin, std::cout) == false) {
