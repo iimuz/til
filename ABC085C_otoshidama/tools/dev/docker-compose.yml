@@ -1,0 +1,20 @@
+version: "2"
+services:
+  dev:
+    container_name: atcoder-dev
+    image: iimuz/cpp-dev:v3.8.0-atcoder1
+    environment:
+      USER_ID: ${USER_ID}
+      GROUP_ID: ${GROUP_ID}
+      TZ: ${TIME_ZONE}
+    volumes:
+      - src:/src/github.com/iimuz/atcoder
+    working_dir: /src/github.com/iimuz/atcoder/ABC085C_otoshidama
+    command: ash
+
+volumes:
+  src:
+    driver_opts:
+      type: none
+      device: ${PWD}/../../../
+      o: bind
