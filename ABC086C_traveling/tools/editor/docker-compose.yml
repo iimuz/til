@@ -1,0 +1,19 @@
+version: "2"
+services:
+  nvim:
+    container_name: atcoder-nvim
+    image: iimuz/neovim:v0.3.0-cpp7
+    environment:
+      USER_ID: ${USER_ID}
+      GROUP_ID: ${GROUP_ID}
+      TZ: ${TIME_ZONE}
+    volumes:
+      - src:/src/github.com/iimuz/atcoder
+    working_dir: /src/github.com/iimuz/atcoder/ABC086C_traveling
+
+volumes:
+  src:
+    driver_opts:
+      type: none
+      device: ${PWD}/../../../
+      o: bind
