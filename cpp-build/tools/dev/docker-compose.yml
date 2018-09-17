@@ -1,0 +1,23 @@
+version: "2"
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: grpc-dev
+    image: localhost:cpp
+    environment:
+      USER_ID: ${USER_ID}
+      GROUP_ID: ${GROUP_ID}
+      TZ: ${TIME_ZONE}
+    volumes:
+      - src:/src/github.com/iimuz/grpc-samples
+    working_dir: /src/github.com/iimuz/grpc-samples/cpp-build
+    command: bash
+
+volumes:
+  src:
+    driver_opts:
+      type: none
+      device: ${PWD}/../../../
+      o: bind
