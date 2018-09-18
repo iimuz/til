@@ -25,10 +25,22 @@ None.
 )]
 Param()
 
-cd ../../vendor/grpc/third_party/protobuf/cmake
-mkdir -p ./build/solution
-cmake ./build/solution
+$BUILD_PATH = "build/solution"
+$CMAKE_PATH = (Resolve-Path ../../vendor/grpc/third_party/protobuf/cmake).Path
+
+pushd $CMAKE_PATH
+
+# configure
+if ((Test-Path ${BUILD_PATH}) -eq $False) { mkdir -p ${BUILD_PATH} }
+pushd ${BUILD_PATH}
+$relpath = (Resolve-Path -Relative $CMAKE_PATH)
+cmake $relpath
+popd
+
+# build
 cmake --build ./build/solution --config Debug
 cmake --build ./build/solution --config Release
+
+popd
 
 exit 0
