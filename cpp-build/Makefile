@@ -4,7 +4,7 @@ PROTOBUF_DIR := $(GRPC_DIR)/third_party/protobuf
 all:
 .PHONY: all
 
-build-grpc:
+build-grpc: build-protobuf
 	cd $(GRPC_DIR) && git submodule update --init
 	cd $(GRPC_DIR) && $(MAKE) -j4
 .PHONY: build-grpc
@@ -16,7 +16,7 @@ build-protobuf:
 	cd $(PROTOBUF_DIR) && $(MAKE) install
 .PHONY: build-protobuf
 
-install-grpc: build-grpc
+install-grpc: install-protobuf
 	cd $(GRPC_DIR) && $(MAKE) install
 	ldconfig
 .PHONY: install-grpc
@@ -27,5 +27,5 @@ install-protobuf: build-protobuf
 .PHONY: install-protobuf
 
 clean:
-	cd $(GRPC_DIR)/third_party/protobuf && make clean
+	cd $(PROTOBUF_DIR) && make clean
 	cd $(GRPC_DIR) && make clean

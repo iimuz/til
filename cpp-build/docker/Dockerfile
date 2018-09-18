@@ -84,10 +84,11 @@ ENV CC=clang \
   CXX=clang++
 
 # grpc and protobuf
+ENV GRPC_VER=v1.15.0
 RUN set -x && \
   cd /opt && \
   : "get source code" && \
-  git clone https://github.com/grpc/grpc.git && \
+  git clone --depth=1 -b ${GRPC_VER} https://github.com/grpc/grpc.git && \
   cd grpc && \
   git submodule update --init && \
   : "install protobuf" && \

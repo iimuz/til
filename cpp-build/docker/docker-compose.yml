@@ -1,11 +1,11 @@
-version: "2"
+version: "2.3"
 services:
   dev:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: grpc-dev
-    image: localhost:cpp
+    image: localhost:grpc-cpp
     environment:
       USER_ID: ${USER_ID}
       GROUP_ID: ${GROUP_ID}
@@ -19,5 +19,5 @@ volumes:
   src:
     driver_opts:
       type: none
-      device: ${PWD}/../../../
+      device: ${PWD}/../../
       o: bind
