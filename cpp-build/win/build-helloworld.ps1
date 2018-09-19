@@ -1,9 +1,11 @@
 <#
 .SYNOPSIS
-protobuf をビルドします。
+HelloWorld をビルドします。
 
 .DESCRIPTION
 cmake が利用できることが前提となります。
+GRPC_AS_SUBMODULE を ON にしています。
+ON にしない場合は、インストールした gRPC の場所を示す cmakefile が必要となるようです。
 
 .INPUTS
 None. This script does not correspond.
@@ -12,8 +14,8 @@ System.Int32
 If success, this script returns 0, otherwise -1.
 
 .EXAMPLE
-.\build-protobuf.ps1
-Build Protobuf module.
+.\build-helloworld.ps1
+Build HelloWorld project.
 
 .NOTES
 None.
@@ -25,8 +27,8 @@ None.
 )]
 Param()
 
-$BUILD_PATH = "build/solution"
-$CMAKE_PROJ_PATH = (Resolve-Path ../../vendor/grpc/third_party/protobuf/cmake).Path
+$BUILD_PATH = "build"
+$CMAKE_PROJ_PATH = (Resolve-Path ../../vendor/grpc/examples/cpp/helloworld).Path
 $CMAKE_TOOL_PATH = (Resolve-Path "C:/Program Files/CMake/bin").Path
 
 $env:path += ${CMAKE_TOOL_PATH} + ";"
@@ -37,12 +39,12 @@ pushd $CMAKE_PROJ_PATH
 if ((Test-Path ${BUILD_PATH}) -eq $False) { mkdir -p ${BUILD_PATH} }
 pushd ${BUILD_PATH}
 $relpath = (Resolve-Path -Relative $CMAKE_PROJ_PATH)
-cmake $relpath
+cmake $relpath -DGRPC_AS_SUBMODULE=ON
 popd
 
 # build
-cmake --build ./build/solution --config Debug
-cmake --build ./build/solution --config Release
+cmake --build ${BUILD_PATH} --config Debug
+cmake --build ${BUILD_PATH} --config Release
 
 popd
 

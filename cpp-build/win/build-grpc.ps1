@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-protobuf をビルドします。
+gRPC をビルドします。
 
 .DESCRIPTION
 cmake が利用できることが前提となります。
@@ -12,8 +12,8 @@ System.Int32
 If success, this script returns 0, otherwise -1.
 
 .EXAMPLE
-.\build-protobuf.ps1
-Build Protobuf module.
+.\build-grpc.ps1
+Build gRPC module.
 
 .NOTES
 None.
@@ -26,7 +26,7 @@ None.
 Param()
 
 $BUILD_PATH = "build/solution"
-$CMAKE_PROJ_PATH = (Resolve-Path ../../vendor/grpc/third_party/protobuf/cmake).Path
+$CMAKE_PROJ_PATH = (Resolve-Path ../../vendor/grpc).Path
 $CMAKE_TOOL_PATH = (Resolve-Path "C:/Program Files/CMake/bin").Path
 
 $env:path += ${CMAKE_TOOL_PATH} + ";"

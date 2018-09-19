@@ -30,9 +30,9 @@ Param()
 Start-Process -Verb RunAs powershell "Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))"
 
 # install packages
-Start-Process -Verb RunAs powershell "choco install -y cmake"
-Start-Process -Verb RunAs powershell "choco install -y activeperl"
-Start-Process -Verb RunAs powershell "choco install -y golang"
-Start-Process -Verb RunAs powershell "choco install -y yasm"
+Start-Process -Verb RunAs -Wait powershell "choco install -y cmake"
+Start-Process -Verb RunAs -Wait powershell "choco install -y activeperl"
+Start-Process -Verb RunAs -Wait powershell "choco install -y golang"
+Start-Process -Verb RunAs -Wait powershell "choco install -y yasm"
 
 exit 0
