@@ -40,9 +40,8 @@ INSTANTIATE_TEST_CASE_P(
     normal,
     ExampleTest,
     testing::Values(
-      Node{"example1", "2\n3 1 2\n6 1 1\n", "Yes\n"},
-      Node{"example2", "1\n2 100 100\n", "No\n"},
-      Node{"example3", "2\n5 1 1\n100 1 1\n", "No\n"}
+      Node{"example1", "abc\n", "cba\n"},
+      Node{"example2", "ac\n", "ac\n"}
     )
 );
 

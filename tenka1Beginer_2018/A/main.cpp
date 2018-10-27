@@ -1,7 +1,7 @@
 /// @file
 
+#include <algorithm>
 #include <iostream>
-#include <map>
 #include <string>
 
 namespace {
@@ -35,7 +35,12 @@ namespace {
 /// @brief 実行処理
 bool run(std::istream& is, std::ostream& os)
 {
-  os << "test" << "\n";
+  std::string s;
+  is >> s;
+
+  if (s.length() == 3) std::reverse(s.begin(), s.end());
+
+  os << s << "\n";
 
   return true;
 }
