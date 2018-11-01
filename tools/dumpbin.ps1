@@ -4,6 +4,7 @@ dumpbin を利用した操作を行います。
 
 .DESCRIPTION
 dumpbin のオプションを指定して実行します。
+VS2017 がインストールされている前提のパスを利用しています。
 
 .INPUTS
 None. This script does not correspond.

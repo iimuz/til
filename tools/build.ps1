@@ -215,8 +215,6 @@ function Deploy {
   process {
     $BUILD_DIR = (Get-Build-Dir)
     $DEPLOY_DIR = (Get-Deploy-Dir)
-    $PROJ_DIR = (Get-Proj-Dir)
-    $THIRD_PARTY_DIR = (Join-Path $PROJ_DIR vendor/vcpkg/installed/x64-windows/bin)
 
     $CMAKE = (Get-CMake-Path)
 
@@ -225,12 +223,6 @@ function Deploy {
     pushd $BUILD_DIR
     & $CMAKE --build . --target install --config $platform
     popd
-
-    # windows 環境での依存モジュールをコピー
-    Write-Verbose "Copy: libprotobuf.dll"
-    cp (Join-Path $THIRD_PARTY_DIR libprotobuf.dll) (Join-Path $DEPLOY_DIR bin)
-    Write-Verbose "Copy: zlib1.dll"
-    cp (Join-Path $THIRD_PARTY_DIR zlib1.dll) (Join-Path $DEPLOY_DIR bin)
   }
   end {}
 }
@@ -251,7 +243,7 @@ function Vcpkg-Install {
     }
 
     if ($useProxy) {
-      $PROXY_URL = (Read-Host "Input proxy url: ")
+      $PROXY_URL = (Read-Host "Input proxy url. e.g) hoge:8080")
       Start-Process -Verb RunAs -Wait powershell "netsh winhttp set proxy proxy-server=${PROXY_URL}"
       $env:HTTP_PROXY = "http://${PROXY_URL}/"
       $env:HTTPS_PROXY = "http://${PROXY_URL}/"
