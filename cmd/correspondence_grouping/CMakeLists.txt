@@ -14,9 +14,6 @@ link_directories(${PCL_LIBRARY_DIRS})
 target_include_directories(${CORR_GRP_TARGET} PRIVATE ${PCL_INCLUDE_DIRS})
 target_link_libraries(${CORR_GRP_TARGET} PRIVATE ${PCL_LIBRARIES})
 
-# build configuration
-# add_library(${CLIENT_TARGET} SHARED ${CLIENT_LIB_SRCS})
-
 # output directory
 set_target_properties(${CORR_GRP_TARGET} PROPERTIES
   ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/"

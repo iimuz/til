@@ -4,6 +4,12 @@
 .DESCRIPTION
 ビルドしたバイナリをリモート環境に転送します。
 
+.PARAMETER serverName
+転送先のサーバ名を指定します。
+.PARAMETER platform
+Release バイナリを転送するか Debug バイナリを転送するかを指定します。
+Release or Debug を指定します。
+
 .INPUTS
 None. This script does not correspond.
 .OUTPUTS
@@ -23,7 +29,8 @@ None.
   ConfirmImpact="Medium"
 )]
 Param(
-  $serverName = ""
+  [string]$serverName = "",
+  [string]$platform = "Release"
 )
 
 # サーバ名は必須
@@ -37,7 +44,11 @@ $SCRIPT_DIR = (Split-Path -Parent $MyInvocation.MyCommand.Path)
 $PROJ_DIR = (Resolve-Path (Join-Path $SCRIPT_DIR ..)).Path
 
 # 入出力先の設定
-$BIN_DIR = "build/bin/Release"
+if ($platform -eq "Release") {
+  $BIN_DIR = "build/bin/Release"
+} else {
+  $BIN_DIR = "build/bin/Debug"
+}
 $SRC_DIR = (Join-Path $PROJ_DIR $BIN_DIR)
 
 $DST_REDUNDANT_STR_LEN = (Resolve-Path $PROJ_DIR/../../../..).Path.Length + 1
