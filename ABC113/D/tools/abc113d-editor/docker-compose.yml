@@ -9,7 +9,7 @@ services:
       GROUP_ID: ${GROUP_ID}
       TZ: ${TIME_ZONE}
     volumes:
-      - at-tenka1-a-src:/src/github.com/iimuz/atcoder
+      - src:/src/github.com/iimuz/atcoder
     working_dir: /src/github.com/iimuz/atcoder/ABC113/D
 
 volumes:

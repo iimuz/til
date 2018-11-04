@@ -35,6 +35,11 @@ namespace {
 /// @brief 実行処理
 bool run(std::istream& is, std::ostream& os)
 {
+  int h;
+  int w;
+  int k;
+  is >> h >> w >> k;
+
   os << "test" << "\n";
 
   return true;
