@@ -1,8 +1,6 @@
 /// @file
 
-#include <algorithm>
 #include <iostream>
-#include <string>
 
 namespace {
 
@@ -35,7 +33,12 @@ namespace {
 /// @brief 実行処理
 bool run(std::istream& is, std::ostream& os)
 {
-  os << "test" << "\n";
+  int x;
+  int y;
+  is >> x >> y;
+
+  const int COST = x + y / 2;
+  os << COST << "\n";
 
   return true;
 }
