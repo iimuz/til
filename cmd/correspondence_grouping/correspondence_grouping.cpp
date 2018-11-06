@@ -13,7 +13,7 @@
 #include <pcl/common/transforms.h>
 #include <pcl/console/parse.h>
 
-typedef pcl::PointXYZRGBA PointType;
+typedef pcl::PointXYZ PointType;
 typedef pcl::Normal NormalType;
 typedef pcl::ReferenceFrame RFType;
 typedef pcl::SHOT352 DescriptorType;
@@ -259,6 +259,7 @@ main (int argc, char *argv[])
   match_search.setInputCloud (model_descriptors);
 
   //  For each scene keypoint descriptor, find nearest neighbor into the model keypoints descriptor cloud and add it to the correspondences vector.
+  float max_neigh_sqr_dists(0.f);
   for (size_t i = 0; i < scene_descriptors->size (); ++i)
   {
     std::vector<int> neigh_indices (1);
@@ -268,12 +269,15 @@ main (int argc, char *argv[])
       continue;
     }
     int found_neighs = match_search.nearestKSearch (scene_descriptors->at (i), 1, neigh_indices, neigh_sqr_dists);
-    if(found_neighs == 1 && neigh_sqr_dists[0] < 0.25f) //  add match only if the squared descriptor distance is less than 0.25 (SHOT descriptor distances are between 0 and 1 by design)
+    if (max_neigh_sqr_dists < neigh_sqr_dists[0]) max_neigh_sqr_dists = neigh_sqr_dists[0];
+    // if(found_neighs == 1 && neigh_sqr_dists[0] < 0.25f) //  add match only if the squared descriptor distance is less than 0.25 (SHOT descriptor distances are between 0 and 1 by design)
+    if(found_neighs == 1 && neigh_sqr_dists[0] < 0.5f)
     {
       pcl::Correspondence corr (neigh_indices[0], static_cast<int> (i), neigh_sqr_dists[0]);
       model_scene_corrs->push_back (corr);
     }
   }
+  std::cout << "Max neigh sqr dists: " << max_neigh_sqr_dists << std::endl;
   std::cout << "Correspondences found: " << model_scene_corrs->size () << std::endl;
 
   //
@@ -360,7 +364,15 @@ main (int argc, char *argv[])
   //  Visualization
   //
   pcl::visualization::PCLVisualizer viewer ("Correspondence Grouping");
-  viewer.addPointCloud (scene, "scene_cloud");
+  {
+    pcl::PointCloud<PointType>::Ptr view_scene(new pcl::PointCloud<PointType> ());
+    for (size_t i = 0; i < scene->size(); ++i)
+    {
+      PointType& scene_point = scene->at (i);
+      view_scene->push_back (scene_point);
+    }
+    viewer.addPointCloud (view_scene, "scene_cloud");
+  }
 
   pcl::PointCloud<PointType>::Ptr off_scene_model (new pcl::PointCloud<PointType> ());
   pcl::PointCloud<PointType>::Ptr off_scene_model_keypoints (new pcl::PointCloud<PointType> ());
@@ -368,28 +380,60 @@ main (int argc, char *argv[])
   if (show_correspondences_ || show_keypoints_)
   {
     //  We are translating the model so that it doesn't end in the middle of the scene representation
-    pcl::transformPointCloud (*model, *off_scene_model, Eigen::Vector3f (-1,0,0), Eigen::Quaternionf (1, 0, 0, 0));
-    pcl::transformPointCloud (*model_keypoints, *off_scene_model_keypoints, Eigen::Vector3f (-1,0,0), Eigen::Quaternionf (1, 0, 0, 0));
+    pcl::PointCloud<PointType>::Ptr view_model(new pcl::PointCloud<PointType> ());
+    for (size_t i = 0; i < model->size(); ++i)
+    {
+      PointType& model_point = model->at (i);
+      view_model->push_back (model_point);
+    }
+    pcl::transformPointCloud (*view_model, *off_scene_model, Eigen::Vector3f (-1,0,0), Eigen::Quaternionf (1, 0, 0, 0));
 
     pcl::visualization::PointCloudColorHandlerCustom<PointType> off_scene_model_color_handler (off_scene_model, 255, 255, 128);
     viewer.addPointCloud (off_scene_model, off_scene_model_color_handler, "off_scene_model");
+
+    pcl::PointCloud<PointType>::Ptr view_model_keypoints(new pcl::PointCloud<PointType> ());
+    for (size_t i = 0; i < model_keypoints->size(); ++i)
+    {
+      PointType& model_point = model_keypoints->at (i);
+      view_model_keypoints->push_back (model_point);
+    }
+    pcl::transformPointCloud (*view_model_keypoints, *off_scene_model_keypoints, Eigen::Vector3f (-1,0,0), Eigen::Quaternionf (1, 0, 0, 0));
   }
 
   if (show_keypoints_)
   {
-    pcl::visualization::PointCloudColorHandlerCustom<PointType> scene_keypoints_color_handler (scene_keypoints, 0, 0, 255);
-    viewer.addPointCloud (scene_keypoints, scene_keypoints_color_handler, "scene_keypoints");
-    viewer.setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 5, "scene_keypoints");
+    pcl::PointCloud<PointType>::Ptr view_scene_keypoints(new pcl::PointCloud<PointType> ());
+    for (size_t i = 0; i < scene_keypoints->size(); ++i)
+    {
+      PointType& scene_point = scene_keypoints->at (i);
+      view_scene_keypoints->push_back (scene_point);
+    }
+    pcl::visualization::PointCloudColorHandlerCustom<PointType> scene_keypoints_color_handler (view_scene_keypoints, 0, 0, 255);
+    viewer.addPointCloud (view_scene_keypoints, scene_keypoints_color_handler, "view_scene_keypoints");
+    viewer.setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 5, "view_scene_keypoints");
 
-    pcl::visualization::PointCloudColorHandlerCustom<PointType> off_scene_model_keypoints_color_handler (off_scene_model_keypoints, 0, 0, 255);
-    viewer.addPointCloud (off_scene_model_keypoints, off_scene_model_keypoints_color_handler, "off_scene_model_keypoints");
-    viewer.setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 5, "off_scene_model_keypoints");
+    pcl::PointCloud<PointType>::Ptr view_model_keypoints(new pcl::PointCloud<PointType> ());
+    for (size_t i = 0; i < off_scene_model_keypoints->size(); ++i)
+    {
+      PointType& model_point = off_scene_model_keypoints->at (i);
+      view_model_keypoints->push_back (model_point);
+    }
+    pcl::visualization::PointCloudColorHandlerCustom<PointType> model_keypoints_color_handler (view_model_keypoints, 0, 0, 255);
+    viewer.addPointCloud (view_model_keypoints, model_keypoints_color_handler, "view_model_keypoints");
+    viewer.setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 5, "view_model_keypoints");
   }
 
   for (size_t i = 0; i < rototranslations.size (); ++i)
   {
+    pcl::PointCloud<PointType>::Ptr view_model(new pcl::PointCloud<PointType> ());
+    for (size_t i = 0; i < model->size(); ++i)
+    {
+      PointType& model_point = model->at (i);
+      view_model->push_back (model_point);
+    }
+
     pcl::PointCloud<PointType>::Ptr rotated_model (new pcl::PointCloud<PointType> ());
-    pcl::transformPointCloud (*model, *rotated_model, rototranslations[i]);
+    pcl::transformPointCloud (*view_model, *rotated_model, rototranslations[i]);
 
     std::stringstream ss_cloud;
     ss_cloud << "instance" << i;
