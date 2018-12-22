@@ -1,6 +1,8 @@
 /// @file
 
+#include <algorithm>
 #include <iostream>
+#include <string>
 
 namespace {
 
@@ -33,13 +35,13 @@ namespace {
 /// @brief 実行処理
 bool run(std::istream& is, std::ostream& os)
 {
-  int x;
-  int y;
-  is >> x >> y;
+  const char SEARCH_CHAR('2');
+  std::string n;
+  is >> n;
 
-  const int COST = x + y / 2;
-  os << COST << "\n";
-
+  const std::size_t COUNT
+    = std::count(n.begin(), n.end(), SEARCH_CHAR);
+  os << COUNT << '\n';
   return true;
 }
 }  // unnamed namespace
