@@ -1,8 +1,6 @@
 /// @file
 
-#include <cmath>
 #include <iostream>
-#include <map>
 #include <vector>
 
 namespace {
@@ -36,27 +34,22 @@ namespace {
 /// @brief 実行処理
 bool run(std::istream& is, std::ostream& os)
 {
-  const double GRAD_TEMP(6E-3);
-
   int n;
-  is >> n;
+  int h;
+  int w;
+  is >> n >> h >> w;
 
-  int t;
-  int a;
-  is >> t >> a;
+  std::vector<std::pair<int, int>> ab(n);
+  for (int i = 0; i < n; ++i) is >> ab[i].first >> ab[i].second;
 
-  std::vector<int> hArray(n);
-  for (auto& v: hArray) is >> v;
-
-  // 指定した気温との誤差を算出
-  std::map<double, int> epsMap;
-  for (std::size_t idx = 0; idx < hArray.size(); ++idx) {
-    const double TEMP = static_cast<double>(t) - hArray[idx] * GRAD_TEMP;
-    const double EPS = std::abs(static_cast<double>(a) - TEMP);
-    epsMap[EPS] = idx;
+  int count(0);
+  for (const auto& v: ab) {
+    if (v.first < h) continue;
+    if (v.second < w) continue;
+    ++count;
   }
 
-  os << epsMap.begin()->second + 1 << "\n";
+  os << count << "\n";
 
   return true;
 }
