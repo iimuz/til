@@ -1,8 +1,8 @@
 /// @file
 
+#include <algorithm>
 #include <iostream>
-#include <map>
-#include <string>
+#include <vector>
 
 namespace {
 
@@ -35,12 +35,21 @@ namespace {
 /// @brief 実行処理
 bool run(std::istream& is, std::ostream& os)
 {
-  int h;
-  int w;
-  int k;
-  is >> h >> w >> k;
+  const std::string WINNER_YOU("first");
+  const std::string WINNER_RUNRUN("second");
 
-  os << "test" << "\n";
+  long n;
+  is >> n;
+
+  std::vector<long> a(n);
+  for (long i = 0; i < n; ++i) is >> a[i];
+
+  const long MIN_VAL = *std::min_element(a.begin(), a.end());
+
+  const std::string* WINNER = &WINNER_YOU;
+  if (MIN_VAL % 2 == 0) WINNER = &WINNER_RUNRUN;
+
+  os << *WINNER << "\n";
 
   return true;
 }
