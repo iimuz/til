@@ -40,8 +40,10 @@ INSTANTIATE_TEST_CASE_P(
     normal,
     ExampleTest,
     testing::Values(
-      Node{"example1", "2 3\n1 32\n2 63\n1 12\n", "000001000002\n000002000001\n000001000001\n"},
-      Node{"example2", "2 3\n2 55\n2 77\n2 99\n", "000002000001\n000002000002\n000002000003\n"}
+      Node{"example1", "3 24\n", "2\n"},
+      Node{"example2", "5 1\n", "1\n"},
+      Node{"example3", "1 111\n", "111\n"},
+      Node{"example4", "4 972439611840\n", "206\n"}
     )
 );
 

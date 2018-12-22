@@ -1,10 +1,7 @@
 /// @file
 
-#include <iomanip>
+#include <cmath>
 #include <iostream>
-#include <map>
-#include <sstream>
-#include <vector>
 
 namespace {
 
@@ -37,44 +34,22 @@ namespace {
 /// @brief 実行処理
 bool run(std::istream& is, std::ostream& os)
 {
-  int n;
-  int m;
-  is >> n >> m;
+  typedef long Num_t;
 
-  // 県番号、 誕生年
-  std::vector<std::pair<int, int>> cityList(m);
-  for (auto& v: cityList) is >> v.first >> v.second;
+  Num_t n;
+  Num_t p;
+  is >> n >> p;
 
-  // 県番号、 誕生年、 市番号
-  std::map<int, std::map<int, int>> prefList;
-  for (std::size_t idx = 0; idx < cityList.size(); ++idx) {
-    const auto& city = cityList[idx];
-    prefList[city.first][city.second] = idx;
+  // n 乗したときに p を超えない最大数を求める
+  Num_t maxNum = static_cast<Num_t>(std::ceil(std::pow(p, 1.0 / n)));
+
+  // 最大数から逆側にあまりがなくなる値を求める
+  Num_t divisor(maxNum);
+  for (; divisor > 0; --divisor) {
+    if (p % static_cast<Num_t>(std::pow(divisor, n)) == 0) break;
   }
 
-  // map によって並び替えられた順に市番号を振っていく
-  std::vector<std::string> cityNumbers(m);
-  for (const auto& pref: prefList) {
-    int num(1);
-    for (const auto& city: pref.second) {
-      std::ostringstream ss;
-      ss << std::setw(6) << std::setfill('0') << pref.first;
-      const std::string PREF_STR(ss.str());
-
-      ss.str("");
-      ss.clear(std::stringstream::goodbit);
-
-      ss << std::setw(6) << std::setfill('0') << num;
-      const std::string CITY_STR(ss.str());
-
-      cityNumbers[city.second] = PREF_STR + CITY_STR;
-
-      ++num;
-    }
-  }
-
-  // 出力
-  for (const auto& v: cityNumbers) os << v << "\n";
+  os << divisor << '\n';
 
   return true;
 }
