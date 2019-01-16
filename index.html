@@ -12,6 +12,14 @@
       <h1 class="title">A3RT Text summarization API Sample (Travis Test)</h1>
       <input class="input" type="text" placeholder="API Key">
       <textarea class="textarea" placeholder="Input sentences."></textarea>
+      number of sentence after summarization: 
+      <div class="select"><select>
+        <script>
+          for (i = 1; i <= 10; ++i) {
+            document.write('<option>' + i + '</option>')
+          }
+        </script>
+      </select></div>
       <a class="button is-primary">Summarize</a>
       <div class="box" id="result" style="margin-top: 20px">Output</div>
     </div>
@@ -20,12 +28,14 @@
     document.querySelector(".button").addEventListener("click", function () {
       const url = "https://api.a3rt.recruit-tech.co.jp/text_summarization/v1/"
       const text = document.querySelector('textarea').value;
+      const num = document.querySelector('select').value;
       const apikey = document.querySelector('input').value;
+      console.log(num);
 
       let formdata = new FormData();
       formdata.append('apikey', apikey);
       formdata.append('sentences', text);
-      formdata.append('linenumber', 3);
+      formdata.append('linenumber', num);
 
       fetch(url ,{
         method: 'post',
