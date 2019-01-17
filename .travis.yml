@@ -1,0 +1,20 @@
+branches:
+  only:
+    - chore/travis-setting
+
+script:
+  - echo "no build process."
+
+after_success:
+  - openssl aes-256-cbc -K $encrypted_9ca81b5594f5_key -iv $encrypted_9ca81b5594f5_iv -in travis_key.enc -out ~/.ssh/id_rsa -d
+  - chmod 600 ~/.ssh/id_rsa
+  - echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+  - git config --global user.email "travis-ci@example.com"
+  - git config --global user.name "travis"
+  - git clone -b gh-pages git@github.com:iimuz/a3rt-text-summarization-sample.git
+  - cd a3rt-text-summarization-sample
+  - rm -rf ./*
+  - cp ../index.html
+  - git add --all
+  - git commit -m "by Travis CI (JOB $TRAVIS_JOB_NUMBER)"
+  - git push origin gh-pages
