@@ -1,6 +1,6 @@
 branches:
   only:
-    - chore/travis-setting
+    - master
 
 script:
   - echo "no build process."
