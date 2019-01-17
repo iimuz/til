@@ -12,9 +12,12 @@ after_success:
   - git config --global user.email "travis-ci@example.com"
   - git config --global user.name "travis"
   - git clone -b gh-pages git@github.com:iimuz/a3rt-text-summarization-sample.git
+  - ls -la ./
   - cd a3rt-text-summarization-sample
+  - ls -la ./
   - rm -rf ./*
   - cp ../index.html
+  - ls -la ./
   - git add --all
   - git commit -m "by Travis CI (JOB $TRAVIS_JOB_NUMBER)"
   - git push origin gh-pages
