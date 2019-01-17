@@ -9,41 +9,55 @@
   <body>
   <section class="section">
     <div class="container">
-      <h1 class="title">A3RT Text summarization API Sample (Travis Test)</h1>
-      <input class="input" type="text" placeholder="API Key">
-      <textarea class="textarea" placeholder="Input sentences."></textarea>
-      number of sentence after summarization: 
-      <div class="select"><select>
+      <h1 class="title">A3RT Text summarization API Sample</h1>
+      <input class="input" type="text" id="apikey" placeholder="API Key">
+      <textarea class="textarea" id="text" placeholder="Input sentences."></textarea>
+      <div class="select"><select id="num">
         <script>
           for (i = 1; i <= 10; ++i) {
-            document.write('<option>' + i + '</option>')
+            document.write('<option>' + i + '</option>');
           }
         </script>
       </select></div>
-      <a class="button is-primary">Summarize</a>
+      <a class="button is-primary" id="summarize">Summarize</a>
       <div class="box" id="result" style="margin-top: 20px">Output</div>
+      <div class="content">
+        Response status: <div id="res-code"></div>
+        Response message: <div id="res-msg"></div>
+      </div>
     </div>
   </section>
   <script>
-    document.querySelector(".button").addEventListener("click", function () {
-      const url = "https://api.a3rt.recruit-tech.co.jp/text_summarization/v1/"
-      const text = document.querySelector('textarea').value;
-      const num = document.querySelector('select').value;
-      const apikey = document.querySelector('input').value;
-      console.log(num);
+    document.getElementById('summarize').addEventListener("click", function () {
+      const url = 'https://api.a3rt.recruit-tech.co.jp/text_summarization/v1/';
+      const text = document.getElementById('text').value;
+      const num = document.getElementById('num').value;
+      const apikey = document.getElementById('apikey').value;
 
       let formdata = new FormData();
       formdata.append('apikey', apikey);
       formdata.append('sentences', text);
       formdata.append('linenumber', num);
+      console.log(...formdata.entries())
+
+      document.getElementById('res-msg').innerHTML = '';
+      document.getElementById('res-code').innerHTML = '';
+      document.getElementById('result').innerHTML = '';
 
       fetch(url ,{
         method: 'post',
         body: formdata,
-      }).then(response => {
+      })
+      .catch(err => console.log(err))
+      .then(response => {
+        console.log(response)
         response.json().then(data => {
           console.log(data)
-          document.querySelector("#result").innerHTML = data.summary
+          document.getElementById('res-msg').innerHTML = data.message;
+          document.getElementById('res-code').innerHTML = data.status;
+          if (response.ok) {
+            document.getElementById('result').innerHTML = data.summary.join('。') + '。';
+          }
         });
       });
     }, false);
