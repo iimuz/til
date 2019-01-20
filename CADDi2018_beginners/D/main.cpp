@@ -44,10 +44,10 @@ bool run(std::istream& is, std::ostream& os)
   std::vector<long> a(n);
   for (long i = 0; i < n; ++i) is >> a[i];
 
-  const long MIN_VAL = *std::min_element(a.begin(), a.end());
+  auto itOdd = std::find_if(a.begin(), a.end(), [](long val) { return val % 2; });
 
   const std::string* WINNER = &WINNER_YOU;
-  if (MIN_VAL % 2 == 0) WINNER = &WINNER_RUNRUN;
+  if (itOdd == a.end()) WINNER = &WINNER_RUNRUN;
 
   os << *WINNER << "\n";
 
