@@ -25,10 +25,11 @@
       recognition.onresult = function(event){
         for (var i = event.resultIndex; i < event.results.length; i++){
           for (var j = 0; j < event.results[i].length; j++){
+            const buff = 'Score: ' + event.results[i][j].confidence + ' Results: ' + event.results[i][j].transcript;
             if (event.results[i].isFinal) {
-              document.getElementById('result').innerHTML += event.results[i][j].transcript;
+              document.getElementById('result').innerHTML += buff + '<br />';
             } else {
-              document.getElementById('interim').innerHTML = 'Score: ' + event.results[i][j].confidence + ' Results: ' + event.results[i][j].transcript + '<br />';
+              document.getElementById('interim').innerHTML = buff;
             }
           }
         }
