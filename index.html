@@ -25,7 +25,7 @@
       recognition.onresult = function(event){
         for (var i = event.resultIndex; i < event.results.length; i++){
           for (var j = 0; j < event.results[i].length; j++){
-            if (event.results[0].isFinal) {
+            if (event.results[i].isFinal) {
               document.getElementById('result').innerHTML += event.results[i][j].transcript;
             } else {
               document.getElementById('interim').innerHTML = 'Score: ' + event.results[i][j].confidence + ' Results: ' + event.results[i][j].transcript + '<br />';
