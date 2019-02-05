@@ -32,7 +32,7 @@
         <input class="input" type="text" id="apikey" placeholder="API Key">
         <br />
         Summarize Text:
-        <div class="box" id="result" style="margin-top: 20px"></div>
+        <div class="box" id="summary" style="margin-top: 20px"></div>
         <div class="content">
           Response status: <div id="res-code"></div>
           Response message: <div id="res-msg"></div>
@@ -52,7 +52,7 @@
             if (event.results[i].isFinal) {
               document.getElementById('result').innerHTML += buff + '<br />';
               summarize_text_list.push(event.results[i][j].transcript);
-              if (summarize_text_list.length > document.getElementById('num').value) {
+              if (summarize_text_list.length >= (document.getElementById('num').value * 2)) {
                 summarize_start()
               }
             } else {
@@ -105,7 +105,7 @@
         console.log(...formdata.entries())
         document.getElementById('res-msg').innerHTML = '';
         document.getElementById('res-code').innerHTML = '';
-        document.getElementById('result').innerHTML = '';
+        document.getElementById('summary').innerHTML = '';
         fetch(url ,{
           method: 'post',
           body: formdata,
@@ -118,7 +118,7 @@
             document.getElementById('res-msg').innerHTML = data.message;
             document.getElementById('res-code').innerHTML = data.status;
             if (response.ok) {
-              document.getElementById('result').innerHTML = data.summary.join('。') + '。';
+              document.getElementById('summary').innerHTML = data.summary.join('。') + '。';
               summarize_text_list = data.summary;
             }
           });
