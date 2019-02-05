@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Speech Recognition API Sample</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css">
+  </head>
+  <body>
+    <section class="section">
+      <div class="container">
+        <h1 class="title">Speech Recognition API Sample</h1>
+        <a class="button is-primary" id="record" onclick="recognition.start();">Record</a>
+        <a class="button is-primary" id="rec-end" onclick="recognition.stop();">Stop</a>
+        <div class="box" id="status">Status</div>
+        Interim Results: <div class="box" id="interim"></div>
+        Results: <div class="box" id="result" style="margin-top: 20px"></div>
+      </div>
+
+      <br />
+      <br />
+
+      <div class="container">
+        <a class="button is-primary" id="summarize">Summarize</a>
+        <div class="select"><select id="num">
+          <script>
+            for (i = 2; i <= 5; ++i) {
+              document.write('<option>' + i + '</option>');
+            }
+          </script>
+        </select></div>
+        <input class="input" type="text" id="apikey" placeholder="API Key">
+        <br />
+        Summarize Text:
+        <div class="box" id="result" style="margin-top: 20px"></div>
+        <div class="content">
+          Response status: <div id="res-code"></div>
+          Response message: <div id="res-msg"></div>
+        </div>
+      </div>
+    </section>
+    <script>
+      // 認識用インスタンス生成
+      var recognition = new window.webkitSpeechRecognition() || window.SpeechRecognition();
+      // var recognition = new window.webkitSpeechRecognition();
+      recognition.lang = "ja-JP";  // 日本語を認識する
+      summarize_text_list = [];
+      recognition.onresult = function(event){
+        for (var i = event.resultIndex; i < event.results.length; i++){
+          for (var j = 0; j < event.results[i].length; j++){
+            const buff = 'Score: ' + event.results[i][j].confidence + ' Results: ' + event.results[i][j].transcript;
+            if (event.results[i].isFinal) {
+              document.getElementById('result').innerHTML += buff + '<br />';
+              summarize_text_list.push(event.results[i][j].transcript);
+              if (summarize_text_list.length > document.getElementById('num').value) {
+                summarize_start()
+              }
+            } else {
+              document.getElementById('interim').innerHTML = buff;
+            }
+          }
+        }
+      };
+      // 設定など
+      recognition.continuous = true;      // 連続音声認識を有効化
+      recognition.maxAlternatives = 1;    // 変換候補は一つだけ
+      recognition.interimResults = true;  // 途中経過の結果も取得する
+      recognition.onspeechstart = function(){
+        document.getElementById('status').innerHTML = "Please speech.";
+      };
+      recognition.onspeechend = function() {
+        document.getElementById('status').innerHTML = "End speech.";
+      };
+      recognition.onaudiostart = function(){
+        console.log("Audio start.");
+      };
+      recognition.onaudioend = function(){
+        console.log("Audio end.");
+      };
+      recognition.onsoundstart = function(){
+        console.log("Sound start.");
+      };
+      recognition.onsoundend = function(){
+        console.log("Sound end.");
+      };
+      recognition.onstart = function(){
+        console.log("start.");
+      };
+      recognition.onerror = function(){
+        document.getElementById('status').innerHTML = "error.";
+      };
+      recognition.onnomatch = function(){
+        document.getElementById('status').innerHTML = "cannot recognize speech.";
+      };
+
+      function summarize_start() {
+        const url = 'https://api.a3rt.recruit-tech.co.jp/text_summarization/v1/';
+        const text = summarize_text_list.join('。') + '。';
+        const num = document.getElementById('num').value;
+        const apikey = document.getElementById('apikey').value;
+        let formdata = new FormData();
+        formdata.append('apikey', apikey);
+        formdata.append('sentences', text);
+        formdata.append('linenumber', num);
+        console.log(...formdata.entries())
+        document.getElementById('res-msg').innerHTML = '';
+        document.getElementById('res-code').innerHTML = '';
+        document.getElementById('result').innerHTML = '';
+        fetch(url ,{
+          method: 'post',
+          body: formdata,
+        })
+        .catch(err => console.log(err))
+        .then(response => {
+          console.log(response)
+          response.json().then(data => {
+            console.log(data)
+            document.getElementById('res-msg').innerHTML = data.message;
+            document.getElementById('res-code').innerHTML = data.status;
+            if (response.ok) {
+              document.getElementById('result').innerHTML = data.summary.join('。') + '。';
+              summarize_text_list = data.summary;
+            }
+          });
+        });
+      };
+    </script>
+  </body>
+</html>
