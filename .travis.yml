@@ -28,5 +28,5 @@ after_success:
   - git config --global credential.https://source.developers.google.com.helper gcloud.sh
   - git remote add google https://source.developers.google.com/p/${GCP_PROJECT_ID}/r/${GCP_REPOSITORY}
   - git push google master
-  - gcloud --quiet functions ${GCP_FUNCTION} --trigger-http
+  - gcloud --quiet beta functions ${GCP_FUNCTION} --trigger-http
 
