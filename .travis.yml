@@ -1,0 +1,31 @@
+sudo: false
+language: python
+cache:
+  directories:
+    - "$HOME/google-cloud-sdk/"
+env:
+  - PATH=$PATH:${HOME}/google-cloud-sdk/bin
+  - CLOUDSDK_CORE_DISABLE_PROMPTS=1
+branches:
+  only:
+    - master
+
+before_install:
+  - openssl aes-256-cbc -K $encrypted_9ca81b5594f5_key -iv $encrypted_9ca81b5594f5_iv -in gcloud-service-key.json.enc -out gcloud-service-key.json -d
+  - if [ ! -d ${HOME}/google-cloud-sdk ]; then
+       curl https://sdk.cloud.google.com | bash;
+    fi
+  - gcloud auth activate-service-account --key-file gcloud-service-key.json
+  - gcloud --quiet config set project ${GCP_PROJECT_ID}
+  - gcloud --quiet config set compute/zone ${GCP_ZONE}
+
+script:
+  - echo "no build process."
+
+after_success:
+  - git config --global user.email "travis-ci@example.com"
+  - git config --global user.name "travis"
+  - gcloud init && git config --global credential.https://source.developers.google.com.helper gcloud.sh
+  - git remote add google https://source.developers.google.com/p/${GCP_PROJECT_ID}/r/${GCP_REPOSITORY}
+  - git push google master
+
