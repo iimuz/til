@@ -15,7 +15,7 @@ before_install:
   - if [ ! -d ${HOME}/google-cloud-sdk ]; then
        curl https://sdk.cloud.google.com | bash;
     fi
-  - gcloud auth activate-service-account --key-file gcloud-service-key.json
+  - gcloud --quiet auth activate-service-account --key-file gcloud-service-key.json
   - gcloud --quiet config set project ${GCP_PROJECT_ID}
   - gcloud --quiet config set compute/zone ${GCP_ZONE}
 
@@ -25,7 +25,7 @@ script:
 after_success:
   - git config --global user.email "travis-ci@example.com"
   - git config --global user.name "travis"
-  - gcloud init && git config --global credential.https://source.developers.google.com.helper gcloud.sh
+  - git config --global credential.https://source.developers.google.com.helper gcloud.sh
   - git remote add google https://source.developers.google.com/p/${GCP_PROJECT_ID}/r/${GCP_REPOSITORY}
   - git push google master
 
