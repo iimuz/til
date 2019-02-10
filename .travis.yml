@@ -18,6 +18,8 @@ before_install:
   - gcloud --quiet auth activate-service-account --key-file gcloud-service-key.json
   - gcloud --quiet config set project ${GCP_PROJECT_ID}
   - gcloud --quiet config set compute/zone ${GCP_ZONE}
+  - gcloud --quiet config set compute/region ${GCP_ZONE}
+  - gcloud --quiet config set account ${GCP_SERVICE_ACCOUNT}
 
 script:
   - echo "no build process."
