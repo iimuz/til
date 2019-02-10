@@ -16,9 +16,9 @@ before_install:
   - openssl aes-256-cbc -K $encrypted_9ca81b5594f5_key -iv $encrypted_9ca81b5594f5_iv -in gcloud-service-key.json.enc -out gcloud-service-key.json -d
   - gcloud --version
   - if [ ! -d ${HOME}/google-cloud-sdk ]; then
-  -   rm -rf ${HOME}/google-cloud-sdk
-  -   curl https://sdk.cloud.google.com | bash;
-  - fi
+      rm -rf ${HOME}/google-cloud-sdk;
+      curl https://sdk.cloud.google.com | bash;
+    fi
   - source ${HOME}/google-cloud-sdk/path.bash.inc
   - gcloud --version
   - gcloud --quiet auth activate-service-account --key-file gcloud-service-key.json
