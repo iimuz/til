@@ -30,5 +30,5 @@ after_success:
   - git config --global credential.https://source.developers.google.com.helper gcloud.sh
   - git remote add google https://source.developers.google.com/p/${GCP_PROJECT_ID}/r/${GCP_REPOSITORY}
   - git push google master
-  - gcloud --quiet beta functions deploy ${GCP_FUNCTION} --trigger-http --region=${GCP_ZONE} --source=https://source.developers.google.com/projects/${GCP_PROJECT_ID}/repos/${GCP_FUNCTION}/moveable-aliases/master/paths// --service-account=${GCP_SERVICE_ACCOUNT}
+  - gcloud --quiet alpha functions deploy ${GCP_FUNCTION} --trigger-http --region=${GCP_ZONE} --source=https://source.developers.google.com/projects/${GCP_PROJECT_ID}/repos/${GCP_FUNCTION}/moveable-aliases/master/paths// --service-account=${GCP_SERVICE_ACCOUNT}
 
