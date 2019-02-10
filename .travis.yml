@@ -14,12 +14,11 @@ branches:
 
 before_install:
   - openssl aes-256-cbc -K $encrypted_9ca81b5594f5_key -iv $encrypted_9ca81b5594f5_iv -in gcloud-service-key.json.enc -out gcloud-service-key.json -d
-  # - if [ ! -d ${HOME}/google-cloud-sdk ]; then
-  # -    curl https://sdk.cloud.google.com | bash;
-  # - fi
   - gcloud --version
-  - rm -rf ${HOME}/google-cloud-sdk
-  - curl https://sdk.cloud.google.com | bash;
+  - if [ ! -d ${HOME}/google-cloud-sdk ]; then
+  -   rm -rf ${HOME}/google-cloud-sdk
+  -   curl https://sdk.cloud.google.com | bash;
+  - fi
   - source ${HOME}/google-cloud-sdk/path.bash.inc
   - gcloud --version
   - gcloud --quiet auth activate-service-account --key-file gcloud-service-key.json
@@ -37,5 +36,5 @@ after_success:
   - git config --global credential.https://source.developers.google.com.helper gcloud.sh
   - git remote add google https://source.developers.google.com/p/${GCP_PROJECT_ID}/r/${GCP_REPOSITORY}
   - git push google master
-  - gcloud --quiet alpha functions deploy ${GCP_FUNCTION} --trigger-http --region=${GCP_ZONE} --source=https://source.developers.google.com/projects/${GCP_PROJECT_ID}/repos/${GCP_FUNCTION}/moveable-aliases/master/paths// --service-account=${GCP_SERVICE_ACCOUNT}
+  - gcloud --quiet functions deploy ${GCP_FUNCTION} --trigger-http --region=${GCP_ZONE} --source=https://source.developers.google.com/projects/${GCP_PROJECT_ID}/repos/${GCP_FUNCTION}/moveable-aliases/master/paths// --service-account=${GCP_SERVICE_ACCOUNT}
 
