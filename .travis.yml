@@ -15,6 +15,7 @@ before_install:
   - if [ ! -d ${HOME}/google-cloud-sdk ]; then
        curl https://sdk.cloud.google.com | bash;
     fi
+  - gcloud --version
   - gcloud --quiet auth activate-service-account --key-file gcloud-service-key.json
   - gcloud --quiet config set project ${GCP_PROJECT_ID}
   - gcloud --quiet config set compute/zone ${GCP_ZONE}
