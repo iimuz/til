@@ -2,9 +2,9 @@ sudo: false
 language: python
 python:
   - 3.6
-# cache:
-#   directories:
-#     - "$HOME/google-cloud-sdk/"
+cache:
+  directories:
+    - "$HOME/google-cloud-sdk/"
 env:
   - PATH=$PATH:${HOME}/google-cloud-sdk/bin
   - CLOUDSDK_CORE_DISABLE_PROMPTS=1
@@ -14,12 +14,13 @@ branches:
 
 before_install:
   - openssl aes-256-cbc -K $encrypted_9ca81b5594f5_key -iv $encrypted_9ca81b5594f5_iv -in gcloud-service-key.json.enc -out gcloud-service-key.json -d
-  - gcloud --version
-  - rm -rf ${HOME}/google-cloud-sdk
-  - curl https://sdk.cloud.google.com -o $HOME/install-gcloud.sh
-  - yes | bash $HOME/install-gcloud.sh
+  - gcloud version
+  - if [ ! -d $HOME/google-cloud-sdk/bin ]; then
+      rm -rf ${HOME}/google-cloud-sdk;
+      curl https://sdk.cloud.google.com | bash > /dev/null;
+    fi
   - source ${HOME}/google-cloud-sdk/path.bash.inc
-  - gcloud --version
+  - gcloud version
   - gcloud --quiet auth activate-service-account --key-file gcloud-service-key.json
   - gcloud --quiet config set project ${GCP_PROJECT_ID}
   - gcloud --quiet config set compute/zone ${GCP_ZONE}
@@ -35,5 +36,5 @@ after_success:
   - git config --global credential.https://source.developers.google.com.helper gcloud.sh
   - git remote add google https://source.developers.google.com/p/${GCP_PROJECT_ID}/r/${GCP_REPOSITORY}
   - git push google master
-  - gcloud --quiet functions beta deploy ${GCP_FUNCTION} --trigger-http --region=${GCP_ZONE} --source=https://source.developers.google.com/projects/${GCP_PROJECT_ID}/repos/${GCP_FUNCTION}/moveable-aliases/master/paths// --service-account=${GCP_SERVICE_ACCOUNT}
+  - gcloud --quiet beta functions deploy ${GCP_FUNCTION} --trigger-http --region=${GCP_ZONE} --source=https://source.developers.google.com/projects/${GCP_PROJECT_ID}/repos/${GCP_FUNCTION}/moveable-aliases/master/paths// --service-account=${GCP_SERVICE_ACCOUNT}
 
