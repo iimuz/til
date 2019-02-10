@@ -16,7 +16,7 @@ before_install:
   - openssl aes-256-cbc -K $encrypted_9ca81b5594f5_key -iv $encrypted_9ca81b5594f5_iv -in gcloud-service-key.json.enc -out gcloud-service-key.json -d
   - gcloud --version
   - rm -rf ${HOME}/google-cloud-sdk
-  - curl https://sdk.cloud.google.com -O $HOME/install-gcloud.sh
+  - curl https://sdk.cloud.google.com -o $HOME/install-gcloud.sh
   - yes | bash $HOME/install-gcloud.sh
   - source ${HOME}/google-cloud-sdk/path.bash.inc
   - gcloud --version
