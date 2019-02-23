@@ -1,6 +1,6 @@
 <template>
   <div class="hello">
-    <h1>A3RT Text summarization API Sample</h1>
+    <h1>A3RT Text Summarization API Sample</h1>
     <input class="input" type="text" id="apikey" placeholder="API Key">
     <textarea class="textarea" id="text" placeholder="Input sentences."></textarea>
     <a class="button is-primary" id="summarize">Summarize</a>
@@ -20,19 +20,6 @@ export default class HelloWorld extends Vue {}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
+<style lang="sass" scoped>
+@import "../../node_modules/bulma/bulma.sass";
 </style>
