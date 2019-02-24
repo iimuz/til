@@ -1,9 +1,13 @@
+language: node_js
+node_js:
+  - "8"
+
 branches:
   only:
     - master
 
 script:
-  - echo "no build process."
+  - yarn build
 
 after_success:
   - openssl aes-256-cbc -K $encrypted_9ca81b5594f5_key -iv $encrypted_9ca81b5594f5_iv -in travis_key.enc -out ~/.ssh/id_rsa -d
@@ -13,8 +17,9 @@ after_success:
   - git config --global user.name "travis"
   - git clone -b gh-pages git@github.com:iimuz/a3rt-text-summarization-sample.git
   - cd a3rt-text-summarization-sample
+  - rm ../dist/*.map
   - rm -rf ./*
-  - cp ../index.html ./
+  - cp -r ../dist/* ./
   - git add --all
   - git commit -m "by Travis CI (JOB $TRAVIS_JOB_NUMBER)"
   - git push origin gh-pages
