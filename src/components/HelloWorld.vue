@@ -14,16 +14,16 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
+import { summarizeController } from '@/summarizeController';
 
 @Component
 export default class HelloWorld extends Vue {
-  private apikey: string = '';
   private inputValue: string = '';
   private resultValue: string = 'Output';
 
-  private summarize(): void {
-    this.resultValue = this.inputValue;
+  private async summarize(): Promise<any> {
+    this.resultValue = await summarizeController(this.inputValue);
   }
 }
 </script>
