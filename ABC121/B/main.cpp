@@ -36,12 +36,26 @@ namespace {
 /// @brief 実行処理
 bool run(std::istream& is, std::ostream& os)
 {
-  int h;
-  int w;
-  int k;
-  is >> h >> w >> k;
+  int n;
+  int m;
+  int c;
+  is >> n >> m >> c;
 
-  os << "test" << "\n";
+  std::vector<int> bList(m);
+  for (auto& v: bList) is >> v;
+
+  int correctAnswerNum(0);
+  for (int i = 0; i < n; ++i) {
+    std::vector<int> aList(m);
+    for (auto& v: aList) is >> v;
+
+    int sum(c);
+    for (int j = 0; j < m; ++j) sum += aList[j] * bList[j];
+
+    if (sum > 0) ++correctAnswerNum;
+  }
+
+  os << correctAnswerNum << "\n";
 
   return true;
 }

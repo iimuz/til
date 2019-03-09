@@ -1,9 +1,9 @@
 /// @file
 
+#include <algorithm>
 #include <iomanip>
 #include <iostream>
 #include <map>
-#include <sstream>
 #include <vector>
 
 namespace {
@@ -37,12 +37,29 @@ namespace {
 /// @brief 実行処理
 bool run(std::istream& is, std::ostream& os)
 {
-  int h;
-  int w;
-  int k;
-  is >> h >> w >> k;
+  long n;
+  long m;
+  is >> n >> m;
 
-  os << "test" << "\n";
+  std::vector<std::pair<long, long>> shopList(n);
+  for (auto& v: shopList) is >> v.first >> v.second;
+
+  std::sort(shopList.begin(), shopList.end());
+
+  long sumMoney(0);
+  long numDrinks(0);
+  for (const auto& shop: shopList) {
+    if (numDrinks + shop.second >= m) {
+      const long BUY_NUM = m - numDrinks;
+      sumMoney += shop.first * BUY_NUM;
+      break;
+    }
+
+    numDrinks += shop.second;
+    sumMoney += shop.first * shop.second;
+  }
+
+  os << sumMoney << "\n";
 
   return true;
 }

@@ -1,7 +1,7 @@
 /// @file
 
 #include <iostream>
-#include <map>
+#include <limits>
 #include <string>
 
 namespace {
@@ -35,12 +35,18 @@ namespace {
 /// @brief 実行処理
 bool run(std::istream& is, std::ostream& os)
 {
-  int h;
-  int w;
-  int k;
-  is >> h >> w >> k;
+  using Numeric_t = unsigned long;
+  const Numeric_t MAX_VALUE = 1e+12;
+  Numeric_t a;
+  Numeric_t b;
+  is >> a >> b;
 
-  os << "test" << "\n";
+  unsigned long fxor(a);
+  for (unsigned long i = a + 1; i <= b; ++i) {
+    fxor ^= i;
+  }
+
+  os << fxor << "\n";
 
   return true;
 }

@@ -33,12 +33,18 @@ namespace {
 /// @brief 実行処理
 bool run(std::istream& is, std::ostream& os)
 {
+  int H;
+  int W;
   int h;
   int w;
-  int k;
-  is >> h >> w >> k;
+  is >> H >> W;
+  is >> h >> w;
 
-  os << "test" << "\n";
+  const int restH = H - h;
+  const int restW = W - w;
+  const int restCell = restH * restW;
+
+  os << restCell << "\n";
 
   return true;
 }
