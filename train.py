@@ -1,5 +1,6 @@
 import pathlib
 import pickle
+from typing import Dict, List
 
 import torch
 from discriminator import Discriminator
@@ -8,13 +9,23 @@ from torch import nn, optim
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
-from typing import Dict, List
+from torchvision.utils import save_image
 
 
 def format_history(d_loss: float, g_loss: float):
     """ 1 回分のデータを整形して返す
     """
     return {"d_loss": d_loss, "g_loss": g_loss}
+
+
+def generate(generator: torch.nn, z_dim: int, image_num: int, is_cuda: bool):
+    """ generator から画像を生成する
+    """
+    z = set_device(torch.rand((image_num, z_dim)), is_cuda)
+    with torch.no_grad():
+        z = Variable(z, volatile=True)
+        samples = generator(z).data.cpu()
+    return samples
 
 
 def get_data_loader(batch_size: int):
@@ -42,12 +53,17 @@ def run():
     learning_rate = 2e-4
     z_dim = 62
     num_epochs = 2
+    checkpoint_save_image_num = 64
     log_dir = pathlib.Path("./logs")
     log_dir.mkdir(exist_ok=True)
 
+    # check cuda
+    is_cuda = torch.cuda.is_available()
+    print(f"cuda state: {is_cuda}")
+
     # initialize network
-    generator = Generator()
-    discriminator = Discriminator()
+    generator = set_device(Generator(), is_cuda)
+    discriminator = set_device(Discriminator(), is_cuda)
 
     # optimizer
     g_optimizer = optim.Adam(
@@ -75,8 +91,13 @@ def run():
             data_loader,
             batch_size,
             z_dim,
+            is_cuda,
         )
         save_checkpoint(discriminator, generator, epoch, log_dir)
+        save_image(
+            generate(generator, z_dim, checkpoint_save_image_num, is_cuda),
+            log_dir.joinpath(f"epoch_{epoch:03}.png"),
+        )
         history.append(format_history(d_loss, g_loss))
         print(f"epoch {epoch}, d_loss: {d_loss:.4}, g_loss: {g_loss:.4}")
 
@@ -113,6 +134,7 @@ def train_one_epoch(
     data_loader: DataLoader,
     batch_size: int,
     z_dim: int,
+    is_cuda: bool,
 ):
     """ Learn 1 epoch.
 
@@ -129,14 +151,16 @@ def train_one_epoch(
         バッチサイズ
     z_dim : int
         入力ランダムベクトルの次元数
+    is_cuda : bool
+        True の場合に、 cuda を利用する
     """
     # 訓練モード
     discriminator.train()
     generator.train()
 
     # ラベル設定
-    label_real = Variable(torch.ones(batch_size, 1))
-    label_fake = Variable(torch.zeros(batch_size, 1))
+    label_real = set_device(Variable(torch.ones(batch_size, 1)), is_cuda)
+    label_fake = set_device(Variable(torch.zeros(batch_size, 1)), is_cuda)
 
     data_size = 0
     d_running_loss = 0
@@ -149,12 +173,12 @@ def train_one_epoch(
 
         # Discriminator が real 画像を real と判定できるか
         d_optimizer.zero_grad()
-        d_real = discriminator(Variable(real_images))
+        d_real = discriminator(Variable(set_device(real_images, is_cuda)))
         d_real_loss = criterion(d_real, label_real)
 
         # Discriminator 用に fake 画像を生成し、
         # Discriminator が fake と判定できるか
-        z = Variable(torch.rand((batch_size, z_dim)))
+        z = Variable(set_device(torch.rand((batch_size, z_dim)), is_cuda))
         fake_images = generator(z)
         d_fake = discriminator(fake_images.detach())
         d_fake_loss = criterion(d_fake, label_fake)
@@ -167,7 +191,7 @@ def train_one_epoch(
 
         # Generator が生成した画像を Discriminator に real と判定させられるか
         g_optimizer.zero_grad()
-        z = Variable(torch.rand((batch_size, z_dim)))
+        z = Variable(set_device(torch.rand((batch_size, z_dim)), is_cuda))
         fake_images = generator(z)
         d_fake = discriminator(fake_images)
         g_loss = criterion(d_fake, label_real)
@@ -179,6 +203,14 @@ def train_one_epoch(
     g_running_loss /= data_size
 
     return d_running_loss, g_running_loss
+
+
+def set_device(src, is_cuda):
+    """ CUDA デバイス対応に変換する
+    """
+    if is_cuda:
+        return src.cuda()
+    return src
 
 
 if __name__ == "__main__":
