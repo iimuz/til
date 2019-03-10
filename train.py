@@ -101,7 +101,6 @@ def parse_arguments() -> Dict[str, any]:
         metavar=None,
     )
     parser.add_argument(
-        "-e",
         "--checkpoint_each",
         action="store",
         nargs=None,
