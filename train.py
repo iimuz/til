@@ -23,7 +23,7 @@ def generate(generator: torch.nn, z_dim: int, image_num: int, is_cuda: bool):
     """
     z = set_device(torch.rand((image_num, z_dim)), is_cuda)
     with torch.no_grad():
-        z = Variable(z, volatile=True)
+        z = Variable(z)
         samples = generator(z).data.cpu()
     return samples
 
@@ -121,7 +121,7 @@ def save_checkpoint(
 def save_history(history: List[Dict[str, str]], log_dir: pathlib.Path) -> None:
     """ save history.
     """
-    with open(log_dir.joinpath("history.pkl", "wb")) as f:
+    with open(log_dir.joinpath("history.pkl"), "wb") as f:
         pickle.dump(history, f)
 
 
