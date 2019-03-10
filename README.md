@@ -34,5 +34,5 @@ notebooks フォルダの下にあります。
 [hokuto]: https://qiita.com/hokuto_HIRANO/items/7381095aaee668513487
 [phyblas]: https://qiita.com/phyblas/items/bcab394e1387f15f66ee
 [taku]: https://qiita.com/taku-buntu/items/0093a68bfae0b0ff879d
-[tsunotsuno]]: https://tsunotsuno.hatenablog.com/entry/dcgan
+[tsunotsuno]: https://tsunotsuno.hatenablog.com/entry/dcgan
 
