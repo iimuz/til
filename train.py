@@ -150,8 +150,7 @@ def run():
     args.log_dir.mkdir(exist_ok=True)
 
     # check cuda
-    is_cuda = torch.cuda.is_available()
-    is_cuda = is_cuda and args.is_cuda()
+    is_cuda = torch.cuda.is_available() and args.is_cuda
     print(f"cuda state: {is_cuda}")
 
     # initialize network
@@ -188,7 +187,7 @@ def run():
         )
         save_checkpoint(discriminator, generator, epoch, args.log_dir)
         save_image(
-            generate(generator, args.z_dim, args.checkpoint_image_num, is_cuda),
+            generate(generator, args.z_dim, args.checkpoint_images, is_cuda),
             args.log_dir.joinpath(f"epoch_{epoch:03}.png"),
         )
         history.append(format_history(d_loss, g_loss))
