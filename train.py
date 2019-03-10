@@ -12,6 +12,8 @@ from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 from torchvision.utils import save_image
 
+import data_loader
+
 
 def format_history(d_loss: float, g_loss: float):
     """ 1 回分のデータを整形して返す
@@ -123,7 +125,7 @@ def parse_arguments() -> Dict[str, any]:
     return args
 
 
-def get_data_loader(batch_size: int):
+def get_data_loader(batch_size: int) -> DataLoader:
     """ Get dataloader.
 
     Parameters
@@ -131,13 +133,10 @@ def get_data_loader(batch_size: int):
     batch_size : int
         バッチサイズ
     """
-    transform = transforms.Compose([transforms.ToTensor()])
-    dataset = datasets.MNIST(
-        "data/mnist", train=True, download=True, transform=transform
-    )
-    data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+    # loader = data_loader.load_mnist(batch_size)
+    loader = data_loader.load_icons(pathlib.Path('data/icons'), batch_size)
 
-    return data_loader
+    return loader
 
 
 def run():
