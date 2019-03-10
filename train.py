@@ -52,7 +52,7 @@ def run():
     batch_size = 128
     learning_rate = 2e-4
     z_dim = 62
-    num_epochs = 2
+    num_epochs = 25
     checkpoint_save_image_num = 64
     log_dir = pathlib.Path("./logs")
     log_dir.mkdir(exist_ok=True)
