@@ -1,3 +1,4 @@
+import argparse
 import pathlib
 import pickle
 from typing import Dict, List
@@ -28,6 +29,100 @@ def generate(generator: torch.nn, z_dim: int, image_num: int, is_cuda: bool):
     return samples
 
 
+def parse_arguments() -> Dict[str, any]:
+    """ 引数の設定を行います
+    """
+    parser = argparse.ArgumentParser(usage=f"Usage python {__file__}")
+    parser.add_argument(
+        "-b",
+        "--batch_size",
+        action="store",
+        nargs="?",
+        const=128,
+        default=128,
+        type=int,
+        choices=None,
+        dest="batch_size",
+        help="set batch_size",
+        metavar=None,
+    )
+    parser.add_argument(
+        "-l",
+        "--learning_rate",
+        action="store",
+        nargs="?",
+        const=2e-4,
+        default=2e-4,
+        type=float,
+        choices=None,
+        dest="learning_rate",
+        help="set learning rate",
+        metavar=None,
+    )
+    parser.add_argument(
+        "-z",
+        "--z_dim",
+        action="store",
+        nargs="?",
+        const=62,
+        default=62,
+        type=int,
+        choices=None,
+        dest="z_dim",
+        help="set dimension for input vector of generator.",
+        metavar=None,
+    )
+    parser.add_argument(
+        "-e",
+        "--epochs",
+        action="store",
+        nargs="?",
+        const=25,
+        default=25,
+        type=int,
+        choices=None,
+        dest="num_epoch",
+        help="set number of training epoch.",
+        metavar=None,
+    )
+    parser.add_argument(
+        "-d",
+        "--log_dir",
+        action="store",
+        nargs="?",
+        const=pathlib.Path("logs"),
+        default=pathlib.Path("logs"),
+        type=pathlib.Path,
+        choices=None,
+        dest="log_dir",
+        help="set direcotry path of logs.",
+        metavar=None,
+    )
+    parser.add_argument(
+        "-i",
+        "--checkpoint_images",
+        action="store",
+        nargs="?",
+        const=64,
+        default=64,
+        type=int,
+        choices=None,
+        dest="checkpoint_images",
+        help="set number of images created by generator each epoch.",
+        metavar=None,
+    )
+    parser.add_argument(
+        "-c",
+        "--cuda",
+        action="store_true",
+        default=False,
+        dest="is_cuda",
+        help="if set this flag and cuda device is avaliable, use cuda.",
+    )
+    args = parser.parse_args()
+    return args
+
+
 def get_data_loader(batch_size: int):
     """ Get dataloader.
 
@@ -48,17 +143,15 @@ def get_data_loader(batch_size: int):
 def run():
     """ Run training.
     """
-    # hyper parameters
-    batch_size = 128
-    learning_rate = 2e-4
-    z_dim = 62
-    num_epochs = 25
-    checkpoint_save_image_num = 64
-    log_dir = pathlib.Path("./logs")
-    log_dir.mkdir(exist_ok=True)
+    args = parse_arguments()
+    print(f"parameters: {args}")
+
+    # create output folders
+    args.log_dir.mkdir(exist_ok=True)
 
     # check cuda
     is_cuda = torch.cuda.is_available()
+    is_cuda = is_cuda and args.is_cuda()
     print(f"cuda state: {is_cuda}")
 
     # initialize network
@@ -67,21 +160,21 @@ def run():
 
     # optimizer
     g_optimizer = optim.Adam(
-        generator.parameters(), lr=learning_rate, betas=(0.5, 0.999)
+        generator.parameters(), lr=args.learning_rate, betas=(0.5, 0.999)
     )
     d_optimizer = optim.Adam(
-        discriminator.parameters(), lr=learning_rate, betas=(0.5, 0.999)
+        discriminator.parameters(), lr=args.learning_rate, betas=(0.5, 0.999)
     )
 
     # loss
     criterion = nn.BCELoss()
 
     # datasets
-    data_loader = get_data_loader(batch_size)
+    data_loader = get_data_loader(args.batch_size)
 
     # training
     history = []
-    for epoch in range(num_epochs):
+    for epoch in range(args.num_epoch):
         d_loss, g_loss = train_one_epoch(
             discriminator,
             generator,
@@ -89,19 +182,19 @@ def run():
             d_optimizer,
             g_optimizer,
             data_loader,
-            batch_size,
-            z_dim,
+            args.batch_size,
+            args.z_dim,
             is_cuda,
         )
-        save_checkpoint(discriminator, generator, epoch, log_dir)
+        save_checkpoint(discriminator, generator, epoch, args.log_dir)
         save_image(
-            generate(generator, z_dim, checkpoint_save_image_num, is_cuda),
-            log_dir.joinpath(f"epoch_{epoch:03}.png"),
+            generate(generator, args.z_dim, args.checkpoint_image_num, is_cuda),
+            args.log_dir.joinpath(f"epoch_{epoch:03}.png"),
         )
         history.append(format_history(d_loss, g_loss))
         print(f"epoch {epoch}, d_loss: {d_loss:.4}, g_loss: {g_loss:.4}")
 
-    save_history(history, log_dir)
+    save_history(history, args.log_dir)
 
 
 def save_checkpoint(
