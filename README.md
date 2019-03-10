@@ -4,6 +4,22 @@ Implemtation of Deep Convolutional Generative Adversarial Networks (DCGAN) using
 
 PyTorch を利用して DCGAN を実装してみるサンプルになります。
 
+## Usage
+
+```sh
+python train.py \
+  --batch_size 127 \
+  --learning_rate 2e-4 \
+  --epochs 25 \
+  --z_dim 62 \
+  --checkpoint_images 64 \
+  --log_dir "logs" \
+  --cuda
+```
+
+実際に Google Colaboratory を利用して実行した際の ipynb は、
+notebooks フォルダの下にあります。
+
 ## References
 
 * [arXiv: Unsupervised Representation Learning with Deep Convolutional Generative Adversarial Networks][arxiv]
