@@ -41,12 +41,30 @@ bool run(std::istream& is, std::ostream& os)
   Numeric_t b;
   is >> a >> b;
 
-  unsigned long fxor(a);
-  for (unsigned long i = a + 1; i <= b; ++i) {
-    fxor ^= i;
-  }
+  auto f = [](Numeric_t num) -> Numeric_t {
+    Numeric_t fxor (0);
 
-  os << fxor << "\n";
+    if (((num - 1) / 2) % 2 == 0) fxor |= 0x01;
+
+    for (Numeric_t i = 1, N = sizeof(Numeric_t) * 8, v = 2; i < N; ++i, v = v << 1) {
+      if (num < (v - 1)) break;
+
+      const Numeric_t REST = num - (v - 1);
+      const Numeric_t DIV_NUM = REST / v;
+      const Numeric_t MOD_NUM = REST % v;
+      if (DIV_NUM % 2 == 1) continue;
+      if (MOD_NUM % 2 == 0) continue;
+      fxor |= v;
+    }
+
+    return fxor;
+  };
+
+  const Numeric_t A_XOR = f(a - 1);
+  const Numeric_t B_XOR = f(b);
+  const Numeric_t F_XOR = B_XOR ^ A_XOR;
+
+  os << F_XOR << "\n";
 
   return true;
 }
