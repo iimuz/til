@@ -1,7 +1,7 @@
 version: "3.3"
 services:
   dev:
-    container_name: at-tenka1-d-dev
+    container_name: atcoder_dev
     network_mode: none
     image: iimuz/cpp-dev:v3.8.0-atcoder1
     environment:
@@ -9,13 +9,13 @@ services:
       GROUP_ID: ${GROUP_ID}
       TZ: ${TIME_ZONE}
     volumes:
-      - src:/src/github.com/iimuz/atcoder
-    working_dir: /src/github.com/iimuz/atcoder/tenka1Beginer_2018/D
+      - src:/src:rw
+    working_dir: /src/tenka1Beginer_2018/
     command: ash
 
 volumes:
   src:
     driver_opts:
       type: none
-      device: ${PWD}/../../../../
+      device: ${PWD}/../../
       o: bind

@@ -32,62 +32,61 @@ int main()
 
 namespace {
 
-typedef int val_t;
-typedef std::vector<val_t> arr_t;
+using val_t = long;
+using arr_t = std::vector<val_t>;
 
 /// @brief 実行処理
 bool run(std::istream& is, std::ostream& os)
 {
   // 入力データの読み込み
-  int n;
+  long n;
   is >> n;
 
   arr_t arr(n);
   for(auto& v: arr) is >> v;
 
-  if (n == 2) {
-    os << std::abs(arr.front() - arr.back()) << "\n";
-    return true;
-  }
-
   // 昇順ソート
   std::sort(arr.begin(), arr.end());
 
-  if (n == 3) {
-    val_t dst(0);
-    if ((arr[0] - arr[1]) == 0) {
-      dst += std::abs(arr[2] - arr[0]);
-      dst += std::abs(arr[2] - arr[1]);
-    } else {
-      dst += std::abs(arr[0] - arr[1]);
-      dst += std::abs(arr[0] - arr[2]);
+  val_t leftValue = arr.front();
+  val_t rightValue = arr.back();
+  val_t diffSum = rightValue - leftValue;
+  for (std::size_t first = 1, last = arr.size() - 2; first <= last;) {
+    const val_t ARR_FIRST = arr[first];
+    const val_t ARR_LAST = arr[last];
+
+    const val_t LEFT_FIRST = std::abs(leftValue - ARR_FIRST);
+    const val_t LEFT_LAST = std::abs(leftValue - ARR_LAST);
+    const val_t RIGHT_FIRST = std::abs(rightValue - ARR_FIRST);
+    const val_t RIGHT_LAST = std::abs(rightValue - ARR_LAST);
+
+    const val_t LEFT_MAX = std::max(LEFT_FIRST, LEFT_LAST);
+    const val_t RIGHT_MAX = std::max(RIGHT_FIRST, RIGHT_LAST);
+    if (LEFT_MAX > RIGHT_MAX) {
+      diffSum += LEFT_MAX;
+      if (LEFT_FIRST > LEFT_LAST) {
+        leftValue = ARR_FIRST;
+        ++first;
+        continue;
+      }
+
+      leftValue = ARR_LAST;
+      --last;
+      continue;
     }
-    os << dst << "\n";
-    return true;
+
+    diffSum += RIGHT_MAX;
+    if (RIGHT_FIRST > RIGHT_LAST) {
+      rightValue = ARR_FIRST;
+      ++first;
+      continue;
+    }
+
+    rightValue = ARR_LAST;
+    --last;
   }
 
-  if ((arr[1] - arr[0]) < (arr[n - 1] - arr[n - 2])) std::reverse(arr.begin(), arr.end());
-
-  arr_t::const_iterator current = arr.begin();
-  arr_t::const_iterator target = arr.end() - 1;
-
-  val_t dst(0);
-  dst += std::abs(*target - *current);
-  dst += std::abs(*(target - 1) - *current);
-
-  ++current;
-  while (std::distance(current, target) > 0) {
-    dst += std::abs(*target - *current);
-
-    if (std::distance(current, target - 2) < 0) break;
-    dst += std::abs(*(target - 2) - *current);
-
-    ++current;
-    --target;
-    if (std::distance(current, target) < 2) break;
-  }
-
-  os << dst << "\n";
+  os << diffSum << "\n";
 
   return true;
 }
