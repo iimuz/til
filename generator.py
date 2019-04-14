@@ -18,14 +18,14 @@ class Generator(nn.Module):
             nn.Linear(62, 1024),
             nn.BatchNorm1d(1024),
             nn.ReLU(),
-            nn.Linear(1024, 128 * 7 * 7),
+            nn.Linear(1024, 128 * 8 * 8),
             nn.ReLU(),
         )
         self.deconv = nn.Sequential(
             nn.ConvTranspose2d(128, 64, kernel_size=4, stride=2, padding=1),
             nn.BatchNorm2d(64),
             nn.ReLU(),
-            nn.ConvTranspose2d(64, 1, kernel_size=4, stride=2, padding=1),
+            nn.ConvTranspose2d(64, 3, kernel_size=4, stride=2, padding=1),
             nn.Sigmoid(),
         )
 
@@ -39,6 +39,6 @@ class Generator(nn.Module):
         view によって (128, 7, 7) 画像へ変換する。
         """
         x = self.fc(input)
-        x = x.view(-1, 128, 7, 7)
+        x = x.view(-1, 128, 8, 8)
         x = self.deconv(x)
         return x

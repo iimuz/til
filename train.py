@@ -3,6 +3,7 @@ import pathlib
 import pickle
 from typing import Dict, List
 
+import data_loader
 import torch
 from discriminator import Discriminator
 from generator import Generator
@@ -11,6 +12,7 @@ from torch.autograd import Variable
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 from torchvision.utils import save_image
+from tqdm import tqdm
 
 
 def format_history(d_loss: float, g_loss: float):
@@ -99,6 +101,18 @@ def parse_arguments() -> Dict[str, any]:
         metavar=None,
     )
     parser.add_argument(
+        "--checkpoint_each",
+        action="store",
+        nargs=None,
+        const=None,
+        default=5,
+        type=int,
+        choices=None,
+        dest="checkpoint_each",
+        help="save checkpoint data each input value.",
+        metavar=None,
+    )
+    parser.add_argument(
         "-i",
         "--checkpoint_images",
         action="store",
@@ -123,7 +137,7 @@ def parse_arguments() -> Dict[str, any]:
     return args
 
 
-def get_data_loader(batch_size: int):
+def get_data_loader(batch_size: int) -> DataLoader:
     """ Get dataloader.
 
     Parameters
@@ -131,13 +145,10 @@ def get_data_loader(batch_size: int):
     batch_size : int
         バッチサイズ
     """
-    transform = transforms.Compose([transforms.ToTensor()])
-    dataset = datasets.MNIST(
-        "data/mnist", train=True, download=True, transform=transform
-    )
-    data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+    # loader = data_loader.load_mnist(batch_size)
+    loader = data_loader.load_icons(pathlib.Path("data/icons"), batch_size)
 
-    return data_loader
+    return loader
 
 
 def run():
@@ -173,7 +184,8 @@ def run():
 
     # training
     history = []
-    for epoch in range(args.num_epoch):
+    progress_bar = tqdm(range(args.num_epoch))
+    for epoch in progress_bar:
         d_loss, g_loss = train_one_epoch(
             discriminator,
             generator,
@@ -185,13 +197,16 @@ def run():
             args.z_dim,
             is_cuda,
         )
-        save_checkpoint(discriminator, generator, epoch, args.log_dir)
-        save_image(
-            generate(generator, args.z_dim, args.checkpoint_images, is_cuda),
-            args.log_dir.joinpath(f"epoch_{epoch:03}.png"),
-        )
+        if epoch % args.checkpoint_each == 0:
+            save_checkpoint(discriminator, generator, epoch, args.log_dir)
+            save_image(
+                generate(generator, args.z_dim, args.checkpoint_images, is_cuda),
+                args.log_dir.joinpath(f"epoch_{epoch:03}.png"),
+            )
         history.append(format_history(d_loss, g_loss))
-        print(f"epoch {epoch}, d_loss: {d_loss:.4}, g_loss: {g_loss:.4}")
+
+        state_message = f"epoch {epoch}, d_loss: {d_loss:.4}, g_loss: {g_loss:.4}"
+        progress_bar.set_description(state_message)
 
     save_history(history, args.log_dir)
 
