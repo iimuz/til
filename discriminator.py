@@ -8,12 +8,12 @@ class Discriminator(nn.Module):
     def __init__(self, width: int, height: int, channel: int) -> None:
         super().__init__()
 
-        self._WIDTH = width / 4
-        self._HEIGHT = height / 4
+        self._WIDTH = int(width / 4)
+        self._HEIGHT = int(height / 4)
         self._INTERMIDIATE_CHANNEL = 128
 
         self.conv = nn.Sequential(
-            nn.Conv2d(channel, 64, kernel_size=4, stride=2, padding=1),
+            nn.Conv2d(int(channel), 64, kernel_size=4, stride=2, padding=1),
             nn.LeakyReLU(0.2),
             nn.Conv2d(
                 64, self._INTERMIDIATE_CHANNEL, kernel_size=4, stride=2, padding=1

@@ -15,12 +15,12 @@ class Generator(nn.Module):
         """
         super().__init__()
 
-        self._WIDTH = width / 4
-        self._HEIGHT = height / 4
+        self._WIDTH = int(width / 4)
+        self._HEIGHT = int(height / 4)
         self._INTERMIDIATE_CHANNEL = 128
 
         self.fc = nn.Sequential(
-            nn.Linear(z_dim, 1024),
+            nn.Linear(int(z_dim), 1024),
             nn.BatchNorm1d(1024),
             nn.ReLU(),
             nn.Linear(1024, self._INTERMIDIATE_CHANNEL * self._WIDTH * self._HEIGHT),
@@ -32,7 +32,7 @@ class Generator(nn.Module):
             ),
             nn.BatchNorm2d(64),
             nn.ReLU(),
-            nn.ConvTranspose2d(64, channel, kernel_size=4, stride=2, padding=1),
+            nn.ConvTranspose2d(64, int(channel), kernel_size=4, stride=2, padding=1),
             nn.Sigmoid(),
         )
 

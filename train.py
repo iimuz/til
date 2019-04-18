@@ -27,6 +27,7 @@ def execfile(filepath: str) -> [Dict, Dict]:
     ---
     """
     locals = {}
+    globals = {}
     globals.update({"__file__": filepath, "__name__": "__main__"})
     with open(filepath, "rb") as f:
         exec(compile(f.read(), filepath, "exec"), globals, locals)
@@ -93,45 +94,45 @@ def run():
         print(f"config file does not exist: {args.config_path}")
         return
     _, locals = execfile(args.config_path)
-    print(f"parameters: locals")
+    print(f"parameters: {locals}")
 
     # create output folders
-    LOG_DIR = pathlib.Path(locals.LOG_DIR)
+    LOG_DIR = pathlib.Path(locals["LOG_DIR"])
     LOG_DIR.mkdir(exist_ok=True)
 
     # check cuda
-    is_cuda = torch.cuda.is_available() and locals.USE_CUDA
+    is_cuda = torch.cuda.is_available() and locals["USE_CUDA"]
     print(f"cuda state: {is_cuda}")
 
     # initialize network
     generator = set_device(
         Generator(
-            locals.Z_DIM, locals.IMAGE_WIDTH, locals.IMAGE_HEIGHT, locals.IMAGE_CHANNELS
+            locals["Z_DIM"], locals["IMAGE_WIDTH"], locals["IMAGE_HEIGHT"], locals["IMAGE_CHANNELS"]
         ),
         is_cuda,
     )
     discriminator = set_device(
-        Discriminator(locals.IMAGE_WIDTH, locals.IMAGE_HEIGHT, locals.IMAGE_CHANNELS),
+        Discriminator(locals["IMAGE_WIDTH"], locals["IMAGE_HEIGHT"], locals["IMAGE_CHANNELS"]),
         is_cuda,
     )
 
     # optimizer
     g_optimizer = optim.Adam(
-        generator.parameters(), lr=locals.LEARNING_RATE, betas=(0.5, 0.999)
+        generator.parameters(), lr=locals["LEARNING_RATE"], betas=(0.5, 0.999)
     )
     d_optimizer = optim.Adam(
-        discriminator.parameters(), lr=locals.LEARNING_RATE, betas=(0.5, 0.999)
+        discriminator.parameters(), lr=locals["LEARNING_RATE"], betas=(0.5, 0.999)
     )
 
     # loss
     criterion = nn.BCELoss()
 
     # datasets
-    data_loader = get_data_loader(locals.BATCH_SIZE)
+    data_loader = get_data_loader(locals["BATCH_SIZE"])
 
     # training
     history = []
-    progress_bar = tqdm(range(locals.EPCOCH_NUM))
+    progress_bar = tqdm(range(locals["EPOCH_NUM"]))
     for epoch in progress_bar:
         d_loss, g_loss = train_one_epoch(
             discriminator,
@@ -140,25 +141,26 @@ def run():
             d_optimizer,
             g_optimizer,
             data_loader,
-            args.batch_size,
-            args.z_dim,
+            locals["BATCH_SIZE"],
+            locals["Z_DIM"],
             is_cuda,
         )
         if epoch % args.checkpoint_each == 0:
             save_checkpoint(discriminator, generator, epoch, LOG_DIR)
             save_image(
-                generate(generator, args.z_dim, args.checkpoint_images, is_cuda),
+                generate(generator, locals["Z_DIM"], args.checkpoint_images, is_cuda),
                 LOG_DIR.joinpath(f"epoch_{epoch:03}.png"),
             )
+            save_history(history, LOG_DIR)
         history.append(format_history(d_loss, g_loss))
 
         state_message = f"epoch {epoch}, d_loss: {d_loss:.4}, g_loss: {g_loss:.4}"
         progress_bar.set_description(state_message)
 
-    save_checkpoint(discriminator, generator, locals.EPCOCH_NUM, LOG_DIR)
+    save_checkpoint(discriminator, generator, locals["EPCOCH_NUM"], LOG_DIR)
     save_image(
         generate(generator, args.z_dim, args.checkpoint_images, is_cuda),
-        LOG_DIR.joinpath(f"epoch_{locals.EPCOCH_NUM:03}.png"),
+        LOG_DIR.joinpath(f"epoch_{locals['EPCOCH_NUM']:03}.png"),
     )
     save_history(history, LOG_DIR)
 

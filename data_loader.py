@@ -15,7 +15,9 @@ def load_mnist(batch_size: int) -> DataLoader:
 
 
 def load_icons(path: pathlib.Path, batch_size: int) -> DataLoader:
-    transform = transforms.Compose([transforms.ToTensor()])
+    transform = transforms.Compose([
+        transforms.ToTensor()
+    ])
     data = datasets.ImageFolder(str(path), transform=transform)
     loader = DataLoader(data, shuffle=True, batch_size=batch_size, num_workers=4)
 
