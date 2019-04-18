@@ -145,10 +145,10 @@ def run():
             locals["Z_DIM"],
             is_cuda,
         )
-        if epoch % args.checkpoint_each == 0:
+        if epoch % locals["CHECKPOINT_EACH"] == 0:
             save_checkpoint(discriminator, generator, epoch, LOG_DIR)
             save_image(
-                generate(generator, locals["Z_DIM"], args.checkpoint_images, is_cuda),
+                generate(generator, locals["Z_DIM"], locals["CHECKPOINT_EACH"], is_cuda),
                 LOG_DIR.joinpath(f"epoch_{epoch:03}.png"),
             )
             save_history(history, LOG_DIR)
@@ -157,10 +157,10 @@ def run():
         state_message = f"epoch {epoch}, d_loss: {d_loss:.4}, g_loss: {g_loss:.4}"
         progress_bar.set_description(state_message)
 
-    save_checkpoint(discriminator, generator, locals["EPCOCH_NUM"], LOG_DIR)
+    save_checkpoint(discriminator, generator, locals["EPOCH_NUM"], LOG_DIR)
     save_image(
-        generate(generator, args.z_dim, args.checkpoint_images, is_cuda),
-        LOG_DIR.joinpath(f"epoch_{locals['EPCOCH_NUM']:03}.png"),
+        generate(generator, locals["Z_DIM"], locals["CHECKPOINT_IMAGES"], is_cuda),
+        LOG_DIR.joinpath(f"epoch_{locals['EPOCH_NUM']:03}.png"),
     )
     save_history(history, LOG_DIR)
 
