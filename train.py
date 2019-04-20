@@ -107,12 +107,17 @@ def run():
     # initialize network
     generator = set_device(
         Generator(
-            locals["Z_DIM"], locals["IMAGE_WIDTH"], locals["IMAGE_HEIGHT"], locals["IMAGE_CHANNELS"]
+            locals["Z_DIM"],
+            locals["IMAGE_WIDTH"],
+            locals["IMAGE_HEIGHT"],
+            locals["IMAGE_CHANNELS"],
         ),
         is_cuda,
     )
     discriminator = set_device(
-        Discriminator(locals["IMAGE_WIDTH"], locals["IMAGE_HEIGHT"], locals["IMAGE_CHANNELS"]),
+        Discriminator(
+            locals["IMAGE_WIDTH"], locals["IMAGE_HEIGHT"], locals["IMAGE_CHANNELS"]
+        ),
         is_cuda,
     )
 
@@ -148,7 +153,9 @@ def run():
         if epoch % locals["CHECKPOINT_EACH"] == 0:
             save_checkpoint(discriminator, generator, epoch, LOG_DIR)
             save_image(
-                generate(generator, locals["Z_DIM"], locals["CHECKPOINT_EACH"], is_cuda),
+                generate(
+                    generator, locals["Z_DIM"], locals["CHECKPOINT_IMAGES"], is_cuda
+                ),
                 LOG_DIR.joinpath(f"epoch_{epoch:03}.png"),
             )
             save_history(history, LOG_DIR)
