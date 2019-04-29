@@ -25,3 +25,8 @@
   $ python -m unittest problem001/test_main.py
   ```
 
+## Table of Content
+
+* problem001: 1 から 100 までの与えられた整数配列の中から足りない数字を探す。
+* problem002: 与えられた整数の配列において重複した数字を探す。
+
