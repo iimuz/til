@@ -3,7 +3,7 @@ import unittest
 from .main import remove_duplicate
 
 
-class TestTemplate(unittest.TestCase):
+class TestRemoveDuplicate(unittest.TestCase):
     def test_example(self) -> None:
         test_case = [
             {"array": [1, 1, 2, 2, 3, 4, 5], "expected": [1, 2, 3, 4, 5]},
