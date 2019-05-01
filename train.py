@@ -4,6 +4,7 @@ import pickle
 from typing import Dict, List
 
 import data_loader
+import numpy as np
 import torch
 from discriminator import Discriminator
 from generator import Generator
@@ -71,7 +72,7 @@ def parse_arguments() -> Dict[str, any]:
     return args
 
 
-def get_data_loader(batch_size: int) -> DataLoader:
+def get_data_loader(batch_size: int, transform) -> DataLoader:
     """ Get dataloader.
 
     Parameters
@@ -80,9 +81,31 @@ def get_data_loader(batch_size: int) -> DataLoader:
         バッチサイズ
     """
     # loader = data_loader.load_mnist(batch_size)
-    loader = data_loader.load_icons(pathlib.Path("data/icons"), batch_size)
+    loader = data_loader.load_icons(pathlib.Path("data/icons"), batch_size, transform)
 
     return loader
+
+
+def get_transforms(noise_mean: float, noise_sigma: float):
+    """ Get transforms
+    """
+
+    def add_noise(img, mean: float, sigma: float):
+        (row, col), ch = img.size, len(img.getbands())
+        gauss = np.random.normal(mean, sigma, (row, col, ch)).astype(np.float32)
+        gauss = gauss.reshape(row, col, ch)
+        noisy = img + gauss
+        return noisy
+
+    transform = transforms.Compose(
+        [
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.RandomVerticalFlip(p=0.5),
+            lambda img: add_noise(img, noise_mean, noise_sigma),
+            transforms.ToTensor(),
+        ]
+    )
+    return transform
 
 
 def run():
@@ -133,7 +156,8 @@ def run():
     criterion = nn.BCELoss()
 
     # datasets
-    data_loader = get_data_loader(locals["BATCH_SIZE"])
+    transform = get_transforms(locals["NOISE_MEAN"], locals["NOISE_SIGMA"])
+    data_loader = get_data_loader(locals["BATCH_SIZE"], transform)
 
     # training
     history = []
