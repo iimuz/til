@@ -1,6 +1,3 @@
-from typing import List
-
-
 def run() -> int:
     return 0
 
