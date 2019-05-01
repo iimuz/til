@@ -1,2 +1,8 @@
 # samba-config
-sambda server config
+
+## Usage
+
+```sh
+$ docker-compose up -d
+```
+
