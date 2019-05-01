@@ -4,7 +4,6 @@ import pickle
 from typing import Dict, List
 
 import data_loader
-import numpy as np
 import torch
 from discriminator import Discriminator
 from generator import Generator
@@ -86,23 +85,27 @@ def get_data_loader(batch_size: int, transform) -> DataLoader:
     return loader
 
 
-def get_transforms(noise_mean: float, noise_sigma: float):
+def get_transforms(
+    normalize_mean: List[float],
+    normalize_std: List[float],
+    noise_mean: float,
+    noise_sigma: float,
+):
     """ Get transforms
     """
 
     def add_noise(img, mean: float, sigma: float):
-        (row, col), ch = img.size, len(img.getbands())
-        gauss = np.random.normal(mean, sigma, (row, col, ch)).astype(np.float32)
-        gauss = gauss.reshape(row, col, ch)
-        noisy = img + gauss
+        gauss = torch.distributions.normal.Normal(mean, sigma)
+        noisy = img + gauss.sample(img.size())
         return noisy
 
     transform = transforms.Compose(
         [
             transforms.RandomHorizontalFlip(p=0.5),
             transforms.RandomVerticalFlip(p=0.5),
-            lambda img: add_noise(img, noise_mean, noise_sigma),
             transforms.ToTensor(),
+            transforms.Normalize(normalize_mean, normalize_std),
+            lambda img: add_noise(img, noise_mean, noise_sigma),
         ]
     )
     return transform
@@ -156,7 +159,12 @@ def run():
     criterion = nn.BCELoss()
 
     # datasets
-    transform = get_transforms(locals["NOISE_MEAN"], locals["NOISE_SIGMA"])
+    transform = get_transforms(
+        locals["NORMALIZE_MEAN"],
+        locals["NORMALIZE_STD"],
+        locals["NOISE_MEAN"],
+        locals["NOISE_SIGMA"],
+    )
     data_loader = get_data_loader(locals["BATCH_SIZE"], transform)
 
     # training
