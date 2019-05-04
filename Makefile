@@ -1,6 +1,11 @@
-build/gtest:
-	cd vendor/googletest; mkdir -p build; cd build; cmake ..; make;
-.PHONY: build-gtest
+all:
+.PHONY: all
+
+build/%:
+	cd $* && $(MAKE) build
+
+run/%:
+	cd $* && $(MAKE) run
 
 test:
 	python -m unittest discover -v
