@@ -4,10 +4,20 @@
 # gcloud コマンドのデフォルト値を参照し、
 # リージョンなどを設定する前提としています。
 
-INSTANCE_NAME=instance-1
-DISK_SIZE=10GB
-MACHINE_TYPE=f1-micro
+# * preemptible f1-micro
+#     * 0.6 GB Memory
+#     * 0.006 $ / min, 4.17 $ / month
+# * preemptible g1-small
+#     * 1.7 GB Memory
+#     * 0.011 $ / min, 7.82 $ / month
+# * preemptible n1-standard-1
+#     * 3.75 GB Memory
+#     * 0.014 $ / min, 10.19 $ / month
+INSTANCE_NAME=${1:-dev}
+MACHINE_TYPE=${2:-f1-micro}
+DISK_SIZE=${3:-10GB}
 
+echo "create: name: $INSTANCE_NAME, type: $MACHINE_TYPE, disk: $DISK_SIZE"
 gcloud compute \
   instances create $INSTANCE_NAME \
   --machine-type=$MACHINE_TYPE \
