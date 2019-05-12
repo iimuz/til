@@ -12,6 +12,8 @@
 各問題に対する解答と実際に動かすコードは別にしています。
 動作確認はテストコードを用いて行うため、下記のようにして実行します。
 
+### python
+
 * 全件テスト
 
   ```sh
@@ -25,6 +27,22 @@
   $ make test/problem002
   # or
   $ python -m unittest problem001/test_main.py
+  ```
+
+### c++
+
+c++ の方は全件を同時に実行するコマンドは用意していません。
+
+* gtest のビルド
+
+  ```sh
+  $ make build/gtest
+  ```
+* テストのビルドと実行
+
+  ```sh
+  $ make build/problem010
+  $ make run/problem010
   ```
 
 ## Table of Content
