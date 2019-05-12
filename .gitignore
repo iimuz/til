@@ -107,3 +107,5 @@ venv.bak/
 logs/
 data/
 
+# editor
+.vscode/

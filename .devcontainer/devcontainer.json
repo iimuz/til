@@ -1,0 +1,8 @@
+{
+  "name": "Logo Generator",
+  "dockerFile": "Dockerfile",
+  "context": "..",
+  "extensions": [
+    "ms-python.python"
+  ]
+}
