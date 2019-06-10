@@ -1,11 +1,11 @@
 import pathlib
-
 from httplib2 import Http
 from typing import List
 
 import googleapiclient.discovery as gdiscovery
 from oauth2client import client
 from oauth2client.file import Storage
+
 
 def get_authorized_service() -> gdiscovery.Resource:
     """ Google Photosの認証を実行

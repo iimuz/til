@@ -6,6 +6,7 @@ import requests
 class GooglePhots:
     """ Google photosへの処理を実行する
     """
+
     def __init__(self, service):
         self._service = service
         pass
@@ -41,7 +42,8 @@ class GooglePhots:
             response = requests.post(URL, data=image_data, headers=HEADERS)
 
         upload_token = response.content.decode('utf-8')
-        new_item = {'newMediaItems': [{'simpleMediaItem': {'uploadToken': upload_token}}]}
+        new_item = {'newMediaItems': [
+            {'simpleMediaItem': {'uploadToken': upload_token}}]}
         response = self._service.mediaItems().batchCreate(body=new_item).execute()
 
         return response
