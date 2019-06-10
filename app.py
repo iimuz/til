@@ -9,7 +9,8 @@ def create_logger() -> logging.Logger:
     """
     handler = logging.StreamHandler()
     handler.setLevel(logging.DEBUG)
-    handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
+    handler.setFormatter(logging.Formatter(
+        "%(asctime)s %(levelname)s %(name)s: %(message)s"))
 
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.DEBUG)
