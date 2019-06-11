@@ -20,7 +20,7 @@ def create_logger() -> logging.Logger:
     return logger
 
 
-if __name__ == "__main__":
+def run() -> None:
     logger = create_logger()
 
     service = google_oauth2.get_authorized_service()
@@ -37,3 +37,7 @@ if __name__ == "__main__":
     response = client.upload_image(IMAGE_PATH)
     logger.info(response)
     logger.info(response['newMediaItemResults'][0]['status'])
+
+
+if __name__ == "__main__":
+    run()
