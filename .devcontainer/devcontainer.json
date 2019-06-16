@@ -1,9 +1,0 @@
-{
-	"name": "AtCoder",
-	"dockerComposeFile": "docker-compose.yml",
-	"service": "vscode",
-	"workspaceFolder": "/workspace",
-	"extensions": [
-		"ms-vscode.cpptools"
-	],
-}
