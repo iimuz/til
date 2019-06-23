@@ -28,7 +28,7 @@ class GooglePhots:
         """
         return self._service.albums().list().execute()
 
-    def upload_image(self, image_path: str):
+    def upload_image(self, image_path: str, album_id: str = ''):
         """ 画像をアップロードする
         """
         with open(image_path, 'rb') as image_data:
@@ -44,6 +44,8 @@ class GooglePhots:
         upload_token = response.content.decode('utf-8')
         new_item = {'newMediaItems': [
             {'simpleMediaItem': {'uploadToken': upload_token}}]}
+        if not album_id == '':
+            new_item['albumId'] = album_id
         response = self._service.mediaItems().batchCreate(body=new_item).execute()
 
         return response
