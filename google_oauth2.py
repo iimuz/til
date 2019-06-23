@@ -7,34 +7,42 @@ from oauth2client import client
 from oauth2client.file import Storage
 
 
-def get_authorized_service() -> gdiscovery.Resource:
+def get_authorized_service(
+        client_path: str,
+        credential_path: str,
+        logger
+) -> gdiscovery.Resource:
     """ Google Photosの認証を実行
     """
     SCOPES = ['https://www.googleapis.com/auth/photoslibrary']
-    OAUTH_CLIENT_FILE = './_test/client_id.json'
-    CREDENTIALS_FILE = './_test/credentials.json'
     API_SERVICE_NAME = 'photoslibrary'
     API_VERSION = 'v1'
 
     credentials = None
-    if pathlib.Path(CREDENTIALS_FILE).exists():
-        storage = Storage(CREDENTIALS_FILE)
+    if pathlib.Path(credential_path).exists():
+        storage = Storage(credential_path)
         credentials = storage.get()
 
     if credentials is None or credentials.invalid:
         credentials = _get_credentials_file(
-            OAUTH_CLIENT_FILE,
+            client_path,
             SCOPES,
-            CREDENTIALS_FILE
+            credential_path,
+            logger
         )
 
-    return gdiscovery.build(API_SERVICE_NAME, API_VERSION, http=credentials.authorize(Http()))
+    return gdiscovery.build(
+        API_SERVICE_NAME,
+        API_VERSION,
+        http=credentials.authorize(Http())
+    )
 
 
 def _get_credentials_file(
     client_file_path: str,
     scopes: List[str],
-    credentials_file_path: str
+    credentials_file_path: str,
+    logger
 ) -> client.OAuth2Credentials:
     """ credentialsファイルを生成する
     """
@@ -45,7 +53,7 @@ def _get_credentials_file(
     )
     auth_uri = flow.step1_get_authorize_url()
 
-    print(f'Open below URL by browser: {auth_uri}')
+    logger.info(f'Open below URL by browser: {auth_uri}')
     token = input("Input your code: ")
 
     credentials = flow.step2_exchange(token)
