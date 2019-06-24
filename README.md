@@ -12,7 +12,20 @@ Google Photosへ画像をアップロードするためのスクリプトです�
 下記のようにコマンドを実行します。
 
 ```sh
-$ python -m app
+# 初回のみ認証設定
+$ python -m auth login
+# hoge.png画像をアップロード
+$ python -m image upload hoge.png
+# アルバム情報の確認
+$ python -m album list
+```
+
+その他のコマンドに関しては、下記のようにそれぞれでヘルプを見れます。
+
+```sh
+$ python -m auth --help
+$ python -m image --help
+$ python -m album --help
 ```
 
 ## Advance preparation
