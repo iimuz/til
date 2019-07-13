@@ -9,8 +9,7 @@ from typing import List
 def create_sound_list(sound_dir: str) -> List[str]:
     """ 音声リストを生成する
     """
-    sound_list = pathlib.Path(sound_dir).glob("*.mp3")
-    sound_list = [str(path) for path in sound_list]
+    sound_list = [str(path) for path in pathlib.Path(sound_dir).glob("*.mp3")]
     random.shuffle(sound_list)
     return sound_list
 
@@ -46,7 +45,7 @@ def run(sound_list: List[str]) -> None:
         while True:
             time.sleep(0.1)
             sensor_data = GPIO.input(4)
-            if sensor_data != 0 and is_continuous == False:
+            if sensor_data != 0 and is_continuous is False:
                 sound_file = sound_list[sound_count]
                 print("start sound: " + sound_file)
                 exec_sound(sound_file)
