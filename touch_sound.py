@@ -42,9 +42,11 @@ def run(sound_list: List[str]) -> None:
     """
     try:
         sound_count = 0
+        is_continuous = False
         while True:
             time.sleep(0.1)
-            if GPIO.input(4) != 0:
+            sensor_data = GPIO.input(4)
+            if sensor_data != 0 and is_continuous == False:
                 sound_file = sound_list[sound_count]
                 print("start sound: " + sound_file)
                 exec_sound(sound_file)
@@ -52,7 +54,11 @@ def run(sound_list: List[str]) -> None:
                 sound_count = sound_count + 1
                 if sound_count >= len(sound_list):
                     sound_count = 0
+                is_continuous = True
                 print("wait sensor data...")
+            if is_continuous and sensor_data == 0:
+                print("sensor is valid.")
+                is_continuous = False
     except KeyboardInterrupt:
         print("end")
         return
