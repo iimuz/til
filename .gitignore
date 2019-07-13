@@ -108,3 +108,6 @@ venv.bak/
 .devcontainer/
 .vscode
 .vscode/
+
+# data
+_test/

@@ -1,12 +1,25 @@
+import pathlib
 import pygame.mixer as mixer
+import random
 import RPi.GPIO as GPIO
 import time
+from typing import List
 
 
-def exec_sound() -> None:
+def create_sound_list(sound_dir: str) -> List[str]:
+    """ 音声リストを生成する
+    """
+    sound_list = pathlib.Path(sound_dir).glob("*.mp3")
+    sound_list = [str(path) for path in sound_list]
+    random.shuffle(sound_list)
+    return sound_list
+
+
+def exec_sound(filename: str) -> None:
     """ 音を鳴らす
     """
-    mixer.music.play(2)
+    mixer.music.load(filename)
+    mixer.music.play(1)
     time.sleep(3)
     mixer.music.stop()
 
@@ -22,18 +35,23 @@ def initialize_sound() -> None:
     """ 音環境の初期化を行う
     """
     mixer.init()
-    mixer.music.load("hoge.mp3")
 
 
-def run() -> None:
+def run(sound_list: List[str]) -> None:
     """ センサの値を検知して音を鳴らす
     """
     try:
+        sound_count = 0
         while True:
             time.sleep(0.1)
             if GPIO.input(4) != 0:
-                print("start sound.")
-                exec_sound()
+                sound_file = sound_list[sound_count]
+                print("start sound: " + sound_file)
+                exec_sound(sound_file)
+
+                sound_count = sound_count + 1
+                if sound_count >= len(sound_list):
+                    sound_count = 0
                 print("wait sensor data...")
     except KeyboardInterrupt:
         print("end")
@@ -41,6 +59,7 @@ def run() -> None:
 
 
 if __name__ == "__main__":
+    sound_list = create_sound_list("_test/sound")
     initialize_sound()
     initialize_sensor()
-    run()
+    run(sound_list)
