@@ -1,70 +1,34 @@
-import pathlib
-import pygame.mixer as mixer
-import random
-import RPi.GPIO as GPIO
-import time
-from typing import List
+import sensor
+import sound
 
 
-def create_sound_list(sound_dir: str) -> List[str]:
-    """ 音声リストを生成する
+def run() -> None:
+    """センサの感知を受けて音をならす
     """
-    sound_list = [str(path) for path in pathlib.Path(sound_dir).glob("*.mp3")]
-    random.shuffle(sound_list)
-    return sound_list
+    SOUND_LOOP_NUM = 1
+    SOUND_TIME_SEC = 3.0
+    sound.initialize()
+    sound_list = sound.ShuffleList("_test/sound")
 
+    SENSOR_INDEX = 4
+    WAIT_SEC = 0.1
+    sensor.initialize(SENSOR_INDEX)
 
-def exec_sound(filename: str) -> None:
-    """ 音を鳴らす
-    """
-    mixer.music.load(filename)
-    mixer.music.play(1)
-    time.sleep(3)
-    mixer.music.stop()
-
-
-def initialize_sensor() -> None:
-    """ センサの初期化を行う
-    """
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(4, GPIO.IN)
-
-
-def initialize_sound() -> None:
-    """ 音環境の初期化を行う
-    """
-    mixer.init()
-
-
-def run(sound_list: List[str]) -> None:
-    """ センサの値を検知して音を鳴らす
-    """
     try:
-        sound_count = 0
-        is_continuous = False
         while True:
-            time.sleep(0.1)
-            sensor_data = GPIO.input(4)
-            if sensor_data != 0 and is_continuous is False:
-                sound_file = sound_list[sound_count]
-                print("start sound: " + sound_file)
-                exec_sound(sound_file)
+            print("wait until balancing...")
+            sensor.wait_until_balancing(SENSOR_INDEX, WAIT_SEC)
 
-                sound_count = sound_count + 1
-                if sound_count >= len(sound_list):
-                    sound_count = 0
-                is_continuous = True
-                print("wait sensor data...")
-            if is_continuous and sensor_data == 0:
-                print("sensor is valid.")
-                is_continuous = False
+            print("wait until moving...")
+            sensor.wait_until_moving(SENSOR_INDEX, WAIT_SEC)
+
+            print("start sound: " + sound_list.current())
+            sound.execute(sound_list.current(), SOUND_LOOP_NUM, SOUND_TIME_SEC)
+            sound_list.next()
     except KeyboardInterrupt:
         print("end")
         return
 
 
 if __name__ == "__main__":
-    sound_list = create_sound_list("_test/sound")
-    initialize_sound()
-    initialize_sensor()
-    run(sound_list)
+    run()
