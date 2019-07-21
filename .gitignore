@@ -103,6 +103,10 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+# data
+_data/*
+!_data/.gitkeep
+
 # editor
 .devcontainer
 .devcontainer/
