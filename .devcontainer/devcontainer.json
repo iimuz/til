@@ -1,0 +1,24 @@
+{
+  "name": "til-cpp",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "vscode",
+  "workspaceFolder": "/workspace",
+  "shutdownAction": "stopCompose",
+  "extensions": [
+    "alefragnani.bookmarks",
+    "eamodio.gitlens",
+    "jaycetyle.vscode-gnu-global",
+    "kriegalex.vscode-cudacpp",
+    "ms-vscode.cpptools",
+  ],
+  "settings": {
+    "C_Cpp.clang_format_style": "{ BasedOnStyle: Google, UseTab: Never, IndentWidth: 2, TabWidth: 2, AccessModifierOffset: -2, NamespaceIndentation: None, AlignConsecutiveAssignments: true, AlignTrailingComments: true, DerivePointerAlignment: false, PointerAlignment: Left }",
+    "editor.formatOnSave": true,
+    "files.associations": {
+      "*.cuh": "cpp",
+      "*.cu": "cpp",
+      "new": "cpp"
+    },
+    "gnuGlobal.autoUpdate": "Enabled",
+  },
+}
