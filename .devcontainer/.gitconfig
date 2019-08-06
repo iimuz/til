@@ -1,0 +1,29 @@
+[alias]
+  lg = log --graph --oneline --decorate=full --branches --tags --remotes
+
+[core]
+  editor = code --wait
+
+[credential]
+  helper = /usr/share/doc/git/contrib/credential/netrc/git-credential-netrc
+
+[diff]
+  tool = codediff
+
+[difftool]
+  prompt = false
+
+[difftool "codediff"]
+  cmd = code --wait --diff $LOCAL $REMOTE
+
+[include]
+  path = ~/.config/git/local.gitconfig
+
+[merge]
+  tool = codediff
+
+[mergetool]
+  keepBackup = false
+
+[mergetool "codediff"]
+  cmd = code \"$MERGED\"
