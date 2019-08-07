@@ -1,0 +1,20 @@
+{
+  "name": "til-markdown",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "vscode",
+  "workspaceFolder": "/workspace",
+  "extensions": [
+    "alefragnani.bookmarks",
+    "davidanson.vscode-markdownlint",
+    "eamodio.gitlens",
+    "esbenp.prettier-vscode",
+    "shd101wyy.markdown-preview-enhanced",
+    "shuworks.vscode-table-formatter",
+  ],
+  "settings": {
+    "editor.formatOnSave": true,
+    "markdown-preview-enhanced.breakOnSingleNewLine": false,
+    "markdown-preview-enhanced.mermaidTheme": "forest",
+    "markdown-preview-enhanced.previewTheme": "solarized-light.css",
+  },
+}
