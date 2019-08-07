@@ -2,6 +2,19 @@ FROM ubuntu:18.04 AS base
 LABEL maintainer "iimuz"
 
 ENV DEBIAN_FRONTEND=noninteractive
+
+RUN set -x \
+  && : "Set locale" \
+  && apt-get update \
+  && apt-get install -y --no-install-recommends \
+    locales \
+    locales-all \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
+ENV LC_ALL=en_US.UTF-8 \
+  LANG=en_US.UTF-8 \
+  LANGUAGE=en_US:en
+
 RUN set -x \
   && : "Install tools for vscode" \
   && apt-get update \
@@ -24,8 +37,6 @@ RUN set -x \
   && chmod +x /usr/share/doc/git/contrib/credential/netrc/git-credential-netrc \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
-COPY .bashrc /root/.bashrc
-COPY .gitconfig /root/.gitconfig
 
 RUN set -x \
   && : "install packages for markdown preview enhanced." \
@@ -48,7 +59,10 @@ RUN set -x \
   && fc-cache -fv \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
+COPY style.less /root/.mume/style.less
 
+COPY .bashrc /root/.bashrc
+COPY .gitconfig /root/.gitconfig
 ENV DEBIAN_FRONTEND=dialog \
   SHELL=/bin/bash \
   HOME=/root
@@ -69,6 +83,7 @@ RUN set -x \
   && chsh -s /bin/bash $USER_NAME
 
 USER $USER_NAME
+COPY style.less /home/$USER_NAME/.mume/style.less
 COPY .bashrc /home/$USER_NAME/.bashrc
 COPY .gitconfig /home/$USER_NAME/.gitconfig
 ENV DEBIAN_FRONTEND=dialog \
