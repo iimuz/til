@@ -1,0 +1,11 @@
+image:
+  dir: "../_data/img"
+  query: "*.png"
+  size:
+    width: 32
+    height: 32
+
+matrix:
+  columns: 20
+
+output: "../_data/concat.png"

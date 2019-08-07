@@ -7,6 +7,7 @@ python で調べたり、簡易のコードを記述したときの実行サン�
 ## サンプルリスト
 
 - depwalker: dependency walker の依存関係結果からネットワークグラフを表示するサンプル
+- image-concat: 複数の画像を並べて 1 枚の画像とするサンプル
 - image-resize: 画像をリサイズするサンプル
 - overlap_diff_image: 基準画像との差異を基準画像にオーバーラップ表示するサンプル
 - unittest_sample: unittest を実行するサンプル
@@ -19,4 +20,3 @@ python で調べたり、簡易のコードを記述したときの実行サン�
 
 docker コンテナ内で開発しています。
 開発用 docker コンテナは vscode で利用するため、 `.devcontainer` に含まれています。
-
