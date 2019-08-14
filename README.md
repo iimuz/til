@@ -6,6 +6,7 @@ python で調べたり、簡易のコードを記述したときの実行サン�
 
 ## サンプルリスト
 
+- code_coverage: コードカバレッジの計測用サンプル
 - depwalker: dependency walker の依存関係結果からネットワークグラフを表示するサンプル
 - image-concat: 複数の画像を並べて 1 枚の画像とするサンプル
 - image-resize: 画像をリサイズするサンプル
