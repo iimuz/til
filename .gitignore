@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+# data
+_bin/*
+!_bin/.gitkeep
+_data/*
+!_data/.gitkeep
