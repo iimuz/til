@@ -1,5 +1,8 @@
 # Today I Learn about GCP
 
+- firebase-command: firebase CLI を docker
+- scripts: GCP を操作するための簡易スクリプト
+
 ## Tips
 
 ### アカウント切り替え
