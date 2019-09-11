@@ -4,6 +4,10 @@ firebase を利用した静的サイトの構築デモ。
 
 ## 手順
 
+### 初期化
+
+`firebase init` コマンドを実行するといくつかの質問に答えることで、プロジェクトの初期化ができる。
+
 ```sh
 $ firebase init
 
@@ -61,4 +65,33 @@ i  Writing gitignore file to .gitignore...
 
 ✔  Firebase initialization complete!
 ```
+
+## プロジェクトの追加
+
+上記ではデフォルトプロジェクトを追加しなかったので、下記コマンドで手動で追加する。
+
+```sh
+$ firebase use --add
+
+? Which project do you want to add? hoge
+? What alias do you want to use for this project? (e.g. staging) staging
+
+Created alias staging for hoge.
+Now using alias staging (hoge)
+```
+
+設定は、 `.firebase` に追加される。
+
+## プロジェクトの変更
+
+プロジェクトを変更したい場合は、下記のように実行する。
+
+```sh
+$ firebase use staging
+```
+
+## その他
+
+- デプロイ: `firebase deploy`
+- 公開停止: `firebase hosting:disable`
 
