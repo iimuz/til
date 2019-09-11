@@ -1,14 +1,17 @@
-# gcp-tiny-script
+# Today I Learn about GCP
 
-Tiny scripts for GCE
+- firebase-command: firebase CLI を docker
+- scripts: GCP を操作するための簡易スクリプト
 
-## アカウント切り替え
+## Tips
+
+### アカウント切り替え
 
 ```sh
 $ gcloud config configurations activate hoge
 ```
 
-### 切り替え用アカウントの作成
+#### 切り替え用アカウントの作成
 
 ```sh
 $ gcloud config configurations create hoge
