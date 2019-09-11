@@ -1,14 +1,14 @@
-# gcp-tiny-script
+# Today I Learn about GCP
 
-Tiny scripts for GCE
+## Tips
 
-## アカウント切り替え
+### アカウント切り替え
 
 ```sh
 $ gcloud config configurations activate hoge
 ```
 
-### 切り替え用アカウントの作成
+#### 切り替え用アカウントの作成
 
 ```sh
 $ gcloud config configurations create hoge
