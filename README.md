@@ -1,6 +1,8 @@
 # Today I Learn about GCP
 
 - firebase-command: firebase CLI を docker
+- firebase-static-site: firebase hosting を利用したサンプル
+- firebase-with-cloud-run: firebase hosting と cloud run の連携
 - scripts: GCP を操作するための簡易スクリプト
 
 ## Tips
