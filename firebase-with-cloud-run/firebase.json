@@ -5,6 +5,13 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
-    ]
+    ],
+    "rewrites": [{
+      "source": "/**",
+      "run": {
+        "serviceId": "helloworld",
+        "region": "asia-northeast1"
+      }
+    }]
   }
 }
