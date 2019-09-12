@@ -21,7 +21,7 @@ $ gcloud config set compute/region asia-northeast1
 $ gcloud config set compute/zone asia-northeast-a
 $ gcloud config set core/account hoge@example.com
 $ gcloud config set core/project hoge-project
-$ gcloud cofnig set core/disable_usage_reporting False
+$ gcloud config set core/disable_usage_reporting False
 # 設定を作った後に認証が必要なため認証は実行しておく
 $ gcloud auth login
 ```
