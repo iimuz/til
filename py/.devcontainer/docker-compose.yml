@@ -1,0 +1,14 @@
+version: "3.7"
+services:
+  vscode:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+      target: withUser
+      args:
+        - USER_NAME=dev
+        - USER_ID=1000
+        - GROUP_ID=1000
+    user: dev
+    volumes:
+      - ..:/workspace

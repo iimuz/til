@@ -1,0 +1,6 @@
+bokeh
+numpy
+pandas
+pyyaml
+scikit-learn
+umap-learn
