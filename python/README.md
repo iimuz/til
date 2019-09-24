@@ -8,8 +8,8 @@ python で調べたり、簡易のコードを記述したときの実行サン�
 
 - code_coverage: コードカバレッジの計測用サンプル
 - depwalker: dependency walker の依存関係結果からネットワークグラフを表示するサンプル
-- image-concat: 複数の画像を並べて 1 枚の画像とするサンプル
 - image-resize: 画像をリサイズするサンプル
+- image_concat: 複数の画像を並べて 1 枚の画像とするサンプル
 - overlap_diff_image: 基準画像との差異を基準画像にオーバーラップ表示するサンプル
 - unittest_sample: unittest を実行するサンプル
 - view_bokeh: bokeh を利用してブラウザにインタラクティブなグラフ表示を行うサンプル
@@ -19,5 +19,13 @@ python で調べたり、簡易のコードを記述したときの実行サン�
 
 ## 開発環境
 
+### pipfile
+
+各フォルダに pipfile を用意しています。
+フォルダ内で `pipenv install` で必要な環境が構築できます。
+
+### vscode
+
 docker コンテナ内で開発しています。
 開発用 docker コンテナは vscode で利用するため、 `.devcontainer` に含まれています。
+
