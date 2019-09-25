@@ -38,3 +38,9 @@ gpu バージョンを利用する場合は、 Pipfile のパッケージを変�
 
 [halhorn]: https://qiita.com/halhorn/items/2fba53cf65e994b7de76
 
+### ipynb
+
+[Collaboratory][colab] を利用して実行した結果が `hello.ipynb` になります。
+
+[colab]: https://colab.research.google.com/
+
