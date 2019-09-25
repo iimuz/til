@@ -11,6 +11,7 @@ python で調べたり、簡易のコードを記述したときの実行サン�
 - image-resize: 画像をリサイズするサンプル
 - image_concat: 複数の画像を並べて 1 枚の画像とするサンプル
 - overlap_diff_image: 基準画像との差異を基準画像にオーバーラップ表示するサンプル
+- tensorflow_hello_world: tensorflow の hello world サンプル
 - unittest_sample: unittest を実行するサンプル
 - view_bokeh: bokeh を利用してブラウザにインタラクティブなグラフ表示を行うサンプル
 - view_bokeh_table: bokeh を利用してブラウザで csv をテーブル表示するサンプル
