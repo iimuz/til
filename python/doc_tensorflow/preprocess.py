@@ -15,9 +15,9 @@ def resize(x):
     x_out = []
     for i in range(len(x)):
         img = x[i].reshape(x[i].shape[:-1])
-        img = Image.fromarray(img)
+        img = Image.fromarray((img * 255).astype(np.uint8))
         img = img.convert("RGB")
         img = img.resize((width, height), Image.LANCZOS)
-        x_out.append(np.array(img))
+        x_out.append(np.array(img).astype(np.float32) / 255)
 
     return np.array(x_out)

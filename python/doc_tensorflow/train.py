@@ -4,7 +4,7 @@ import numpy as np
 import preprocess
 
 from logging import getLogger
-from tensorflow.keras import backend as K
+from loss import original_loss
 from tensorflow.keras.applications import MobileNetV2
 from tensorflow.python.keras.engine.network import Network
 from tensorflow.keras.layers import Dense
@@ -28,20 +28,7 @@ def main() -> None:
     x_ref = preprocess.resize(x_ref)
 
     np.random.seed(0)
-    train(x_train_s, x_ref, y_ref, 20)
-
-
-def original_loss(y_true, y_pred):
-    """ 損失関数
-    """
-    lc = (
-        1
-        / (classes * batch_size)
-        * batch_size ** 2
-        * K.sum((y_pred - K.mean(y_pred, axis=0)) ** 2, axis=[1])
-        / ((batch_size - 1) ** 2)
-    )
-    return lc
+    train(x_train_s, x_ref, y_ref, 40)
 
 
 def train(x_target, x_ref, y_ref, epoch_num):
@@ -107,17 +94,19 @@ def train(x_target, x_ref, y_ref, epoch_num):
             logger.info(f"epoch: {epoch}")
             logger.info(f"Descriptive loss: {loss[-1]}")
             logger.info(f"Compact loss: {loss_c[-1]}")
-    network.save("_data/model.h5")
+    model_t.save("_data/model.h5")
 
     plt.plot(loss, label="Descriptive loss")
     plt.xlabel("epoch")
     plt.legend()
     plt.show()
+    plt.savefig("_data/descriptive_loss.png")
 
     plt.plot(loss_c, label="Compact loss")
     plt.xlabel("epoch")
     plt.legend()
     plt.show()
+    plt.savefig("_data/compact_loss.png")
 
 
 if __name__ == "__main__":
