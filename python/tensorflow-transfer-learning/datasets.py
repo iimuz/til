@@ -14,6 +14,16 @@ logger = getLogger(__name__)
 def image_formatter(
     image: EagerTensor, label: EagerTensor, image_size=(160, 160)
 ) -> Tuple[EagerTensor, EagerTensor]:
+    """画像の前処理
+
+    Args:
+        image (EagerTensor): 入力画像
+        label (EagerTensor): ラベルデータ
+        image_size (tuple, optional): 出力画像のサイズ. Defaults to (160, 160).
+
+    Returns:
+        Tuple[EagerTensor, EagerTensor]: (出力画像, ラベルデータ)
+    """
     image = tf.cast(image, tf.float32)
     image = (image / 127.5) - 1
     image = tf.image.resize(image, image_size)
@@ -24,6 +34,15 @@ def image_formatter(
 def get_dataset(
     split_weights=(8, 1, 1)
 ) -> Tuple[DatasetV1Adapter, DatasetV1Adapter, DatasetV1Adapter, DatasetInfo]:
+    """学習用データを取得するためのアダプタを取得する
+
+    Args:
+        split_weights (tuple, optional): (学習、検証、テスト)の. Defaults to (8, 1, 1).
+
+    Returns:
+        Tuple[DatasetV1Adapter, DatasetV1Adapter, DatasetV1Adapter, DatasetInfo]: (学習用データセット, 検証用データセット, テスト用データセット, メタ情報)
+    """
+
     splits = tfds.Split.TRAIN.subsplit(weighted=split_weights)
 
     (raw_train, raw_validation, raw_test), metadata = tfds.load(
@@ -36,6 +55,16 @@ def get_dataset(
 def get_preprocessed_dataset(
     split_weights=(8, 1, 1), image_size=(160, 160)
 ) -> Tuple[DatasetV1Adapter, DatasetV1Adapter, DatasetV1Adapter, DatasetInfo]:
+    """前処理済みのデータを取得するためのアダプタを取得する
+
+    Args:
+        split_weights (tuple, optional): (学習、検証、テスト)の. Defaults to (8, 1, 1).
+        image_size (tuple, optional): [description]. Defaults to (160, 160).
+
+    Returns:
+        Tuple[DatasetV1Adapter, DatasetV1Adapter, DatasetV1Adapter, DatasetInfo]: (学習用データセット, 検証用データセット, テスト用データセット, メタ情報)
+    """
+
     def converter(dataset):
         return dataset.map(
             lambda image, label: image_formatter(image, label, image_size)
@@ -66,7 +95,7 @@ def get_batch_dataset(
         shuffle_seed ([type], optional): [description]. Defaults to None.
 
     Returns:
-        Tuple[DatasetV1Adapter, DatasetV1Adapter, DatasetV1Adapter, DatasetInfo]: [description]
+        Tuple[DatasetV1Adapter, DatasetV1Adapter, DatasetV1Adapter, DatasetInfo]: (学習用データセット, 検証用データセット, テスト用データセット, メタ情報)
     """
 
     def batch_converter(dataset):
