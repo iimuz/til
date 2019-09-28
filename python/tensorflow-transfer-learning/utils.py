@@ -42,8 +42,8 @@ def plot_history(history: History) -> None:
         history (History): 表示するグラフの履歴
     """
     plt.figure()
-    plt.plot(history.history["accuracy"], label="Training Accuracy")
-    plt.plot(history.history["val_accuracy"], label="Validation Accuracy")
+    plt.plot(history.history["acc"], label="Training Accuracy")
+    plt.plot(history.history["val_acc"], label="Validation Accuracy")
     plt.legend(loc="lower right")
     plt.ylabel("Accuracy")
     plt.ylim([min(plt.ylim()), 1])
