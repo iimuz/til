@@ -173,7 +173,7 @@ def train(
         save_history(generator_history, discriminator_history, history_filepath)
 
         if display is not None:
-            display.clera_output(wait=True)
+            display.clear_output(wait=True)
         show_and_save_images(
             generator(seed, training=False),
             f"_data/image_at_epoch_{epoch:04d}.png",
