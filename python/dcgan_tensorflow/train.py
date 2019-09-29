@@ -188,9 +188,9 @@ def train(
 def train_step(
     images: tf.Tensor,
     generator: tf.keras.Model,
-    generator_optimizer: tf.keras.Optimizers.Optimizer,
+    generator_optimizer: tf.keras.optimizers.Optimizer,
     discriminator: tf.keras.Model,
-    discriminator_optimizer: tf.keras.Optimizers.Optimizer,
+    discriminator_optimizer: tf.keras.optimizers.Optimizer,
     batch_size: int = 256,
     noise_dim: int = 100,
     train_generator_loss: List = None,
