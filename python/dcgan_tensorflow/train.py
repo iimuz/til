@@ -250,6 +250,7 @@ def _main() -> None:
 
     dataset_train, _ = dataset.get_batch_dataset()
     train(dataset_train, epochs=2)
+    utils.save_gif("_data/", "image_at_epoch_*", "_data/dcgan.gif")
 
 
 if __name__ == "__main__":
