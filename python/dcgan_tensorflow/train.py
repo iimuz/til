@@ -142,10 +142,11 @@ def train(
     num_examples_to_generate = 16
     seed = tf.random.normal([num_examples_to_generate, gen_input_dim])
 
-    generator_loss = tf.keras.metrics.Mean(name="generator_loss")
-    discriminator_loss = tf.keras.metrics.Mean(name="discriminator_loss")
     start_epoch = checkpoint.save_counter.numpy()
     for epoch in range(start_epoch, epochs):
+        generator_loss = tf.keras.metrics.Mean(name="generator_loss")
+        discriminator_loss = tf.keras.metrics.Mean(name="discriminator_loss")
+
         start_learning = time.time()
         for image_batch in dataset:
             train_step(
