@@ -7,10 +7,14 @@ python で調べたり、簡易のコードを記述したときの実行サン�
 ## サンプルリスト
 
 - code_coverage: コードカバレッジの計測用サンプル
+- dcgan_tensorflow: DCGAN を tensorflow で記述したサンプル
 - depwalker: dependency walker の依存関係結果からネットワークグラフを表示するサンプル
+- doc_tensorflow: DOC を tensorflow で記述したサンプル
 - image-resize: 画像をリサイズするサンプル
 - image_concat: 複数の画像を並べて 1 枚の画像とするサンプル
 - overlap_diff_image: 基準画像との差異を基準画像にオーバーラップ表示するサンプル
+- tensorflow-eager-mnist: tensorflow の eager mode で MNIST を分類するサンプル
+- tensorflow-transfer-learning: tensorflow で転移学習するサンプル
 - tensorflow_hello_world: tensorflow の hello world サンプル
 - unittest_sample: unittest を実行するサンプル
 - view_bokeh: bokeh を利用してブラウザにインタラクティブなグラフ表示を行うサンプル
