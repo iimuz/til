@@ -160,20 +160,21 @@ def train(
                 discriminator_loss,
             )
         end_learning = time.time()
+
         generator_history.append(generator_loss.result())
         discriminator_history.append(discriminator_loss.result())
-        logger.info(
-            f"Epoch {epoch},"
-            f" Generator Loss: {generator_history[-1]},"
-            f" Discriminator Loss: {discriminator_history[-1]},"
-            f" Time: {end_learning - start_learning} sec"
-        )
 
         checkpoint_manager.save()
         save_history(generator_history, discriminator_history, history_filepath)
 
         if display is not None:
             display.clear_output(wait=True)
+        logger.info(
+            f"Epoch {epoch},"
+            f" Generator Loss: {generator_history[-1]},"
+            f" Discriminator Loss: {discriminator_history[-1]},"
+            f" Time: {end_learning - start_learning} sec"
+        )
         show_and_save_images(
             generator(seed, training=False),
             f"_data/image_at_epoch_{epoch:04d}.png",
