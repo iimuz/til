@@ -12,6 +12,7 @@ python で調べたり、簡易のコードを記述したときの実行サン�
 - doc_tensorflow: DOC を tensorflow で記述したサンプル
 - image-resize: 画像をリサイズするサンプル
 - image_concat: 複数の画像を並べて 1 枚の画像とするサンプル
+- imageio_gif: imageio パッケージを利用して gif アニメーションファイルを作成するサンプル
 - overlap_diff_image: 基準画像との差異を基準画像にオーバーラップ表示するサンプル
 - tensorflow-eager-mnist: tensorflow の eager mode で MNIST を分類するサンプル
 - tensorflow-transfer-learning: tensorflow で転移学習するサンプル
