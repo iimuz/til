@@ -30,9 +30,6 @@ def create_images(
         return
 
     block_size = (size[0] // num, size[0] // num)
-    filepath_template = lambda: str(
-        pathlib.Path(save_dir).joinpath(f"{prefix}{idx:03d}{save_ext}")
-    )
     for idx in range(num):
         image = np.zeros(size, dtype=np.uint8)
         image[
@@ -40,7 +37,7 @@ def create_images(
             idx * block_size[1] : (idx + 1) * block_size[1],
         ] = 255
         image = Image.fromarray(image)
-        image.save(filepath_template())
+        image.save(str(pathlib.Path(save_dir).joinpath(f"{prefix}{idx:03d}{save_ext}")))
 
 
 def create_gif(
@@ -55,8 +52,7 @@ def create_gif(
         search_query (str, optional): gif ファイルにまとめる画像を取得するためのクエリ. Defaults to "images*.png".
         filepath (str, optional): gif ファイルを保存するファイル名. Defaults to "_data/anim.gif".
     """
-    filenames = pathlib.Path(image_dir).glob(search_query)
-    filenames = sorted(filenames)
+    filenames = sorted(pathlib.Path(image_dir).glob(search_query))
     with imageio.get_writer(filepath, mode="I") as writer:
         for filename in filenames:
             logger.info(f"load file: {filename}")
