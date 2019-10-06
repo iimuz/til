@@ -3,7 +3,7 @@ from logging import getLogger
 import numpy as np
 import tensorflow as tf
 
-logger = getLogger()
+logger = getLogger(__name__)
 
 
 def dataset_formatter(
