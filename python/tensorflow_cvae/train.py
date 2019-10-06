@@ -22,7 +22,16 @@ logger = getLogger(__name__)
 
 
 @tf.function
-def compute_apply_gradients(model, batch, optimizer):
+def compute_apply_gradients(
+    model: tf.keras.Model, batch: tf.Tensor, optimizer: tf.keras.optimizers.Optimizer
+) -> None:
+    """勾配を計算する
+
+    Args:
+        model (tf.keras.Model): ネットワーク
+        batch (tf.Tensor): バッチデータ
+        optimizer (tf.keras.optimizers.Optimizer): 最適化関数
+    """
     with tf.GradientTape() as tape:
         loss = compute_loss(model, batch)
     gradients = tape.gradient(loss, model.trainable_variables)
@@ -30,7 +39,16 @@ def compute_apply_gradients(model, batch, optimizer):
 
 
 @tf.function
-def compute_loss(model, batch):
+def compute_loss(model: tf.keras.Model, batch: tf.Tensor) -> tf.Tensor:
+    """損失の計算
+
+    Args:
+        model (tf.keras.Model): ネットワーク
+        batch (tf.Tensor): バッチデータ
+
+    Returns:
+        tf.Tensor: 損失
+    """
     mean, logvar = model.encode(batch)
     z = model.reparameterize(mean, logvar)
     x_logit = model.decode(z)
@@ -44,7 +62,20 @@ def compute_loss(model, batch):
     return -tf.reduce_mean(logpx_z + logpz - logqz_x)
 
 
-def log_normal_pdf(sample, mean, logvar, raxis=1):
+def log_normal_pdf(
+    sample: tf.Tensor, mean: tf.Tensor, logvar: tf.Tensor, raxis: int = 1
+) -> tf.Tensor:
+    """対数正規分布
+
+    Args:
+        sample (tf.Tensor): サンプル
+        mean (tf.Tensor): 平均
+        logvar (tf.Tensor): 対数分散
+        raxis (int, optional): raxis. Defaults to 1.
+
+    Returns:
+        tf.Tensor: 分布
+    """
     log2pi = tf.math.log(2.0 * np.pi)
     return tf.reduce_sum(
         -0.5 * ((sample - mean) ** 2.0 * tf.exp(-logvar) + logvar + log2pi), axis=raxis
@@ -52,6 +83,14 @@ def log_normal_pdf(sample, mean, logvar, raxis=1):
 
 
 def restore_history(filepath: str) -> List:
+    """損失などの履歴を復元する
+
+    Args:
+        filepath (str): 復元するファイルパス
+
+    Returns:
+        List: ELBO の履歴
+    """
     elbo_history: List = []
     if pathlib.Path(filepath).exists() is False:
         return elbo_history
@@ -64,11 +103,23 @@ def restore_history(filepath: str) -> List:
 
 
 def save_history(elbo_history: List, filepath: str) -> None:
+    """損失などの履歴を保存する
+
+    Args:
+        elbo_history (List): ELBO の履歴
+        filepath (str): 保存するファイルパス
+    """
     with open(filepath, "wb") as f:
         pickle.dump({"elbo_history": elbo_history}, f)
 
 
 def show_and_save_history(elbo_history: List, filepath: str) -> None:
+    """損失などの変化量を表示し、保存する
+
+    Args:
+        elbo_history (List): ELBO の履歴
+        filepath (str): 画像を保存するファイルパス
+    """
     plt.figure()
     plt.plot(elbo_history, label="ELBO")
     plt.title("ELBO")
@@ -77,6 +128,12 @@ def show_and_save_history(elbo_history: List, filepath: str) -> None:
 
 
 def show_and_save_images(images, filepath: str):
+    """復号化した画像の表示と保存
+
+    Args:
+        images ([type]): 画像データセット
+        filepath (str): 保存するファイル名
+    """
     fig = plt.figure()
     for i in range(images.shape[0]):
         plt.subplot(4, 4, i + 1)
@@ -88,6 +145,8 @@ def show_and_save_images(images, filepath: str):
 
 
 def _main() -> None:
+    """簡易動作スクリプト
+    """
     import logging
 
     logging.basicConfig(level=logging.INFO)
@@ -139,6 +198,7 @@ def _main() -> None:
         show_and_save_images(predictions, f"_data/image_at_epoch_{epoch:04d}.png")
         show_and_save_history(elbo_history, history_image_filepath)
         save_history(elbo_history, history_filepath)
+    utils.save_gif("_data/", "image_at_epoch_*.png", "_data/cvae.gif")
 
 
 if __name__ == "__main__":
