@@ -49,6 +49,31 @@ class CVAE(tf.keras.Model):
             ]
         )
 
+    def decode(self, batch, apply_sigmoid=False):
+        logits = self.generative_net(batch)
+        if apply_sigmoid:
+            probs = tf.sigmoid(logits)
+            return probs
+
+        return logits
+
+    def encode(self, batch):
+        mean, logvar = tf.split(self.inference_net(batch), num_or_size_splits=2, axis=1)
+        logger.info(f"encode type: mean: {type(mean)}, logvar: {type(logvar)}")
+        return mean, logvar
+
+    def reparameterize(self, mean, logvar):
+        eps = tf.random.normal(shape=mean.shape)
+        val = eps * tf.exp(logvar * 0.5) + mean
+        logger.info(f"reparameterize type {type(val)}")
+        return val
+
+    @tf.function
+    def sample(self, eps=None):
+        if eps is None:
+            eps = tf.random.normal(shape(100, self.latent_dim))
+        return self.decode(eps, apply_sigmoid=True)
+
 
 def _main() -> None:
     import logging

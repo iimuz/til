@@ -59,7 +59,6 @@ def get_batch_dataset(
         tf.data.Dataset: バッチ単位の画像データセット
     """
     train_dataset, test_dataset = get_dataset()
-    logger.info(f"dataset type: {type(train_dataset)}")
     train_dataset = (
         tf.data.Dataset.from_tensor_slices(train_dataset)
         .shuffle(train_buff)
