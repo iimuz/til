@@ -88,7 +88,7 @@ class CVAE(tf.keras.Model):
         return mean, logvar
 
     def reparameterize(self, mean: tf.Tensor, logvar: tf.Tensor) -> tf.Tensor:
-        """潜在空間での値を計算する
+        """潜在空間から値をサンプリングする
 
         Args:
             mean (tf.Tensor): 平均
@@ -102,7 +102,7 @@ class CVAE(tf.keras.Model):
 
     @tf.function
     def sample(self, eps: tf.Tensor = None) -> tf.Tensor:
-        """潜在空間からサンプリングを行う
+        """適当な値で潜在空間から復号化する
 
         Args:
             eps (tf.Tensor, optional): 誤差. Defaults to None.

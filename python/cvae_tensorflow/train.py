@@ -152,7 +152,7 @@ def _main() -> None:
     logging.basicConfig(level=logging.INFO)
     logger.info(f"eager execution: {tf.executing_eagerly()}")
 
-    epochs = 2
+    epochs = 20
     latent_dim = 50
     num_example_to_generate = 16
     random_vector_for_generation = tf.random.normal(
