@@ -7,6 +7,8 @@ python で調べたり、簡易のコードを記述したときの実行サン�
 ## サンプルリスト
 
 - code_coverage: コードカバレッジの計測用サンプル
+- cvae_tensorflow: CVAE を tensorflow で記述したサンプル
+- datasets: データセットのダウンロード用スクリプト
 - dcgan_tensorflow: DCGAN を tensorflow で記述したサンプル
 - depwalker: dependency walker の依存関係結果からネットワークグラフを表示するサンプル
 - doc_tensorflow: DOC を tensorflow で記述したサンプル
@@ -34,4 +36,3 @@ python で調べたり、簡易のコードを記述したときの実行サン�
 
 docker コンテナ内で開発しています。
 開発用 docker コンテナは vscode で利用するため、 `.devcontainer` に含まれています。
-
