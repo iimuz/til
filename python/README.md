@@ -19,6 +19,7 @@ python で調べたり、簡易のコードを記述したときの実行サン�
 - tensorflow-eager-mnist: tensorflow の eager mode で MNIST を分類するサンプル
 - tensorflow-transfer-learning: tensorflow で転移学習するサンプル
 - tensorflow_hello_world: tensorflow の hello world サンプル
+- tqdm-usage: tqdm の利用方法サンプル
 - unittest_sample: unittest を実行するサンプル
 - view_bokeh: bokeh を利用してブラウザにインタラクティブなグラフ表示を行うサンプル
 - view_bokeh_table: bokeh を利用してブラウザで csv をテーブル表示するサンプル
