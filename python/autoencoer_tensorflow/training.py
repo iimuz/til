@@ -86,7 +86,7 @@ def _main() -> None:
     image_shape = (28, 28, 1)
     epochs = 50
     dims = image_shape[0] * image_shape[1]
-    (x_train, y_train), _ = tf.keras.datasets.mnist.load_data()
+    (x_train, _), _ = tf.keras.datasets.mnist.load_data()
     train_ds = (
         tf.data.Dataset.from_tensor_slices(x_train)
         .map(lambda x: _convert_types(x, dims))
