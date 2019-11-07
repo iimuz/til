@@ -1,7 +1,7 @@
 from logging import getLogger
+from typing import Tuple
 
 # third party
-import matplotlib.pyplot as plt
 import tensorflow as tf
 from tqdm import tqdm
 
@@ -14,10 +14,10 @@ from checkpoint import Checkpoint
 logger = getLogger(__name__)
 
 
-def train(dataset: tf.data.Dataset) -> None:
-    image_shape = (28, 28, 1)
+def train(
+    dataset: tf.data.Dataset, image_shape: Tuple[int, int, int], epochs: int
+) -> None:
     input_shape = image_shape[0] * image_shape[1] * image_shape[2]
-    epochs = 50
     history_filepath = "data/history.pkl"
     history_imagepath = "data/history.png"
     reconstruct_filepath = "data/reconstruct.png"
@@ -61,6 +61,15 @@ def train(dataset: tf.data.Dataset) -> None:
 
 
 def _convert_types(image: tf.Tensor, dims: int) -> tf.Tensor:
+    """入力データセットを成型する
+
+    Args:
+        image (tf.Tensor): 入力画像
+        dims (int): 1次元配列とするときの次元数
+
+    Returns:
+        tf.Tensor: 変換した画像
+    """
     image = tf.cast(image, tf.float32)
     image /= 255.0
     image = tf.reshape(image, [dims])
@@ -68,11 +77,15 @@ def _convert_types(image: tf.Tensor, dims: int) -> tf.Tensor:
 
 
 def _main() -> None:
+    """動作確認用スクリプト
+    """
     import logging
 
     logging.basicConfig(level=logging.INFO)
 
-    dims = 28 * 28
+    image_shape = (28, 28, 1)
+    epochs = 50
+    dims = image_shape[0] * image_shape[1]
     (x_train, y_train), _ = tf.keras.datasets.mnist.load_data()
     train_ds = (
         tf.data.Dataset.from_tensor_slices(x_train)
@@ -81,7 +94,7 @@ def _main() -> None:
         .batch(128)
     )
 
-    train(train_ds)
+    train(train_ds, image_shape, epochs)
 
 
 if __name__ == "__main__":
