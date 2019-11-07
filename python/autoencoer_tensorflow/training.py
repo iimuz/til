@@ -8,6 +8,7 @@ from tqdm import tqdm
 import history
 import network
 import visualize
+from checkpoint import Checkpoint
 
 logger = getLogger(__name__)
 
@@ -24,6 +25,13 @@ def train(dataset: tf.data.Dataset) -> None:
     loss = tf.keras.losses.mean_squared_error
     # loss = tf.keras.losses.binary_crossentropy
 
+    checkpoint = Checkpoint(
+        save_dir="data/ckpts",
+        max_to_keep=3,
+        restore=True,
+        model=model,
+        optimizer=optimizer,
+    )
     epoch_history = history.Epoch()
     input_example = [data for data in dataset.take(1)][-1]
     progress_bar = tqdm(range(epochs))
@@ -34,6 +42,7 @@ def train(dataset: tf.data.Dataset) -> None:
             model.train_step(batch, loss, optimizer, batch_history)
 
         # save results
+        checkpoint.save()
         batch_history.result()
         epoch_history.result(batch_history)
 
