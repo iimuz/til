@@ -30,6 +30,8 @@ def show_images(
     if filepath is not None:
         plt.savefig(filepath)
 
+    plt.close()
+
 
 def _concat_images(
     images: np.ndarray, image_shape: Tuple[int, int, int], rows: int, cols: int

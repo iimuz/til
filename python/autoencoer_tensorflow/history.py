@@ -1,10 +1,15 @@
 # default packages
+import pathlib
+import pickle
 import time
+from logging import getLogger
 from typing import List
 
 # thrid party
 import matplotlib.pyplot as plt
 import tensorflow as tf
+
+logger = getLogger(__name__)
 
 
 class Batch:
@@ -30,6 +35,34 @@ class Epoch:
         return f"loss: {self.loss[-1]:.4e}" f", time: {self.calc_time[-1]:.4e} sec"
 
 
+def restore(filepath: str) -> Epoch:
+    if filepath is None:
+        logger.info("file path is None.")
+        return Epoch()
+
+    if pathlib.Path(filepath).exists() is False:
+        logger.info(f"cannot find file: {filepath}")
+        return Epoch()
+
+    with open(filepath, "rb") as f:
+        result = pickle.load(f)
+
+    epoch = Epoch()
+    epoch.loss = result["loss"]
+    epoch.calc_time = result["calc_time"]
+
+    return epoch
+
+
+def save(history: Epoch, filepath: str) -> None:
+    if filepath is None:
+        logger.info("file path is None.")
+        return
+
+    with open(filepath, "wb") as f:
+        pickle.dump({"loss": history.loss, "calc_time": history.calc_time}, f)
+
+
 def show_image(history: Epoch, filepath: str = None) -> None:
     plt.figure()
     plt.subplot(2, 1, 1)
@@ -42,6 +75,7 @@ def show_image(history: Epoch, filepath: str = None) -> None:
         plt.savefig(filepath)
 
     plt.show()
+    plt.close()
 
 
 def _show_loss_image(loss: List[float]) -> None:

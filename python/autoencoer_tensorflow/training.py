@@ -1,6 +1,7 @@
 from logging import getLogger
 
 # third party
+import matplotlib.pyplot as plt
 import tensorflow as tf
 from tqdm import tqdm
 
@@ -16,8 +17,9 @@ logger = getLogger(__name__)
 def train(dataset: tf.data.Dataset) -> None:
     image_shape = (28, 28, 1)
     input_shape = image_shape[0] * image_shape[1] * image_shape[2]
-    epochs = 2
-    history_filepath = "data/history.png"
+    epochs = 50
+    history_filepath = "data/history.pkl"
+    history_imagepath = "data/history.png"
     reconstruct_filepath = "data/reconstruct.png"
 
     model = network.Autoencoder(input_shape)
@@ -32,9 +34,9 @@ def train(dataset: tf.data.Dataset) -> None:
         model=model,
         optimizer=optimizer,
     )
-    epoch_history = history.Epoch()
+    epoch_history = history.restore(history_filepath)
     input_example = [data for data in dataset.take(1)][-1]
-    progress_bar = tqdm(range(epochs))
+    progress_bar = tqdm(range(checkpoint.save_counter(), epochs))
     for epoch in progress_bar:
         # learning
         batch_history = history.Batch()
@@ -45,10 +47,11 @@ def train(dataset: tf.data.Dataset) -> None:
         checkpoint.save()
         batch_history.result()
         epoch_history.result(batch_history)
+        history.save(epoch_history, history_filepath)
 
         # show results
-        progress_bar.set_description(f"{epoch_history.get_latest()}")
-        history.show_image(epoch_history, filepath=history_filepath)
+        progress_bar.set_description(f"epoch: {epoch}, {epoch_history.get_latest()}")
+        history.show_image(epoch_history, filepath=history_imagepath)
         visualize.show_images(
             input_example,
             network.reconstruct(model, input_example),
