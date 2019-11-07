@@ -2,6 +2,7 @@ from logging import getLogger
 
 # third party
 import tensorflow as tf
+from tqdm import tqdm
 
 # my pakcages
 import history
@@ -25,7 +26,8 @@ def train(dataset: tf.data.Dataset) -> None:
 
     epoch_history = history.Epoch()
     input_example = [data for data in dataset.take(1)][-1]
-    for epoch in range(epochs):
+    progress_bar = tqdm(range(epochs))
+    for epoch in progress_bar:
         # learning
         batch_history = history.Batch()
         for batch in dataset:
@@ -36,7 +38,7 @@ def train(dataset: tf.data.Dataset) -> None:
         epoch_history.result(batch_history)
 
         # show results
-        logger.info(f"epoch: {epoch}/{epochs}, {epoch_history.get_latest()}")
+        progress_bar.set_description(f"{epoch_history.get_latest()}")
         history.show_image(epoch_history, filepath=history_filepath)
         visualize.show_images(
             input_example,
