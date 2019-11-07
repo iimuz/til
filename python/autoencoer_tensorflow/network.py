@@ -1,9 +1,9 @@
-# default package
-from typing import Tuple
-
 # third party
 import tensorflow as tf
 from tensorflow.keras import layers
+
+# my packages
+import history
 
 
 class Autoencoder(tf.keras.Model):
@@ -24,12 +24,15 @@ class Autoencoder(tf.keras.Model):
         inputs: tf.Tensor,
         loss_obj: tf.keras.losses.Loss,
         optimizer: tf.keras.optimizers.Optimizer,
+        batch_history: history.Batch,
     ) -> None:
         with tf.GradientTape() as tape:
             reconstruct = self(inputs)
             loss = loss_obj(inputs, reconstruct)
         gradients = tape.gradient(loss, self.trainable_variables)
         optimizer.apply_gradients(zip(gradients, self.trainable_variables))
+
+        batch_history.loss(loss)
 
 
 def _make_decoder(input_dim: int, output_dim: int) -> tf.keras.Model:
