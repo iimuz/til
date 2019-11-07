@@ -13,7 +13,7 @@ class Autoencoder(tf.keras.Model):
         self.encoder = _make_encoder(input_dim, dims)
         self.decoder = _make_decoder(dims, input_dim)
 
-    def call(self, inputs: tf.Tensor) -> None:
+    def call(self, inputs: tf.Tensor) -> tf.Tensor:
         code = self.encoder(inputs)
         reconstruct = self.decoder(code)
         return reconstruct
@@ -33,6 +33,10 @@ class Autoencoder(tf.keras.Model):
         optimizer.apply_gradients(zip(gradients, self.trainable_variables))
 
         batch_history.loss(loss)
+
+
+def reconstruct(model: Autoencoder, inputs: tf.Tensor) -> tf.Tensor:
+    return model(inputs)
 
 
 def _make_decoder(input_dim: int, output_dim: int) -> tf.keras.Model:
