@@ -28,3 +28,9 @@ $ gcloud config set core/disable_usage_reporting False
 $ gcloud auth login
 ```
 
+### compute instance のイメージ名一覧
+
+```
+$ gcloud compute images list
+```
+
