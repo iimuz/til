@@ -4,7 +4,9 @@
 
 ## Usage
 
+簡易な学習を実行する場合は、下記のようにして実行します。
+
 ```sh
 pipenv install --skip-lock
-pipenv run python training.py
+pipenv run python -m unittest test_network
 ```
