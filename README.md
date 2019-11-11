@@ -12,3 +12,4 @@ Today I Learn.
 - javascript: html/css/javascript に関係するサンプルコードです。
 - markdown: markdown に関するサンプルコードです。
 - python: python に関するサンプルコードです。
+- r: R に関するサンプルコードです。
