@@ -10,7 +10,7 @@ from tqdm import tqdm
 # my packages
 from src.data import history
 from src.data.checkpoint import Checkpoint
-from src.models import dense_ae as network
+from src.models import cvae as network
 from src.visualization import visualize
 
 
@@ -37,8 +37,10 @@ class TestNetwork(unittest.TestCase):
 
         # test
         reconstruct = model([data for data in train_ds.take(1)][0])
-        input_dims = image_shape[0] * image_shape[1] * image_shape[2]
-        self.assertEqual(reconstruct.shape, (batch_size, input_dims))
+        self.assertEqual(
+            reconstruct.shape,
+            (batch_size, image_shape[0], image_shape[1], image_shape[2]),
+        )
 
 
 def _train(
@@ -54,15 +56,13 @@ def _train(
     Returns:
         tf.keras.Model: 学習したモデル
     """
-    input_shape = image_shape[0] * image_shape[1] * image_shape[2]
-    output_base = pathlib.Path("data/dense_ae")
+    output_base = pathlib.Path("data/cvae")
     history_filepath = output_base.joinpath("history.pkl")
     history_imagepath = output_base.joinpath("history.png")
     reconstruct_filepath = output_base.joinpath("reconstruct.png")
 
-    model = network.Autoencoder(input_shape)
+    model = network.CVAE()
     optimizer = tf.keras.optimizers.Adam(1e-4)
-    loss = tf.keras.losses.mean_squared_error
 
     checkpoint = Checkpoint(
         save_dir=str(output_base.joinpath("ckpts")),
@@ -78,7 +78,7 @@ def _train(
         # learning
         batch_history = history.Batch()
         for batch in dataset:
-            model.train_step(batch, loss, optimizer, batch_history)
+            model.train_step(batch, optimizer, batch_history)
 
         # save results
         checkpoint.save()
@@ -111,5 +111,6 @@ def _convert_types(image: tf.Tensor, dims: int) -> tf.Tensor:
     """
     image = tf.cast(image, tf.float32)
     image /= 255.0
-    image = tf.reshape(image, [dims])
+    image = tf.round(image)
+    image = tf.reshape(image, [28, 28, 1])
     return image
