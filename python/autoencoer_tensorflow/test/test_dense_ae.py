@@ -7,10 +7,10 @@ import tensorflow as tf
 from tqdm import tqdm
 
 # my packages
-import history
-import network
-import visualize
-from checkpoint import Checkpoint
+from src.data import history
+from src.data.checkpoint import Checkpoint
+from src.models import dense_ae as network
+from src.visualization import visualize
 
 
 class TestNetwork(unittest.TestCase):

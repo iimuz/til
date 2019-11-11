@@ -3,7 +3,7 @@ import tensorflow as tf
 from tensorflow.keras import layers
 
 # my packages
-import history
+from src.data import history
 
 
 class Autoencoder(tf.keras.Model):

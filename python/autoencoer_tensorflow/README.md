@@ -8,5 +8,5 @@
 
 ```sh
 pipenv install --skip-lock
-pipenv run python -m unittest test_network
+pipenv run python -m unittest test.test_network
 ```
