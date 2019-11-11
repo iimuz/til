@@ -1,4 +1,5 @@
 # default packages
+import pathlib
 import unittest
 from typing import Tuple
 
@@ -7,10 +8,10 @@ import tensorflow as tf
 from tqdm import tqdm
 
 # my packages
-import history
-import network
-import visualize
-from checkpoint import Checkpoint
+from src.data import history
+from src.data.checkpoint import Checkpoint
+from src.models import dense_ae as network
+from src.visualization import visualize
 
 
 class TestNetwork(unittest.TestCase):
@@ -54,16 +55,17 @@ def _train(
         tf.keras.Model: 学習したモデル
     """
     input_shape = image_shape[0] * image_shape[1] * image_shape[2]
-    history_filepath = "data/history.pkl"
-    history_imagepath = "data/history.png"
-    reconstruct_filepath = "data/reconstruct.png"
+    output_base = pathlib.Path("data/dense_ae")
+    history_filepath = output_base.joinpath("history.pkl")
+    history_imagepath = output_base.joinpath("history.png")
+    reconstruct_filepath = output_base.joinpath("reconstruct.png")
 
     model = network.Autoencoder(input_shape)
     optimizer = tf.keras.optimizers.Adam(1e-4)
     loss = tf.keras.losses.mean_squared_error
 
     checkpoint = Checkpoint(
-        save_dir="data/ckpts",
+        save_dir=str(output_base.joinpath("ckpts")),
         max_to_keep=3,
         restore=True,
         model=model,
