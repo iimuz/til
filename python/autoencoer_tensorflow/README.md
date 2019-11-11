@@ -10,3 +10,9 @@
 pipenv install --skip-lock
 pipenv run python -m unittest test.test_network
 ```
+
+## Models
+
+下記にモデルファイル名と簡易な説明を記載します。
+
+- `src.models.dense_ae`: 単純な Dense 層のみで構成した Autoencoder
