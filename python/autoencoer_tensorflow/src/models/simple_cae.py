@@ -11,14 +11,14 @@ from src.data import history
 
 
 class Autoencoder(tf.keras.Model):
-    """単純な全結合Autoencoder
+    """単純な Convolutional Autoencoder
     """
 
     def __init__(self, input_shape: Tuple[int, int, int]) -> None:
         """Initialize
 
         Args:
-            input_dim (int): 入力次元数
+            input_dim (Tuple[int, int, int]): 入力次元数
         """
         super(Autoencoder, self).__init__()
         self.encoder, reduce_rate = _make_encoder()
@@ -73,8 +73,7 @@ def _make_decoder(input_shape: Tuple[int, int]) -> tf.keras.Model:
     """decoderを生成する
 
     Args:
-        input_dim (int): 入力次元
-        output_dim (int): 出力次元
+        input_shape (Tuple[int, int]): encoderが最終的に出力する画像サイズ
 
     Returns:
         tf.keras.Model: decoderモデル
@@ -102,6 +101,7 @@ def _make_encoder() -> Tuple[tf.keras.Model, int]:
 
     Returns:
         tf.keras.Model: decoderモデル
+        int: 縮小倍率
     """
     model = tf.keras.Sequential(
         [
