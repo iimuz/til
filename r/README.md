@@ -7,3 +7,4 @@ R 言語でのサンプルメモです。
 ## サンプルリスト
 
 - hello: hello world サンプル
+- renv_sample: renv の簡易利用サンプル
