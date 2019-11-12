@@ -14,7 +14,7 @@ logger = getLogger(__name__)
 
 
 class CVAE(tf.keras.Model):
-    """Convolutional Variational Auto Encoder
+    """Convolutional Variational Autoencoder
     """
 
     def __init__(self) -> None:
