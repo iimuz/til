@@ -1,0 +1,10 @@
+version: "3.7"
+services:
+  jupyter-r:
+    build:
+      context: .
+      dockerfile: Dockerfile
+  volumes:
+    - .local/share/renv:/home/dev/.local/share/renv:rw
+    - .local/share/jupyter:/home/dev/.local/share/jupyter:rw
+    - .:/workspace:rw
