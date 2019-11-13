@@ -6,8 +6,8 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-jupyter = "*"
-jupyterlab = "*"
+jupyter = "==1.0.0"
+jupyterlab = "==1.2.3"
 
 [requires]
 python_version = "3.7"
