@@ -30,6 +30,18 @@
       "Repository": "CRAN",
       "Hash": "b25b5fb4dbadee37199378c3a8cd5b74"
     },
+    "IRkernel": {
+      "Package": "IRkernel",
+      "Version": "1.0.2.9000",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteRepo": "IRkernel",
+      "RemoteUsername": "IRkernel",
+      "RemoteRef": "master",
+      "RemoteSha": "67592db9cddd1b50ad7daf64a25497a78b728aae",
+      "Hash": "c774d288679822ff0c37348556e58778"
+    },
     "MASS": {
       "Package": "MASS",
       "Version": "7.3-51.1",
