@@ -1,0 +1,10 @@
+= AsciiDoc のサンプル
+
+AsciiDoc に関して調べたりした内容のメモです。
+
+== 参考資料
+
+* link:++http://www.methods.co.nz/asciidoc/++[AsciiDoc]
+* link:++https://powerman.name/doc/asciidoc++[AsciiDoc Cheatsheet]
+* link:++https://takumon.github.io/asciidoc-syntax-quick-reference-japanese-translation/++[Asciidoctor 文法クイックリファレンス(日本語訳)]
+
