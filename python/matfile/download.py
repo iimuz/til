@@ -27,6 +27,12 @@ class TqdmUpTo(tqdm):
 
 
 def get_file(url: str, download_dir: str) -> None:
+    """URLからファイルをダウンロードします
+
+    Args:
+        url (str): ダウンロードするファイルのURL
+        download_dir (str): ダウンロードしたファイルを保存する先
+    """
     filename = url.split("/")[-1]
     download = pathlib.Path(download_dir).joinpath(filename)
 
@@ -40,5 +46,11 @@ def get_file(url: str, download_dir: str) -> None:
 
 
 def unzip(filepath: str, extract_dir: str) -> None:
+    """zipファイルを解凍します
+
+    Args:
+        filepath (str): zipファイルのパス
+        extract_dir (str): 解凍したファイルを保存するディレクトリ
+    """
     with zipfile.ZipFile(filepath) as zfile:
         zfile.extractall(extract_dir)

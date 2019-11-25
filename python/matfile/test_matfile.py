@@ -11,6 +11,8 @@ import download
 
 class TestMatfile(unittest.TestCase):
     def test_matfile(self):
+        """テスト用にmatファイルをダウンロードし、読み込みを実行します。
+        """
         url = "http://data-acoustics.com/wp-content/uploads/2014/06/hs_bearing_1.zip"
         extract_dir = pathlib.Path("data")
         archive_path = extract_dir.joinpath(url.split("/")[-1])
