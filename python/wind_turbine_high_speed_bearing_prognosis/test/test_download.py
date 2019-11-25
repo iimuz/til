@@ -1,8 +1,6 @@
 # default
+import pathlib
 import unittest
-
-# third party
-from scipy import io
 
 # my pckages
 import download
@@ -12,8 +10,11 @@ class TestDwonload(unittest.TestCase):
     """対象のデータセットをダウンロードするテスト。
     """
 
-    def test_download(self):
-        download.get_file()
-        var = io.loadmat("data/hs_bearing_1/hs_bearing_1/sensor-20130307T015746Z.mat")
-        for key, item in var.items():
-            print(key, item)
+    def test_download(self) -> None:
+        URL = "http://data-acoustics.com/wp-content/uploads/2014/06/hs_bearing_1.zip"
+        EXPAND_DIR = pathlib.Path("data")
+        ARCHIVE_FILE = EXPAND_DIR.joinpath(URL.split("/")[-1])
+
+        if ARCHIVE_FILE.exists() is False:
+            download.get_file(URL, EXPAND_DIR)
+        download.extract(ARCHIVE_FILE, EXPAND_DIR)

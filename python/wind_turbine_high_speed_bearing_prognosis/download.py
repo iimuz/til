@@ -26,18 +26,14 @@ class TqdmUpTo(tqdm):
         self.update(b * bsize - self.n)
 
 
-def get_file() -> None:
-    URL = "http://data-acoustics.com/wp-content/uploads/2014/06/hs_bearing_1.zip"
-    DOWNLOAD = pathlib.Path("data/hs_bearing_1.zip")
-    EXTRACT_DIR = pathlib.Path("data/hs_bearing_1")
+def get_file(url: str, download_dir: str) -> None:
+    ARCHIVE_FILE = pathlib.Path(download_dir).joinpath(url.split("/")[-1])
+    with TqdmUpTo(unit="B", unit_scale=True, miniters=1, desc=ARCHIVE_FILE.name) as t:
+        request.urlretrieve(
+            url, filename=str(ARCHIVE_FILE), reporthook=t.update_to, data=None
+        )
 
-    if DOWNLOAD.exists() is False:
-        with TqdmUpTo(
-            unit="B", unit_scale=True, miniters=1, desc=URL.split("/")[-1]
-        ) as t:
-            request.urlretrieve(
-                URL, filename=str(DOWNLOAD), reporthook=t.update_to, data=None
-            )
 
-    with zipfile.ZipFile(str(DOWNLOAD)) as zfile:
-        zfile.extractall(str(EXTRACT_DIR))
+def extract(filepath: str, expand_dir: str) -> None:
+    with zipfile.ZipFile(filepath) as zfile:
+        zfile.extractall(expand_dir)
