@@ -20,3 +20,7 @@ class TestDwonload(unittest.TestCase):
         if ARCHIVE_FILE.exists() is False:
             download.get_file(URL, str(EXPAND_DIR))
         download.extract(str(ARCHIVE_FILE), str(EXPAND_DIR))
+
+
+if __name__ == "__main__":
+    unittest.main()
