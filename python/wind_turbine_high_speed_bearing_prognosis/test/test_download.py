@@ -13,13 +13,16 @@ class TestDwonload(unittest.TestCase):
     def test_download(self) -> None:
         """データを一つ分ロードし解凍する。
         """
-        URL = "http://data-acoustics.com/wp-content/uploads/2014/06/hs_bearing_1.zip"
+        NUM_ARCHIVE = 5
+        URL_BASE = "http://data-acoustics.com/wp-content/uploads/2014/06/"
         EXPAND_DIR = pathlib.Path("data")
-        ARCHIVE_FILE = EXPAND_DIR.joinpath(URL.split("/")[-1])
 
-        if ARCHIVE_FILE.exists() is False:
-            download.get_file(URL, str(EXPAND_DIR))
-        download.extract(str(ARCHIVE_FILE), str(EXPAND_DIR))
+        for idx in range(1, NUM_ARCHIVE + 1):
+            url = URL_BASE + f"hs_bearing_{idx}.zip"
+            archive_file = EXPAND_DIR.joinpath(url.split("/")[-1])
+            if archive_file.exists() is False:
+                download.get_file(url, str(EXPAND_DIR))
+            download.extract(str(archive_file), str(EXPAND_DIR))
 
 
 if __name__ == "__main__":
