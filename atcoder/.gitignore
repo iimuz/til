@@ -1,0 +1,8 @@
+.env
+bin/
+
+## editor
+.vscode
+.vscode/
+.devcontainer
+.devcontainer/
