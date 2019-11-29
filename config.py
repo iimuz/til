@@ -12,6 +12,12 @@ LEARNING_RATE = 2e-4
 # Generator 用パラメータ
 Z_DIM = 62
 
+# Data 用パラメータ
+NORMALIZE_MEAN = [0.7172, 0.6836, 0.6748]
+NORMALIZE_STD = [0.2388, 0.2547, 0.2592]
+NOISE_MEAN = 0
+NOISE_SIGMA = 0.005
+
 # log 用パラメータ
 LOG_DIR = "logs"
 CHECKPOINT_EACH = 5

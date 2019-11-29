@@ -71,7 +71,7 @@ def parse_arguments() -> Dict[str, any]:
     return args
 
 
-def get_data_loader(batch_size: int) -> DataLoader:
+def get_data_loader(batch_size: int, transform) -> DataLoader:
     """ Get dataloader.
 
     Parameters
@@ -80,9 +80,35 @@ def get_data_loader(batch_size: int) -> DataLoader:
         バッチサイズ
     """
     # loader = data_loader.load_mnist(batch_size)
-    loader = data_loader.load_icons(pathlib.Path("data/icons"), batch_size)
+    loader = data_loader.load_icons(pathlib.Path("data/icons"), batch_size, transform)
 
     return loader
+
+
+def get_transforms(
+    normalize_mean: List[float],
+    normalize_std: List[float],
+    noise_mean: float,
+    noise_sigma: float,
+):
+    """ Get transforms
+    """
+
+    def add_noise(img, mean: float, sigma: float):
+        gauss = torch.distributions.normal.Normal(mean, sigma)
+        noisy = img + gauss.sample(img.size())
+        return noisy
+
+    transform = transforms.Compose(
+        [
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.RandomVerticalFlip(p=0.5),
+            transforms.ToTensor(),
+            transforms.Normalize(normalize_mean, normalize_std),
+            lambda img: add_noise(img, noise_mean, noise_sigma),
+        ]
+    )
+    return transform
 
 
 def run():
@@ -133,7 +159,13 @@ def run():
     criterion = nn.BCELoss()
 
     # datasets
-    data_loader = get_data_loader(locals["BATCH_SIZE"])
+    transform = get_transforms(
+        locals["NORMALIZE_MEAN"],
+        locals["NORMALIZE_STD"],
+        locals["NOISE_MEAN"],
+        locals["NOISE_SIGMA"],
+    )
+    data_loader = get_data_loader(locals["BATCH_SIZE"], transform)
 
     # training
     history = []
