@@ -1,0 +1,7 @@
+.gcloudignore
+.git
+.gitignore
+
+gcloud-service-key*
+
+node_modules
