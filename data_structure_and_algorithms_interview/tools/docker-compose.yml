@@ -1,0 +1,14 @@
+version: "3.7"
+services:
+  dev:
+    container_name: atcoder_dev
+    network_mode: none
+    image: iimuz/cpp-dev:v3.8.0-atcoder1
+    environment:
+      USER_ID: $USER_ID
+      GROUP_ID: $GROUP_ID
+      TZ: $TIME_ZONE
+    volumes:
+      - ../:/src:rw
+    working_dir: /src
+    command: ash

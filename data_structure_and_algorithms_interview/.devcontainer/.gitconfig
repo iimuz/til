@@ -1,0 +1,2 @@
+[alias]
+  lg = log --graph --oneline --decorate=full --branches --tags --remotes
