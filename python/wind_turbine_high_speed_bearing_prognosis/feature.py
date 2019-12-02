@@ -1,4 +1,5 @@
 # default package
+from logging import getLogger
 from typing import Dict
 
 
@@ -8,11 +9,11 @@ import scipy.signal
 import scipy.stats
 
 
-def calc_all(data: np.ndarray) -> Dict:
-    _, _, spectrogram = scipy.signal.spectrogram(data, 97656, return_onesided=False)
-    spectrogram = scipy.stats.kurtosis(spectrogram ** 2, axis=0)
-    print(spectrogram.shape)
+# logger
+logger = getLogger(__name__)
 
+
+def calc_all(data: np.ndarray, fs: float) -> Dict:
     features = {
         "Mean": np.mean(data),
         "Std": np.std(data),
@@ -24,7 +25,23 @@ def calc_all(data: np.ndarray) -> Dict:
         "ImpulseFactor": impulse_factor(data),
         "MarginFactor": margin_factor(data),
         "Energy": energy(data),
-        "SKMean": np.mean(spectrogram),
+    }
+    features.update(calc_spectrum(data, fs))
+
+    return features
+
+
+def calc_spectrum(data: np.ndarray, fs: float) -> Dict:
+    freq, t, spectrum = scipy.signal.spectrogram(
+        data, fs, window=("hann"), nperseg=256, scaling="spectrum"
+    )
+    kspectrum = scipy.stats.kurtosis(spectrum, axis=1)
+
+    features = {
+        "SKMean": np.mean(kspectrum),
+        "SKStd": np.std(kspectrum),
+        "SKSkewness": scipy.stats.skew(kspectrum),
+        "SKKurtosis": scipy.stats.kurtosis(kspectrum),
     }
 
     return features
