@@ -7,4 +7,5 @@ powershell で調べたり、簡易のコードを記述したときの実行サ
 ## サンプルリスト
 
 - hash: windows標準コマンドでハッシュ値を計算します。
+- pesudo_bat: powershellを簡単に起動する方法
 
