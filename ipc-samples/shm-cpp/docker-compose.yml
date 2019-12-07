@@ -1,0 +1,10 @@
+version: '2'
+services:
+  dev:
+    image: iimuz/cpp-dev:v1.1.1-boost1.66.1
+    environment:
+      TZ: Asia/Tokyo
+    volumes:
+      - ..:/home/dev/src:rw
+    working_dir: /home/dev/src/shm-cpp
+    entrypoint: bash
