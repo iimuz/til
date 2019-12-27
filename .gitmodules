@@ -1,0 +1,16 @@
+[submodule "cpp/grpc-samples/vendor/grpc"]
+	path = cpp/grpc-samples/vendor/grpc
+	url = https://github.com/grpc/grpc.git
+
+[submodule "cpp/point-cloud-library-sample/vendor/vcpkg"]
+	path = cpp/point-cloud-library-sample/vendor/vcpkg
+	url = https://github.com/Microsoft/vcpkg.git
+
+[submodule "others/atcoder/vendor/googletest"]
+	path = others/atcoder/vendor/googletest
+	url = https://github.com/google/googletest.git
+
+[submodule "others/data_structure_and_algorithms_interview/vendor/googletest"]
+	path = others/data_structure_and_algorithms_interview/vendor/googletest
+	url = https://github.com/google/googletest.git
+
