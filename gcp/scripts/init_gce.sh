@@ -8,12 +8,3 @@ sudo apt upgrade -y
 sudo apt autoremove -y
 sudo apt clean
 
-sudo apt install -y --no-install-recommeds git
-
-mkdir -p src/github.com/iimuz && pushd $_
-git clone https://github.com/iimuz/dotfiles.git
-pushd dotfiles
-bash setup_ubuntu.sh
-popd
-popd
-

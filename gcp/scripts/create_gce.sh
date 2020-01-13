@@ -14,8 +14,9 @@
 #     * 3.75 GB Memory
 #     * 0.014 $ / min, 10.19 $ / month
 INSTANCE_NAME=${1:-dev}
-MACHINE_TYPE=${2:-f1-micro}
-DISK_SIZE=${3:-10GB}
+MACHINE_TYPE=${2:-n1-standard-1}
+DISK_SIZE=${3:-50GB}
+ATATCH_DISK=${4:-dev-home}
 
 echo "create: name: $INSTANCE_NAME, type: $MACHINE_TYPE, disk: $DISK_SIZE"
 gcloud compute \
@@ -26,14 +27,16 @@ gcloud compute \
   --no-restart-on-failure \
   --maintenance-policy=TERMINATE \
   --preemptible \
-  --image=ubuntu-1804-bionic-v20190204 \
+  --image=ubuntu-1804-bionic-v20200108 \
   --image-project=ubuntu-os-cloud \
   --boot-disk-size=$DISK_SIZE \
   --boot-disk-type=pd-standard \
-  --boot-disk-device-name=$INSTANCE_NAME
+  --boot-disk-device-name=$INSTANCE_NAME \
+  --disk=name=$ATATCH_DISK,device-name=$ATATCH_DISK,mode=rw,boot=no
 
 # インスタンスの sshd が起動するまで適当に待つ
 echo "wait starting insntance sshd for 20 sec..."
 sleep 20s
 gcloud compute scp init_gce.sh $INSTANCE_NAME:/home/$USER/
+gcloud compute scp init_home.sh $INSTANCE_NAME:/home/$USER/
 
