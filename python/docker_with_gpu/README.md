@@ -6,11 +6,23 @@ GPU を含む docker 環境で Tensorflow や PyTorch が動作することを�
 下記のテストを行うためのスクリプトを用意しています。
 
 - `nvidia_smi.sh`: docker 内で nvidia-smi により GPU のログを取得できる。
-- `check_gpu_using_tf.sh`: Tensorflow で GPU が認識できているか確認する。
-  - `Num GPUs Available: 1` のようなログが出ます。数字は利用できる GPU 数に依存します。
-- `logging_device_placement.sh`: GPU で簡単な計算を行い、計算したデバイスを表示する。
-  - `Executing op MatMul in device /job:localhost/replica:0/task:0/device:GPU:0` のようなログが出力されます。
-- `mnist_tutorial_tf.sh`: MNIST のチュートリアルを実行する。
+- tensorflow 系
+  - `tf_check_gpu.sh`: Tensorflow で GPU が認識できているか確認する。
+    - `Num GPUs Available: 1` のようなログが出ます。数字は利用できる GPU 数に依存します。
+  - `tf_logging_device_placement.sh`: GPU で簡単な計算を行い、計算したデバイスを表示する。
+    - `Executing op MatMul in device /job:localhost/replica:0/task:0/device:GPU:0` のようなログが出力されます。
+  - `tf_mnist_tutorial.sh`: MNIST のチュートリアルを実行する。
+- pytorch 系
+
+  - `torch_check_gpu.sh`: GPU の認識状態を確認します。
+
+    ```sh
+    current device: 0
+    device: <torch.cuda.device object at 0x7f7972427050>
+    device count: 1
+    device name: Tesla M60
+    available: True
+    ```
 
 ## docker での GPU 利用
 
@@ -25,3 +37,10 @@ Tensorflow は v2 系の場合、インストールするパッケージを CPU 
 
 - `tensorflow/tensorflow:2.1.0-gpu-py3`: GPU が利用できるイメージ
 - `tensorflow/tensorflow:2.1.0-py3`: nvidia-smi は使えるが、 Tensorflow が GPU を認識しない。
+
+## 参考資料
+
+- 2018.1.8 StackOverflow [How to check if pytorch is using the GPU?][stackoverflow_torch_gpu]
+  - PyTorch を利用した GPU デバイスの認識状態を取得するためのコードが記載されています。
+
+[stackoverflow_torch_gpu]: https://stackoverflow.com/questions/48152674/how-to-check-if-pytorch-is-using-the-gpu
