@@ -42,5 +42,10 @@ Tensorflow は v2 系の場合、インストールするパッケージを CPU 
 
 - 2018.1.8 StackOverflow [How to check if pytorch is using the GPU?][stackoverflow_torch_gpu]
   - PyTorch を利用した GPU デバイスの認識状態を取得するためのコードが記載されています。
+- PyTorch
+  - [TRAINING A CLASSIFIER][torch_cifar10]
+    - PyTorch の CIFAR10 の学習スクリプトの元です。
+      CPU 番のため `.cuda()` をつけて GPU 版にしています。
 
 [stackoverflow_torch_gpu]: https://stackoverflow.com/questions/48152674/how-to-check-if-pytorch-is-using-the-gpu
+[torch_cifar10]: https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html#sphx-glr-beginner-blitz-cifar10-tutorial-py

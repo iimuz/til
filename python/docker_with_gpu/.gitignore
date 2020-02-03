@@ -1,0 +1,3 @@
+# data folder
+_data/*
+!_data/.gitkeep
