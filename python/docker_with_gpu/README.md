@@ -18,11 +18,13 @@ GPU を含む docker 環境で Tensorflow や PyTorch が動作することを�
 
     ```sh
     current device: 0
-    device: <torch.cuda.device object at 0x7f7972427050>
+    device: <torch.cuda.device object at 0xXXXXXXXXXXXX>
     device count: 1
-    device name: Tesla M60
+    device name: GPU Device Name Hoge
     available: True
     ```
+
+  - `torch_cifar10.sh`: CIFAR10 の分類を実行します。
 
 ## docker での GPU 利用
 
@@ -46,6 +48,11 @@ Tensorflow は v2 系の場合、インストールするパッケージを CPU 
   - [TRAINING A CLASSIFIER][torch_cifar10]
     - PyTorch の CIFAR10 の学習スクリプトの元です。
       CPU 番のため `.cuda()` をつけて GPU 版にしています。
+- Tensorflow
+  - [GPU Support][tf_gpu]: GPU 用パッケージのインストール方法等。
+  - [初心者のための Tensorflow2.0 入門][tf_beginner]: MNIST のチュートリアル元。
 
 [stackoverflow_torch_gpu]: https://stackoverflow.com/questions/48152674/how-to-check-if-pytorch-is-using-the-gpu
+[tf_beginner]: https://www.tensorflow.org/tutorials/quickstart/beginner
+[tf_gpu]: https://www.tensorflow.org/install/gpu
 [torch_cifar10]: https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html#sphx-glr-beginner-blitz-cifar10-tutorial-py
