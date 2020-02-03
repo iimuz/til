@@ -8,4 +8,4 @@ docker run \
   --mount type=bind,source="$(pwd)",target=/workspace,readonly \
   -w /workspace \
   tensorflow/tensorflow:2.1.0-gpu-py3 \
-  python logging_device_placement.py
+  python tf_mnist_tutorial.py
