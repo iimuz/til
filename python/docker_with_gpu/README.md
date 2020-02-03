@@ -8,9 +8,9 @@ GPU を含む docker 環境で Tensorflow や PyTorch が動作することを�
 - `nvidia_smi.sh`: docker 内で nvidia-smi により GPU のログを取得できる。
 - `check_gpu_using_tf.sh`: Tensorflow で GPU が認識できているか確認する。
   - `Num GPUs Available: 1` のようなログが出ます。数字は利用できる GPU 数に依存します。
-- ``: GPU で簡単な計算を行い、計算したデバイスを表示する。
+- `logging_device_placement.sh`: GPU で簡単な計算を行い、計算したデバイスを表示する。
   - `Executing op MatMul in device /job:localhost/replica:0/task:0/device:GPU:0` のようなログが出力されます。
-- MNIST のチュートリアルを実行する。
+- `mnist_tutorial_tf.sh`: MNIST のチュートリアルを実行する。
 
 ## docker での GPU 利用
 
