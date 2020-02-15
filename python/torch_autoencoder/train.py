@@ -11,7 +11,8 @@ import torch.optim as optim
 import torchvision.transforms as transforms
 
 # from simpleautoencoder import SimpleAutoencoder
-from simpledeepautoencoder import SimpleDeepAutoencoder
+# from simpledeepautoencoder import SimpleDeepAutoencoder
+from simplelstm import SimpleLSTM
 from vwapdataset import VwapDataset
 
 logger = getLogger(__name__)
@@ -86,11 +87,10 @@ def _main() -> None:
     logger.info(f"use device: {device}")
 
     _init_rand_seed(0)
-    loader = _init_loader(
-        "_data/interim/dataset/train.pkl", "_data/interim/dataset/scaler.pkl"
-    )
+    loader = _init_loader("_data/interim/train.pkl", "_data/interim/scaler.pkl")
     # model = SimpleAutoencoder(10, 5).to(device)
-    model = SimpleDeepAutoencoder(10, 6).to(device)
+    # model = SimpleDeepAutoencoder(10, 6).to(device)
+    model = SimpleLSTM(10, 6, 10, device).to(device)
     criterion = nn.MSELoss()
     optimizer = optim.SGD(model.parameters(), lr=1e-3, momentum=0.9)
 
