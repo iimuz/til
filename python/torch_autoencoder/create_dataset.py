@@ -30,6 +30,7 @@ def _calc_vwap(df: pd.DataFrame) -> pd.DataFrame:
 def _download(
     base_url: str, target_list: List[str], download_dir: pathlib.Path
 ) -> None:
+    download_dir.mkdir(exist_ok=True)
     for filename in target_list:
         url = base_url + filename
         filepath = download_dir.joinpath(filename)
@@ -51,7 +52,6 @@ def _read_dataset(filelist: List[pathlib.Path]) -> pd.DataFrame:
                 logger.error(f"filename: {filepath}\n{e}")
                 continue
     df = pd.concat([val for val in data.values()])
-    df = pd.concat(map(pd.read_csv, filelist))
     df = df[df.symbol == "XBTUSD"]
     df.timestamp = pd.to_datetime(df.timestamp.str.replace("D", "T"))
     df = df.sort_values("timestamp")
@@ -68,7 +68,7 @@ def _main() -> None:
     BASE_URL = "https://s3-eu-west-1.amazonaws.com/public.bitmex.com/data/trade/"
     TARGET_LIST = [
         f"{(datetime(2019, 8, 1) + timedelta(days=delta)).strftime('%Y%m%d')}.csv.gz"
-        for delta in range(30)
+        for delta in range(60)
     ]
     DOWNLOAD_DIR = pathlib.Path("_data")
     DATASET_FILE = DOWNLOAD_DIR.joinpath("dataset.pkl")
@@ -76,14 +76,20 @@ def _main() -> None:
     TEST_FILE = DOWNLOAD_DIR.joinpath("test.pkl")
     TRAIN_DATE = datetime(2019, 9, 1)
     TRAIN_SC = DOWNLOAD_DIR.joinpath("scaler.pkl")
+    CHUNUK_NUM = 5
 
     # データファイルのダウンロード
     _download(BASE_URL, TARGET_LIST, DOWNLOAD_DIR)
 
     # 単変量の時系列データへ変換
     if DATASET_FILE.exists() is False:
-        df = _read_dataset(list(DOWNLOAD_DIR.glob("*.csv.gz")))
-        df_vwap = _calc_vwap(df)
+        df_vwap_dict = {}
+        filelist = list(DOWNLOAD_DIR.glob("*.csv.gz"))
+        for idx in range(0, len(filelist), CHUNUK_NUM):
+            end_idx = min(idx + CHUNUK_NUM, len(filelist))
+            df = _read_dataset(filelist[idx:end_idx])
+            df_vwap_dict[idx] = _calc_vwap(df)
+        df_vwap = pd.concat([df for df in df_vwap_dict.values()])
         df_vwap.to_pickle(str(DATASET_FILE))
     else:
         df_vwap = pd.read_pickle(str(DATASET_FILE))
