@@ -9,9 +9,8 @@ from aetrainer import AETrainer
 
 # from simpleautoencoder import SimpleAutoencoder
 # from simpledeepautoencoder import SimpleDeepAutoencoder
-from simplecnnautoencoder import SimpleCNNAutoencoder
-
-# from simplelstm import SimpleLSTM
+# from simplecnnautoencoder import SimpleCNNAutoencoder
+from simplelstm import SimpleLSTM
 
 logger = getLogger(__name__)
 
@@ -28,14 +27,16 @@ def _main() -> None:
 
     logging.basicConfig(level=logging.INFO)
 
+    save_path = "_models/lstm"
     gpus = [0] if torch.cuda.is_available() else None
     _init_rand_seed(0)
 
     # model = SimpleAutoencoder(10, 5).to(device)
     # model = SimpleDeepAutoencoder(10, 6).to(device)
-    hparams = dict(input_channels=1)
-    network = SimpleCNNAutoencoder(hparams["input_channels"])
-    # model = SimpleLSTM(10, 6, 10, device).to(device)
+    # hparams = dict(input_channels=1)
+    # network = SimpleCNNAutoencoder(**hparams)
+    hparams = dict(input_size=64, hidden_size=32, output_size=64,)
+    network = SimpleLSTM(**hparams)
 
     model = AETrainer(
         model=network,
@@ -45,15 +46,15 @@ def _main() -> None:
         train_path="_data/interim/train.pkl",
         validation_path="_data/interim/train.pkl",
         learning_rate=1e-3,
-        num_workers=0,
+        num_workers=2,
         hparams=hparams,
     )
     trainer = Trainer(
         early_stop_callback=True,
-        default_save_path="_models/cnn3aepl",
+        default_save_path=save_path,
         fast_dev_run=False,
         min_epochs=1,
-        max_epochs=10,
+        max_epochs=1000,
         gpus=gpus,
     )
     trainer.fit(model)

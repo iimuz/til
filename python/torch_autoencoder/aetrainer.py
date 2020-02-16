@@ -126,16 +126,16 @@ class AETrainer(pl.LightningModule):
 
 
 def _create_graph(data, output):
-    data_cpu = data.cpu()
-    output_cpu = output.cpu()
+    data_cpu = data.detach().cpu().numpy().reshape((data.shape[0], -1))
+    output_cpu = output.detach().cpu().numpy().reshape((data.shape[0], -1))
 
-    fig = plt.figure(figsize=(18, 6))
+    fig = plt.figure(figsize=(30, 6))
     rows, cols = 1, math.ceil(math.sqrt(data_cpu.shape[0]))
 
     for idx in range(cols):
         plt.subplot(rows, cols, idx + 1)
-        plt.plot(data_cpu[idx, :, :, :].view(-1), lablel="input")
-        plt.plot(output_cpu[idx, :, :, :].view(-1), label="reconstruct")
+        plt.plot(data_cpu[idx, :], label="input")
+        plt.plot(output_cpu[idx, :], label="reconstruct")
 
     return fig
 
