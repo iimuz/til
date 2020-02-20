@@ -70,38 +70,42 @@ def _main() -> None:
         f"{(datetime(2019, 8, 1) + timedelta(days=delta)).strftime('%Y%m%d')}.csv.gz"
         for delta in range(60)
     ]
-    DOWNLOAD_DIR = pathlib.Path("_data")
-    DATASET_FILE = DOWNLOAD_DIR.joinpath("dataset.pkl")
-    TRAIN_FILE = DOWNLOAD_DIR.joinpath("train.pkl")
-    TEST_FILE = DOWNLOAD_DIR.joinpath("test.pkl")
+    RAW_DIR = pathlib.Path("_data/raw")
+    DATASET_DIR = pathlib.Path("_data/interim/dataset")
+    DATASET_FILE = DATASET_DIR.joinpath("dataset.pkl")
+    TRAIN_FILE = DATASET_DIR.joinpath("train.pkl")
+    TEST_FILE = DATASET_DIR.joinpath("test.pkl")
     TRAIN_DATE = datetime(2019, 9, 1)
-    TRAIN_SC = DOWNLOAD_DIR.joinpath("scaler.pkl")
+    TRAIN_SC = DATASET_DIR.joinpath("scaler.pkl")
     CHUNUK_NUM = 5
 
     # データファイルのダウンロード
-    _download(BASE_URL, TARGET_LIST, DOWNLOAD_DIR)
+    RAW_DIR.mkdir(exist_ok=True)
+    _download(BASE_URL, TARGET_LIST, RAW_DIR)
 
     # 単変量の時系列データへ変換
+    DATASET_DIR.mkdir(exist_ok=True)
     if DATASET_FILE.exists() is False:
         df_vwap_dict = {}
-        filelist = list(DOWNLOAD_DIR.glob("*.csv.gz"))
+        filelist = sorted(list(RAW_DIR.glob("*.csv.gz")))
         for idx in range(0, len(filelist), CHUNUK_NUM):
             end_idx = min(idx + CHUNUK_NUM, len(filelist))
             df = _read_dataset(filelist[idx:end_idx])
             df_vwap_dict[idx] = _calc_vwap(df)
         df_vwap = pd.concat([df for df in df_vwap_dict.values()])
+        df_vwap = df_vwap.sort_index()
         df_vwap.to_pickle(str(DATASET_FILE))
     else:
         df_vwap = pd.read_pickle(str(DATASET_FILE))
 
     # 学習データと検証データを分離
     if TRAIN_FILE.exists() is False:
-        df_train = df_vwap.loc[:TRAIN_DATE]
+        df_train = df_vwap.loc[df_vwap.index < TRAIN_DATE]
         df_train.to_pickle(str(TRAIN_FILE))
     else:
         df_train = pd.read_pickle(str(TRAIN_FILE))
     if TEST_FILE.exists() is False:
-        df_test = df_vwap.loc[TRAIN_DATE:]
+        df_test = df_vwap.loc[TRAIN_DATE <= df_vwap.index]
         df_test.to_pickle(str(TEST_FILE))
     else:
         df_test = pd.read_pickle(str(TEST_FILE))

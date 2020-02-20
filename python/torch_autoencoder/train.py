@@ -21,7 +21,7 @@ def _create_network(name: str, sequence_length: int):
         return SimpleAutoencoder(**hparams), hparams
 
     if name == "SimpleCNN":
-        hparams = dict(input_channels=1)
+        hparams = dict(input_channel=1)
         return SimpleCNNAutoencoder(**hparams), hparams
 
     if name == "SimpleDNN":
@@ -54,6 +54,7 @@ def _main() -> None:
     _init_rand_seed(0)
 
     sequence_length = 64
+    # name = "SimpleCNN"
     name = "SimpleLSTM"
     network, hparams = _create_network(name, sequence_length)
     save_path = f"_models/{name}"
@@ -62,11 +63,11 @@ def _main() -> None:
         model=network,
         sequence_length=sequence_length,
         batch_size=64,
-        scaler_path="_data/interim/scaler.pkl",
-        train_path="_data/interim/train.pkl",
-        validation_path="_data/interim/train.pkl",
+        scaler_path="_data/interim/dataset/scaler.pkl",
+        train_path="_data/interim/dataset/train.pkl",
+        validation_path="_data/interim/dataset/test.pkl",
         learning_rate=1e-3,
-        num_workers=2,
+        num_workers=4,
         hparams=hparams,
     )
     trainer = Trainer(

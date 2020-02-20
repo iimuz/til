@@ -10,10 +10,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torchvision.transforms as transforms
-from pytorch_lightning import Trainer
-from torchvision.utils import make_grid
 
-from simplecnnautoencoder import SimpleCNNAutoencoder
 from vwapdataset import VwapDataset
 from minmax_scaler import MinMaxScaler
 
@@ -69,18 +66,6 @@ class AETrainer(pl.LightningModule):
             plt.cla()
             plt.clf()
             plt.close()
-
-            # nrow = math.ceil(math.sqrt(self.batch_size))
-            # self.logger.experiment.add_image(
-            #     tag="train/input",
-            #     img_tensor=make_grid(batch, nrow=nrow, padding=0),
-            #     global_step=self.global_step,
-            # )
-            # self.logger.experiment.add_image(
-            #     tag="train/output",
-            #     img_tensor=make_grid(output, nrow=nrow, padding=0),
-            #     global_step=self.global_step,
-            # )
 
         tensorboard_logs = {"train_loss": loss}
         return {"loss": loss, "log": tensorboard_logs}
@@ -151,7 +136,7 @@ def _create_loader(
     with open(scaler_path, "rb") as f:
         sc = pickle.load(f)
     transform = transforms.Compose(
-        [transforms.ToTensor(), MinMaxScaler(sc.data_min_, sc.data_max_),]
+        [transforms.ToTensor(), MinMaxScaler(sc.data_min_, sc.data_max_)]
     )
     trainset = VwapDataset(
         pathlib.Path(dataset_path), sequence_length, transform=transform

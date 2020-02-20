@@ -1,4 +1,3 @@
-import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -14,24 +13,12 @@ class SimpleLSTM(nn.Module):
         self.lstm2 = nn.LSTMCell(self.hidden_size, self.output_size)
 
     def forward(self, x):
-        v = x.view(x.shape[0], -1)
+        v = x.view(x.shape[0], x.shape[1], -1)
 
-        h_t = torch.zeros(v.size(0), self.hidden_size, dtype=torch.float32).to(
-            self.device
-        )
-        c_t = torch.zeros(v.size(0), self.hidden_size, dtype=torch.float32).to(
-            self.device
-        )
-        h_t, c_t = self.lstm(v, (h_t, c_t))
+        _, (h_t, _) = self.lstm(v)
         code = F.relu(h_t)
 
-        decode = torch.zeros(code.size(0), self.output_size, dtype=torch.float32).to(
-            self.device
-        )
-        c1_t = torch.zeros(code.size(0), self.output_size, dtype=torch.float32).to(
-            self.device
-        )
-        decode, c1_t = self.lstm2(code, (decode, c1_t))
+        decode, _ = self.lstm2(code)
 
         outputs = decode.view(x.shape[0], x.shape[1], x.shape[2], -1)
         return outputs
