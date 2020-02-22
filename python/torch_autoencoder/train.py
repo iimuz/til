@@ -30,9 +30,9 @@ def _create_network(name: str, sequence_length: int):
 
     if name == "SimpleLSTM":
         hparams = dict(
-            input_size=sequence_length,
+            input_size=1,
             hidden_size=32,
-            output_size=sequence_length,
+            output_size=1,
             device="cuda:0" if torch.cuda.is_available() else "cpu",
         )
         return SimpleLSTM(**hparams), hparams
@@ -54,7 +54,6 @@ def _main() -> None:
     _init_rand_seed(0)
 
     sequence_length = 64
-    # name = "SimpleCNN"
     name = "SimpleLSTM"
     network, hparams = _create_network(name, sequence_length)
     save_path = f"_models/{name}"
@@ -67,7 +66,7 @@ def _main() -> None:
         train_path="_data/interim/dataset/train.pkl",
         validation_path="_data/interim/dataset/test.pkl",
         learning_rate=1e-3,
-        num_workers=4,
+        num_workers=0,
         hparams=hparams,
     )
     trainer = Trainer(

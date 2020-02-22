@@ -9,14 +9,14 @@ class SimpleLSTM(nn.Module):
         self.hidden_size = hidden_size
         self.output_size = output_size
         self.device = device
-        self.lstm = nn.LSTMCell(self.input_size, self.hidden_size)
-        self.lstm2 = nn.LSTMCell(self.hidden_size, self.output_size)
+        self.lstm = nn.LSTM(self.input_size, self.hidden_size, batch_first=True)
+        self.lstm2 = nn.LSTM(self.hidden_size, self.output_size, batch_first=True)
 
     def forward(self, x):
-        v = x.view(x.shape[0], x.shape[1], -1)
+        v = x.view(x.shape[0], -1, x.shape[1])
 
-        _, (h_t, _) = self.lstm(v)
-        code = F.relu(h_t)
+        code, _ = self.lstm(v)
+        code = F.relu(code)
 
         decode, _ = self.lstm2(code)
 
