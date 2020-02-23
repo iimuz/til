@@ -2,9 +2,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-class SimpleLSTM(nn.Module):
+class SingleLSTM(nn.Module):
     def __init__(self, input_size, hidden_size, output_size, device) -> None:
-        super(SimpleLSTM, self).__init__()
+        super(SingleLSTM, self).__init__()
         self.input_size = input_size
         self.hidden_size = hidden_size
         self.output_size = output_size

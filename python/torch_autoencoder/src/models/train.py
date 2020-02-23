@@ -13,10 +13,10 @@ from pytorch_lightning import Trainer
 
 # my packages
 from src.models.aetrainer import AETrainer
-from src.models.simpleautoencoder import SimpleAutoencoder
-from src.models.simpledeepautoencoder import SimpleDeepAutoencoder
-from src.models.simplecnnautoencoder import SimpleCNNAutoencoder
-from src.models.simplelstm import SimpleLSTM
+from src.models.doublecnn import DoubleCNN
+from src.models.doubledense import DoubleDense
+from src.models.singledense import SingleDense
+from src.models.singlelstm import SingleLSTM
 
 # logger
 logger = getLogger(__name__)
@@ -24,7 +24,7 @@ logger = getLogger(__name__)
 
 def _argparse() -> Dict:
     parser = argparse.ArgumentParser(description="Training autoencoders.")
-    parser.add_argument("name", help="autoencoder name", default="SimpleAE")
+    parser.add_argument("name", help="autoencoder name", default="SingleDense")
     args = parser.parse_args()
 
     return vars(args)
@@ -34,26 +34,26 @@ def _create_network(
     name: str, sequence_length: int
 ) -> Tuple[Optional[nn.Module], Optional[Dict]]:
     """ネットワークを生成します."""
-    if name == "SimpleAE":
+    if name == "SingleDense":
         hparams = dict(input_dim=sequence_length, hidden_dim=sequence_length // 2)
-        return SimpleAutoencoder(**hparams), hparams
+        return SingleDense(**hparams), hparams
 
-    if name == "SimpleCNN":
+    if name == "DoubleCNN":
         hparams = dict(input_channel=1)
-        return SimpleCNNAutoencoder(**hparams), hparams
+        return DoubleCNN(**hparams), hparams
 
-    if name == "SimpleDNN":
+    if name == "DoubleDense":
         hparams = dict(input_dim=sequence_length, hidden_dim=sequence_length // 2)
-        return SimpleDeepAutoencoder(**hparams), hparams
+        return DoubleDense(**hparams), hparams
 
-    if name == "SimpleLSTM":
+    if name == "SingleLSTM":
         hparams = dict(
             input_size=1,
             hidden_size=32,
             output_size=1,
             device="cuda:0" if torch.cuda.is_available() else "cpu",
         )
-        return SimpleLSTM(**hparams), hparams
+        return SingleLSTM(**hparams), hparams
 
     logger.error(f"unknown network name: {name}")
     return None, None

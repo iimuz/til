@@ -6,20 +6,24 @@ import torch.nn.functional as F
 logger = getLogger(__name__)
 
 
-class SimpleAutoencoder(nn.Module):
+class SingleDense(nn.Module):
     def __init__(self, input_dim: int, hidden_dim: int) -> None:
-        super(SimpleAutoencoder, self).__init__()
+        super(SingleDense, self).__init__()
         self.encoder = nn.Linear(input_dim, hidden_dim)
         self.decoder = nn.Linear(hidden_dim, input_dim)
 
     def forward(self, x):
-        code = F.relu(self.encoder(x))
+        v = x.view(x.shape[0], -1, x.shape[1])
+
+        code = F.relu(self.encoder(v))
         reconstruct = F.relu(self.decoder(code))
-        return reconstruct
+
+        outputs = reconstruct.view(x.shape[0], x.shape[1], x.shape[2], -1)
+        return outputs
 
 
 if __name__ == "__main__":
     import logging
 
     logging.basicConfig(level=logging.INFO)
-    logger.info(SimpleAutoencoder(10, 3))
+    logger.info(SingleDense(10, 3))
