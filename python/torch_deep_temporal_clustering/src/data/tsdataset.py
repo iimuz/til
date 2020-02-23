@@ -1,0 +1,48 @@
+"""時系列データセット."""
+# defualt packages
+import logging
+import pathlib
+
+# third party packages
+import torch
+from sktime.utils.load_data import load_from_tsfile_to_dataframe
+from torch.utils.data import Dataset
+
+# logger
+logger = logging.getLogger(__name__)
+
+
+class TSDataset(Dataset):
+    """時系列データセットクラス."""
+
+    def __init__(self, filepath: pathlib.Path, transform=None) -> None:
+        self.transform = transform
+        self.x, self.y = load_from_tsfile_to_dataframe(str(filepath))
+
+    def __len__(self) -> int:
+        return self.x.shape[0]
+
+    def __getitem__(self, idx):
+        index = idx.tolist() if torch.is_tensor(idx) else idx
+
+        x = self.x.iloc[index, :].to_numpy()
+        y = self.y[index]
+
+        if self.transform is not None:
+            x = self.transform(x)
+
+        return x, y
+
+
+def _main() -> None:
+    logging.basicConfig(level=logging.INFO)
+
+    target = pathlib.Path("_data/raw/CBF/CBF_TRAIN.ts")
+    dataset = TSDataset(target)
+    for idx in range(2):
+        x, y = dataset[idx]
+        logger.info(f"value [{idx}]: {x[0].shape}, {y}")
+
+
+if __name__ == "__main__":
+    _main()
