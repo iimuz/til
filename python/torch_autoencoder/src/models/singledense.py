@@ -13,7 +13,7 @@ class SingleDense(nn.Module):
         self.decoder = nn.Linear(hidden_dim, input_dim)
 
     def forward(self, x):
-        v = x.view(x.shape[0], -1, x.shape[1])
+        v = x.view(x.shape[0], x.shape[1], -1)
 
         code = F.relu(self.encoder(v))
         reconstruct = F.relu(self.decoder(code))
