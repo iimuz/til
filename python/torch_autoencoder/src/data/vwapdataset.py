@@ -1,11 +1,20 @@
+"""vwap データセット."""
+# default pcakges
 import pathlib
+from logging import getLogger
 
+# thrid party packages
 import pandas as pd
 import torch
 from torch.utils.data import Dataset
 
+# logger
+logger = getLogger(__name__)
+
 
 class VwapDataset(Dataset):
+    """vwapデータセットクラス."""
+
     def __init__(self, filepath: pathlib.Path, seq_len: int, transform=None):
         self.dataset = pd.read_pickle(filepath)
         self.sequence_length = seq_len
@@ -26,3 +35,20 @@ class VwapDataset(Dataset):
             data = self.transform(data)
 
         return data
+
+
+def _main() -> None:
+    """vwapデータセットの簡易確認用スクリプト."""
+    import logging
+
+    logging.basicConfig(level=logging.INFO)
+
+    dataset = VwapDataset(
+        filepath=pathlib.Path("_data/interim/dataset/train.pkl"), seq_len=64
+    )
+    for i in range(5):
+        logger.info(f"value: {dataset[i]}")
+
+
+if __name__ == "__main__":
+    _main()

@@ -1,3 +1,4 @@
+"""tqdm for downloader."""
 import sys
 
 if "ipykernel" in sys.modules:
