@@ -7,3 +7,9 @@ Madiraju, N. S., Sadat, S. M., Fisher, D., & Karimabadi, H. (2018).
 [Deep Temporal Clustering : Fully Unsupervised Learning of Time-Domain Features][dtc].
 
 [dtc]: http://arxiv.org/abs/1802.01059
+
+## Dataset
+
+"Anthony Bagnall, Jason Lines, William Vickers and Eamonn Keogh,
+The UEA & UCR Time Series Classification Repository,
+www.timeseriesclassification.com"
