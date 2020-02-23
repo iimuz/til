@@ -10,3 +10,11 @@ Poetry で管理しているため、下記コマンドで環境構築できま�
 ```sh
 poetry install
 ```
+
+## Usage
+
+学習は下記のように実行します。
+
+```sh
+python -m src.models.train SimpleAE
+```
