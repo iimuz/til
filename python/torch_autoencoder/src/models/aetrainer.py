@@ -11,8 +11,8 @@ import torch.nn as nn
 import torch.optim as optim
 import torchvision.transforms as transforms
 
-from vwapdataset import VwapDataset
-from minmax_scaler import MinMaxScaler
+from src.data.vwapdataset import VwapDataset
+from src.feature.minmax_scaler import MinMaxScaler
 
 
 class AETrainer(pl.LightningModule):
