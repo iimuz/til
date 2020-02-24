@@ -10,6 +10,8 @@ tqdm = "^4.43.0"
 torch = "^1.3.1"
 pytorch-lightning = "^0.6.0"
 sktime = "^0.3.1"
+torchvision = "^0.4.2"
+numpy = "^1.18.1"
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"
