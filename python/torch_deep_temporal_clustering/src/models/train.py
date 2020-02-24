@@ -28,15 +28,13 @@ def _init_rand_seed(seed):
 
 def init_centers(
     train_path: pathlib.Path, network: dtc.DTClustering, n_clusters: int, workers: int
-) -> np.ndarray:
+) -> None:
     dataset = TSDataset(train_path)
     loader = torch.utils.data.DataLoader(
         dataset, batch_size=len(dataset), shuffle=False, num_workers=workers
     )
     train_x = next(iter(loader))[0].permute(0, 3, 1, 2)
-    init_centers = dtc.calc_centeroid(train_x, network, n_clusters=n_clusters)
-
-    return init_centers
+    network.init_centroid(train_x, n_clusters=n_clusters)
 
 
 def _main() -> None:
@@ -45,8 +43,10 @@ def _main() -> None:
     gpus = [0] if torch.cuda.is_available() else None
     _init_rand_seed(seed=0)
     save_path = "_models/test"
+    save_path2 = "_models/test2"
     ckpt_path = pathlib.Path(
-        "_models/test/lightning_logs/version_0/checkpoints/_ckpt_epoch_9999.ckpt"
+        # "_models/test/lightning_logs/version_0/checkpoints/_ckpt_epoch_19999.ckpt"
+        "_models/test/lightning_logs/version_45/checkpoints/_ckpt_epoch_99.ckpt"
     )
     train_path = pathlib.Path("_data/raw/CBF/CBF_TRAIN.ts")
     valid_path = pathlib.Path("_data/raw/CBF/CBF_TEST.ts")
@@ -69,7 +69,7 @@ def _main() -> None:
             default_save_path=save_path,
             fast_dev_run=False,
             min_epochs=1,
-            max_epochs=10000,
+            max_epochs=100,
             gpus=gpus,
         )
         trainer.fit(model)
@@ -77,11 +77,21 @@ def _main() -> None:
         logger.info(f"load checkpoint: {ckpt_path}")
         ckpt = torch.load(str(ckpt_path))
         model.load_state_dict(ckpt["state_dict"])
-    model.eval()
-    model.freeze()
+    model.train()
 
-    centers = init_centers(train_path, network, n_clusters, workers)
-    logger.info(centers.shape)
+    _init_rand_seed(seed=0)
+    init_centers(train_path, network, n_clusters, workers)
+
+    _init_rand_seed(seed=0)
+    trainer = Trainer(
+        early_stop_callback=True,
+        default_save_path=save_path2,
+        fast_dev_run=False,
+        min_epochs=1,
+        max_epochs=100,
+        gpus=gpus,
+    )
+    trainer.fit(model)
 
 
 if __name__ == "__main__":

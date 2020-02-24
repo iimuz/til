@@ -3,7 +3,9 @@
 import logging
 
 # thrid party packages
-import sklearn.cluster as clusetr
+import numpy as np
+import sklearn.cluster as cluster
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -86,18 +88,65 @@ class Autoencder(nn.Module):
         return decode
 
 
+class Clustering(nn.Module):
+    def __init__(self, n_clusters: int, seq_len: int, feature_num: int) -> None:
+        super(Clustering, self).__init__()
+        self.alpha = 2.0
+        self.n_clusters = n_clusters
+        self.seq_len = seq_len
+        self.feature_num = feature_num
+        self.centroids = nn.Parameter(
+            torch.rand(1, n_clusters, seq_len, feature_num), True
+        )
+
+    def forward(self, x):
+        """Forward.
+
+        Notes:
+            x: [batch, sequence, feature, 1]
+        """
+        v = x.view(x.shape[0], 1, x.shape[1], -1)  # [batch, 1, seq, feat]
+        diff = v - self.centroids
+        distance = torch.sqrt(torch.sum(diff ** 2, dim=3))
+        distance = torch.sum(distance, dim=2)
+
+        q = 1.0 / (1.0 + distance ** 2 / self.alpha)
+        q = q ** (self.alpha + 1.0) / 2.0
+        q = (q.permute(1, 0) / torch.sum(q, dim=1)).permute(1, 0)
+
+        return q
+
+    def set_centroids(self, centroids: torch.Tensor) -> None:
+        """
+        Notes:
+            centroids: [n_clusters, timestep, feature_num, 1]
+        """
+        shape = centroids.shape
+        with torch.no_grad():
+            self.centroids = nn.Parameter(
+                centroids.view(1, shape[0], shape[1], shape[2]), True
+            )
+
+
 class DTClustering(nn.Module):
     def __init__(self) -> None:
         super(DTClustering, self).__init__()
         self.autoencoder = Autoencder()
+        self.clustering = Clustering(10, 64, 8)
 
     def encode(self, x):
         code = self.autoencoder.encode(x)
         return code
 
     def forward(self, x):
-        decode = self.autoencoder(x)
-        return decode
+        code = self.autoencoder.encode(x)
+        decode = self.autoencoder.decode(code)
+        cluster = self.clustering(code)
+        return decode, cluster
+
+    def init_centroid(self, x, n_clusters: int) -> None:
+        centroid = calc_centeroid(x, self, n_clusters)
+        self.clustering.set_centroids(torch.from_numpy(centroid))
 
 
 def calc_centeroid(x, network: DTClustering, n_clusters: int):
@@ -105,16 +154,22 @@ def calc_centeroid(x, network: DTClustering, n_clusters: int):
 
     Notes:
         Input x: [batch, sequence, feature, 1]
-        Output: [batch, hidden sequence, hidden feature, 1]
+        Output: [n_clusters, hidden sequence, hidden feature, 1]
     """
     code = network.encode(x)
     feature = code.view(code.shape[0], -1)  # [batch, sequence * feature]
     feature = feature.detach().cpu().numpy()
-    km = clusetr.KMeans(n_clusters=n_clusters, n_init=10)
+    km = cluster.KMeans(n_clusters=n_clusters, n_init=10)
     km.fit(feature)
     centers = km.cluster_centers_.reshape(n_clusters, code.shape[1], code.shape[2], 1)
+    centers = centers.astype(np.float32)
 
     return centers
+
+
+def target_distribution(q):
+    weight = q ** 2 / torch.sum(q, axis=0)
+    return (weight.T / torch.sum(weight, axis=1)).T
 
 
 def _main() -> None:

@@ -14,6 +14,7 @@ import torch.optim as optim
 import torchvision.transforms as transforms
 
 # my packages
+import src.models.deep_temporal_clustering as dtc
 from src.data.tsdataset import TSDataset
 
 # logger
@@ -41,27 +42,33 @@ class DTCTrainer(pl.LightningModule):
         self.hparams = argparse.Namespace(
             learning_rate=self.learning_rate,
             sgd_momentum=self.sgd_momentum,
-            train_path=self.train_path,
-            valid_path=self.valid_path,
+            train_path=str(self.train_path),
+            valid_path=str(self.valid_path),
             batch_size=self.batch_size,
             workers=self.workers,
         )
 
         self.network = network
-        self.criterion = nn.MSELoss()
+        self.criterion_ae = nn.MSELoss()
+        self.criterion_cl = nn.KLDivLoss(reduction="batchmean")
 
     def forward(self, x):
         return self.network(x)
 
-    def training_step(self, batch, batch_nb):
+    def training_step(self, batch, batch_nb, optimizer_idx):
         x, y = batch
-        output = self.forward(x)
-        loss = self.criterion(x, output)
+        decode, q = self.forward(x)
+
+        if optimizer_idx == 0:
+            loss = self.criterion_ae(x, decode)
+        else:
+            p = dtc.target_distribution(q)
+            loss = self.criterion_cl(q, p)
 
         if self.global_step % self.trainer.row_log_interval == 0:
             self.logger.experiment.add_figure(
                 tag="train/overlap",
-                figure=_create_graph(x, output),
+                figure=_create_graph(x, decode),
                 global_step=self.global_step,
             )
             plt.cla()
@@ -73,8 +80,8 @@ class DTCTrainer(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         x, y = batch
-        output = self.forward(x)
-        loss = self.criterion(x, output)
+        decode, p = self.forward(x)
+        loss = self.criterion_ae(x, decode)
 
         return {"val_loss": loss}
 
@@ -85,11 +92,18 @@ class DTCTrainer(pl.LightningModule):
         return {"avg_val_loss": avg_loss, "log": tensorboard_logs}
 
     def configure_optimizers(self):
-        return [
-            optim.SGD(
-                self.parameters(), lr=self.learning_rate, momentum=self.sgd_momentum
-            )
-        ]
+        optim_ae = optim.SGD(
+            self.network.autoencoder.parameters(),
+            lr=self.learning_rate,
+            momentum=self.sgd_momentum,
+        )
+        optim_cl = optim.SGD(
+            self.network.clustering.parameters(),
+            lr=self.learning_rate,
+            momentum=self.sgd_momentum,
+        )
+
+        return [optim_ae, optim_cl]
 
     @pl.data_loader
     def train_dataloader(self):
