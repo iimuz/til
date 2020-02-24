@@ -13,6 +13,7 @@ sktime = "^0.3.1"
 torchvision = "^0.4.2"
 numpy = "^1.18.1"
 pillow = "^6.2.2"
+scikit-learn = "^0.22.1"
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"

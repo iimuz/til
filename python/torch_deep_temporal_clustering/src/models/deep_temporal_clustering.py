@@ -3,6 +3,7 @@
 import logging
 
 # thrid party packages
+import sklearn.cluster as clusetr
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -28,14 +29,32 @@ class Autoencder(nn.Module):
             self.n_units[1], 1, 2, stride=2, padding=0
         )
 
-    def forward(self, x):
-        """フォワード処理.
+    def decode(self, x):
+        """decoding.
 
         Notes:
             Input dims: [batch, sequence, feature, 1]
             Ouptut dims: [batch, sequence, feature, 1]
         """
-        # [batch, feature sequence]
+        # [batch, feature, sequence]
+        v = x.view(x.shape[0], x.shape[1], -1)
+        v = v.permute(0, 2, 1)
+        decode = self.decoder_conv1(v)
+
+        # [batch, sequence, feature, 1]
+        decode = decode.permute(0, 2, 1)
+        decode = decode.view(decode.shape[0], decode.shape[1], decode.shape[2], 1)
+
+        return decode
+
+    def encode(self, x):
+        """encoding.
+
+        Notes:
+            Input dims: [batch, sequence, feature, 1]
+            Ouptut dims: [batch, sequence, feature, 1]
+        """
+        # [batch, feature, sequence]
         v = x.view(x.shape[0], x.shape[1], -1)
         v = v.permute(0, 2, 1)
         code = F.leaky_relu(self.encoder_conv1(v))
@@ -50,14 +69,21 @@ class Autoencder(nn.Module):
         code = (code[:, :, : self.n_units[1]] + code[:, :, self.n_units[1] :]) / 2.0
         code = F.leaky_relu(code)
 
-        # [batch, feature, sequence]
-        code = code.permute(0, 2, 1)
-        decode = self.decoder_conv1(code)
+        # [batch, sequence, feature, 1]
+        code = code.view(code.shape[0], code.shape[1], code.shape[2], 1)
 
-        # [batch, sequence, feature]
-        output = decode.permute(0, 2, 1)
-        output = output.view(x.shape[0], x.shape[1], x.shape[2], x.shape[3])
-        return output
+        return code
+
+    def forward(self, x):
+        """フォワード処理.
+
+        Notes:
+            Input dims: [batch, sequence, feature, 1]
+            Ouptut dims: [batch, sequence, feature, 1]
+        """
+        code = self.encode(x)
+        decode = self.decode(code)
+        return decode
 
 
 class DTClustering(nn.Module):
@@ -65,9 +91,30 @@ class DTClustering(nn.Module):
         super(DTClustering, self).__init__()
         self.autoencoder = Autoencder()
 
+    def encode(self, x):
+        code = self.autoencoder.encode(x)
+        return code
+
     def forward(self, x):
         decode = self.autoencoder(x)
         return decode
+
+
+def calc_centeroid(x, network: DTClustering, n_clusters: int):
+    """クラスタ中心を計算します.
+
+    Notes:
+        Input x: [batch, sequence, feature, 1]
+        Output: [batch, hidden sequence, hidden feature, 1]
+    """
+    code = network.encode(x)
+    feature = code.view(code.shape[0], -1)  # [batch, sequence * feature]
+    feature = feature.detach().cpu().numpy()
+    km = clusetr.KMeans(n_clusters=n_clusters, n_init=10)
+    km.fit(feature)
+    centers = km.cluster_centers_.reshape(n_clusters, code.shape[1], code.shape[2], 1)
+
+    return centers
 
 
 def _main() -> None:
