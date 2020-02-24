@@ -13,3 +13,11 @@ Madiraju, N. S., Sadat, S. M., Fisher, D., & Karimabadi, H. (2018).
 "Anthony Bagnall, Jason Lines, William Vickers and Eamonn Keogh,
 The UEA & UCR Time Series Classification Repository,
 www.timeseriesclassification.com"
+
+## References
+
+- GitHub [FlorentF9/DeepTemporalClustering][florentf9]: Keras 実装
+- GitHub [saeeeeru/dtc-tensorflow]: Tensorflow 実装
+
+[saeeeeru]: https://github.com/saeeeeru/dtc-tensorflow
+[florentf9]: https://github.com/FlorentF9/DeepTemporalClustering
