@@ -36,7 +36,7 @@ def _main() -> None:
         network=network,
         train_path="_data/raw/CBF/CBF_TRAIN.ts",
         valid_path="_data/raw/CBF/CBF_TEST.ts",
-        batch_size=64,
+        batch_size=16,
         workers=0,
     )
     trainer = Trainer(
@@ -44,7 +44,7 @@ def _main() -> None:
         default_save_path=save_path,
         fast_dev_run=False,
         min_epochs=1,
-        max_epochs=1000,
+        max_epochs=10000,
         gpus=gpus,
     )
     trainer.fit(model)

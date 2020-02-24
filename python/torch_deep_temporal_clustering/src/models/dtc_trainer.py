@@ -1,9 +1,12 @@
 """学習用処理."""
 # default packages
+import argparse
 import logging
+import math
 import pathlib
 
 # third party packags
+import matplotlib.pyplot as plt
 import pytorch_lightning as pl
 import torch
 import torch.nn as nn
@@ -35,6 +38,15 @@ class DTCTrainer(pl.LightningModule):
         self.batch_size = batch_size
         self.workers = workers
 
+        self.hparams = argparse.Namespace(
+            learning_rate=self.learning_rate,
+            sgd_momentum=self.sgd_momentum,
+            train_path=self.train_path,
+            valid_path=self.valid_path,
+            batch_size=self.batch_size,
+            workers=self.workers,
+        )
+
         self.network = network
         self.criterion = nn.MSELoss()
 
@@ -44,7 +56,17 @@ class DTCTrainer(pl.LightningModule):
     def training_step(self, batch, batch_nb):
         x, y = batch
         output = self.forward(x)
-        loss = self.criterion(output, y)
+        loss = self.criterion(x, output)
+
+        if self.global_step % self.trainer.row_log_interval == 0:
+            self.logger.experiment.add_figure(
+                tag="train/overlap",
+                figure=_create_graph(x, output),
+                global_step=self.global_step,
+            )
+            plt.cla()
+            plt.clf()
+            plt.close()
 
         tensorboard_logs = {"train_loss": loss}
         return {"loss": loss, "log": tensorboard_logs}
@@ -52,7 +74,7 @@ class DTCTrainer(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         x, y = batch
         output = self.forward(x)
-        loss = self.criterion(output, y)
+        loss = self.criterion(x, output)
 
         return {"val_loss": loss}
 
@@ -76,6 +98,21 @@ class DTCTrainer(pl.LightningModule):
     @pl.data_loader
     def val_dataloader(self):
         return _create_loader(self.valid_path, self.batch_size, False, self.workers)
+
+
+def _create_graph(data, output):
+    data_cpu = data.detach().cpu().numpy().reshape((data.shape[0], -1))
+    output_cpu = output.detach().cpu().numpy().reshape((data.shape[0], -1))
+
+    fig = plt.figure(figsize=(30, 6))
+    rows, cols = 1, math.ceil(math.sqrt(data_cpu.shape[0]))
+
+    for idx in range(cols):
+        plt.subplot(rows, cols, idx + 1)
+        plt.plot(data_cpu[idx, :], label="input")
+        plt.plot(output_cpu[idx, :], label="reconstruct")
+
+    return fig
 
 
 def _create_loader(

@@ -44,9 +44,8 @@ def _main() -> None:
 
     target = pathlib.Path("_data/raw/CBF/CBF_TRAIN.ts")
     dataset = TSDataset(target)
-    for idx in range(2):
-        x, y = dataset[idx]
-        logger.info(f"value [{idx}]: {x[0].shape}, {y}")
+    logger.info(f"dataset length: {len(dataset)}")
+    logger.info(f"value shape: {dataset[0][0].shape}, {dataset[0][1].shape}")
 
 
 if __name__ == "__main__":
