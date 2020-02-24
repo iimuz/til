@@ -1,6 +1,7 @@
 """学習を実行するスクリプト."""
 # default packages
 import logging
+import pathlib
 import random
 
 # third party packages
@@ -30,6 +31,9 @@ def _main() -> None:
     gpus = [0] if torch.cuda.is_available() else None
     _init_rand_seed(seed=0)
     save_path = "_models/test"
+    ckpt_path = pathlib.Path(
+        "_models/test/lightning_logs/version_0/checkpoints/_ckpt_epoch_9999.ckpt"
+    )
 
     network = DTClustering()
     model = DTCTrainer(
@@ -39,15 +43,23 @@ def _main() -> None:
         batch_size=16,
         workers=0,
     )
-    trainer = Trainer(
-        early_stop_callback=True,
-        default_save_path=save_path,
-        fast_dev_run=False,
-        min_epochs=1,
-        max_epochs=10000,
-        gpus=gpus,
-    )
-    trainer.fit(model)
+    if ckpt_path.exists() is False:
+        logger.info("learning...")
+        trainer = Trainer(
+            early_stop_callback=True,
+            default_save_path=save_path,
+            fast_dev_run=False,
+            min_epochs=1,
+            max_epochs=10000,
+            gpus=gpus,
+        )
+        trainer.fit(model)
+    else:
+        logger.info(f"load checkpoint: {ckpt_path}")
+        ckpt = torch.load(str(ckpt_path))
+        model.load_state_dict(ckpt["state_dict"])
+    model.eval()
+    model.freeze()
 
 
 if __name__ == "__main__":
