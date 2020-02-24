@@ -1,0 +1,29 @@
+version: "3.7"
+services:
+  tensorboard:
+    image: tensorflow/tensorflow:2.1.0-py3
+    environment:
+      TZ: "Asia/Tokyo"
+    expose:
+      - 38888
+    volumes:
+      - workspace:/workspace:ro
+    working_dir: /workspace
+    command: tensorboard --logdir=/workspace --host=0.0.0.0 --port=38888 --path_prefix=/tensorboard
+
+  nginx:
+    image: nginx:1.17.8
+    environment:
+      TZ: "Asia/Tokyo"
+    ports:
+      - 127.0.0.1:38888:38888
+    volumes:
+      - ./default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./index.html:/var/www/index.html:ro
+
+volumes:
+  workspace:
+    driver_opts:
+      type: none
+      device: $PWD/..
+      o: bind
