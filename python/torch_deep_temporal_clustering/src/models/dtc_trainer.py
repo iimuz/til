@@ -42,15 +42,17 @@ class DTCTrainer(pl.LightningModule):
         return self.network(x)
 
     def training_step(self, batch, batch_nb):
-        output = self.forward(batch)
-        loss = self.criterion(output, batch)
+        x, y = batch
+        output = self.forward(x)
+        loss = self.criterion(output, y)
 
         tensorboard_logs = {"train_loss": loss}
         return {"loss": loss, "log": tensorboard_logs}
 
-    def validation_step(slef, batch, batch_idx):
-        output = self.forward(batch)
-        loss = self.criterion(output, batch)
+    def validation_step(self, batch, batch_idx):
+        x, y = batch
+        output = self.forward(x)
+        loss = self.criterion(output, y)
 
         return {"val_loss": loss}
 

@@ -3,8 +3,8 @@
 import logging
 
 # thrid party packages
-import torch.functional as F
 import torch.nn as nn
+import torch.nn.functional as F
 
 # logger
 logger = logging.getLogger(__name__)
@@ -19,7 +19,7 @@ class DTClustering(nn.Module):
         self.decoder_conv1 = nn.ConvTranspose1d(16, 1, 2, stride=2)
 
     def forward(self, x):
-        code = x.view(x.shape[0], x.shape[1], -1)
+        code = x.view(x.shape[0], -1, x.shape[1])
 
         code = F.relu(self.encoder_conv1(code))
         code = F.relu(self.encoder_conv2(code))

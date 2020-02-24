@@ -4,6 +4,7 @@ import logging
 import pathlib
 
 # third party packages
+import numpy as np
 import torch
 from sktime.utils.load_data import load_from_tsfile_to_dataframe
 from torch.utils.data import Dataset
@@ -23,10 +24,14 @@ class TSDataset(Dataset):
         return self.x.shape[0]
 
     def __getitem__(self, idx):
+        """データを取得する.
+        Notes:
+            データの次元: [Sequence, feature, 1]
+        """
         index = idx.tolist() if torch.is_tensor(idx) else idx
 
-        x = self.x.iloc[index, :].to_numpy()
-        y = self.y[index]
+        x = self.x.iloc[index, 0].to_numpy().astype(np.float32).reshape((1, 1, -1))
+        y = np.float32(self.y[index])
 
         if self.transform is not None:
             x = self.transform(x)

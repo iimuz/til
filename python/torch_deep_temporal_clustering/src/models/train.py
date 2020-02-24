@@ -37,7 +37,7 @@ def _main() -> None:
         train_path="_data/raw/CBF/CBF_TRAIN.ts",
         valid_path="_data/raw/CBF/CBF_TEST.ts",
         batch_size=64,
-        workers=4,
+        workers=0,
     )
     trainer = Trainer(
         early_stop_callback=True,
