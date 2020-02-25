@@ -33,6 +33,7 @@ class DTCTrainer(pl.LightningModule):
         super(DTCTrainer, self).__init__()
         self.learning_rate = 1e-3
         self.sgd_momentum = 0.9
+        self.pretrain = False
 
         self.train_path = train_path
         self.valid_path = valid_path
@@ -46,11 +47,16 @@ class DTCTrainer(pl.LightningModule):
             valid_path=str(self.valid_path),
             batch_size=self.batch_size,
             workers=self.workers,
+            pretrain=self.pretrain,
         )
 
         self.network = network
         self.criterion_ae = nn.MSELoss()
         self.criterion_cl = nn.KLDivLoss(reduction="batchmean")
+
+    def set_pretrain(self, pretrain: bool) -> None:
+        self.pretrain = pretrain
+        self.hparams.pretrain = pretrain
 
     def forward(self, x):
         return self.network(x)
@@ -59,7 +65,7 @@ class DTCTrainer(pl.LightningModule):
         x, y = batch
         decode, q = self.forward(x)
 
-        if optimizer_idx == 0:
+        if self.pretrain or optimizer_idx == 0:
             loss = self.criterion_ae(x, decode)
         else:
             p = dtc.target_distribution(q)
@@ -103,7 +109,10 @@ class DTCTrainer(pl.LightningModule):
             momentum=self.sgd_momentum,
         )
 
-        return [optim_ae, optim_cl]
+        if self.pretrain:
+            return [optim_ae, optim_ae]
+        else:
+            return [optim_ae, optim_cl]
 
     @pl.data_loader
     def train_dataloader(self):

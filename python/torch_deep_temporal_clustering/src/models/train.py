@@ -27,13 +27,18 @@ def _init_rand_seed(seed):
 
 
 def init_centers(
-    train_path: pathlib.Path, network: dtc.DTClustering, n_clusters: int, workers: int
+    train_path: pathlib.Path,
+    network: dtc.DTClustering,
+    n_clusters: int,
+    workers: int,
+    device: str,
 ) -> None:
     dataset = TSDataset(train_path)
     loader = torch.utils.data.DataLoader(
         dataset, batch_size=len(dataset), shuffle=False, num_workers=workers
     )
     train_x = next(iter(loader))[0].permute(0, 3, 1, 2)
+    train_x = train_x.to(device)
     network.init_centroid(train_x, n_clusters=n_clusters)
 
 
@@ -41,12 +46,13 @@ def _main() -> None:
     logging.basicConfig(level=logging.INFO)
 
     gpus = [0] if torch.cuda.is_available() else None
+    device = "gpu:0" if torch.cuda.is_available() else "cpu"
     _init_rand_seed(seed=0)
     save_path = "_models/test"
     save_path2 = "_models/test2"
     ckpt_path = pathlib.Path(
-        # "_models/test/lightning_logs/version_0/checkpoints/_ckpt_epoch_19999.ckpt"
-        "_models/test/lightning_logs/version_45/checkpoints/_ckpt_epoch_99.ckpt"
+        # "_models/test/lightning_logs/version_0/checkpoints/_ckpt_epoch_9999.ckpt"
+        "_models/test/lightning_logs/version_48/checkpoints/_ckpt_epoch_199.ckpt"
     )
     train_path = pathlib.Path("_data/raw/CBF/CBF_TRAIN.ts")
     valid_path = pathlib.Path("_data/raw/CBF/CBF_TEST.ts")
@@ -62,12 +68,13 @@ def _main() -> None:
         batch_size=batch_size,
         workers=workers,
     )
+    model.set_pretrain(True)
     if ckpt_path.exists() is False:
         logger.info("learning...")
         trainer = Trainer(
             early_stop_callback=True,
             default_save_path=save_path,
-            fast_dev_run=False,
+            fast_dev_run=True,
             min_epochs=1,
             max_epochs=100,
             gpus=gpus,
@@ -77,16 +84,18 @@ def _main() -> None:
         logger.info(f"load checkpoint: {ckpt_path}")
         ckpt = torch.load(str(ckpt_path))
         model.load_state_dict(ckpt["state_dict"])
+        model = model.to(device)
     model.train()
 
     _init_rand_seed(seed=0)
-    init_centers(train_path, network, n_clusters, workers)
+    init_centers(train_path, network, n_clusters, workers, device)
 
     _init_rand_seed(seed=0)
+    model.set_pretrain(False)
     trainer = Trainer(
         early_stop_callback=True,
         default_save_path=save_path2,
-        fast_dev_run=False,
+        fast_dev_run=True,
         min_epochs=1,
         max_epochs=100,
         gpus=gpus,
