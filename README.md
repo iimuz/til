@@ -13,3 +13,4 @@ Today I Learn.
 - markdown: markdown に関するサンプルコードです。
 - python: python に関するサンプルコードです。
 - r: R に関するサンプルコードです。
+- sql: SQL に関するサンプルコードです。
