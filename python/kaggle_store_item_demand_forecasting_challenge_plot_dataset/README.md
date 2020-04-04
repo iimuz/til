@@ -11,3 +11,4 @@ kaggle competitions leaderboard demand-forecasting-kernels-only -s
 ## Files
 
 - `v0.1.0_plot_dataset.ipynb`: データセットを多くの加工をせずにプロットしています。
+- `v0.1.0_plot_pivot_table.ipynb`: 週、月などで集約したデータをプロットしています。
