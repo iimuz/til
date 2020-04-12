@@ -107,3 +107,19 @@ Kaggle API を利用してデータセットをダウンロードするときは
 ```py
 !kaggle competitions download -c demand-forecasting-kernels-only -p path/to/raw
 ```
+
+## PyTorch のシード固定
+
+pytorch を利用する際にランダムシードを固定する処理です。
+
+```py
+import random
+
+import numpy as np
+import torch
+
+random.seed(seed)
+np.random.seed(seed)
+torch.manual_seed(seed)
+torch.cuda.manual_seed(seed)
+```
