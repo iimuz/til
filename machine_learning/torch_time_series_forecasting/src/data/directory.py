@@ -26,7 +26,7 @@ def get_raw() -> pathlib.Path:
     return pathlib.Path("data").joinpath("raw")
 
 
-def main() -> None:
+def _main() -> None:
     """実行確認用スクリプト."""
     logging.basicConfig(level=logging.INFO)
 
@@ -37,7 +37,7 @@ def main() -> None:
 
 if __name__ == "__main__":
     try:
-        main()
+        _main()
     except Exception as e:
         logger.error(e)
         logger.error(traceback.format_exc())

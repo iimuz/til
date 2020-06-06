@@ -50,7 +50,7 @@ def get_raw_url() -> str:
     return url
 
 
-def main() -> None:
+def _main() -> None:
     """メインの実行スクリプト."""
     logging.basicConfig(level=logging.INFO)
 
@@ -76,7 +76,7 @@ def main() -> None:
 
 if __name__ == "__main__":
     try:
-        main()
+        _main()
     except Exception as e:
         logger.error(e)
         logger.error(traceback.format_exc())

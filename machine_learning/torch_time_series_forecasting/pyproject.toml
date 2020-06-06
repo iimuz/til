@@ -11,6 +11,7 @@ flake8 = "^3.8.2"
 mypy = "^0.780"
 tqdm = "^4.46.1"
 pandas = "^1.0.4"
+torch = "^1.5.0"
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"

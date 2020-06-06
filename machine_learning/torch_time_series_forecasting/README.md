@@ -2,6 +2,11 @@
 
 Time Series に対する予測モデルの実装集です。
 
+## Usage
+
+- initilize project: `poetry install`
+- download dataset: `poetry run python src/data/dataset.py`
+
 ## Dataset
 
 データセットとして、多変量時系列データとなる `jena_climate_2009_2016` を利用しています。
