@@ -2,7 +2,6 @@
 # default
 import argparse
 import logging
-import math
 import traceback
 
 # third party
@@ -35,6 +34,7 @@ class ForecastTrainer(pl.LightningModule):
     def training_step(self, batch, batch_nb):
         x, y = batch
         prediction = self.forward(x)
+        prediction = prediction.view(y.shape)
         loss = self.criterion(prediction, y)
 
         if self.global_step % self.trainer.row_log_interval == 0:
@@ -53,6 +53,7 @@ class ForecastTrainer(pl.LightningModule):
     def validation_step(self, batch, batch_nb):
         x, y = batch
         prediction = self.forward(x)
+        prediction = prediction.view(y.shape)
         loss = self.criterion(prediction, y)
 
         return {"val_loss": loss}
@@ -64,8 +65,7 @@ class ForecastTrainer(pl.LightningModule):
         return {"val_loss": avg_loss, "log": tensorboard_logs}
 
     def configure_optimizers(self):
-        # optimizer = optim.RMSprop(self.network.parameters())
-        optimizer = optim.Adam(self.network.parameters())
+        optimizer = optim.RMSprop(self.network.parameters())
 
         return optimizer
 
@@ -89,19 +89,20 @@ def _create_graph(x, y, prediction) -> None:
     y_cpu = y.detach().cpu().numpy()
     prediction_cpu = prediction.detach().cpu().numpy()
 
-    rows, cols = math.ceil(math.sqrt(x_cpu.shape[0])), x_cpu.shape[1]
+    rows = min([x_cpu.shape[0], 5])
+    cols = min([x_cpu.shape[2], 5])
     figsize = (6 * cols, 4 * rows)
     fig, axes = plt.subplots(rows, cols, figsize=figsize)
     for batch in range(rows):
         for channel in range(cols):
             ax = axes[batch, channel]
-            index_x = range(x_cpu.shape[2])
-            index_y = range(index_x[-1], index_x[-1] + y_cpu.shape[2])
-            ax.plot(index_x, x_cpu[batch, channel, :], color="b", label="input")
-            ax.scatter(index_y, y_cpu[batch, channel, :], color="g", label="y")
+            index_x = range(x_cpu.shape[1])
+            index_y = range(index_x[-1], index_x[-1] + y_cpu.shape[1])
+            ax.plot(index_x, x_cpu[batch, :, channel], color="b", label="input")
+            ax.scatter(index_y, y_cpu[batch, :, channel], color="g", label="y")
             ax.scatter(
                 index_y,
-                prediction_cpu[batch, channel, :],
+                prediction_cpu[batch, :, channel],
                 color="orange",
                 label="prediction",
             )

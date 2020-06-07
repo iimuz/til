@@ -9,6 +9,8 @@ import traceback
 import numpy as np
 import pandas as pd
 import pytorch_lightning as pl
+import pytorch_lightning.callbacks as pl_callbacks
+import pytorch_lightning.profiler as pl_profiler
 import sklearn.model_selection as model_selection
 import sklearn.preprocessing as preprocessing
 import torch
@@ -65,8 +67,8 @@ def main() -> None:
     data_train = scaler.transform(data_train)
     data_valid = scaler.transform(data_valid)
 
-    input_length = 8
-    forecast_length = 1
+    input_length = 128
+    forecast_length = 64
     dataset_train = jena_climate.Dataset(
         data_train,
         input_length=input_length,
@@ -80,12 +82,13 @@ def main() -> None:
         mode=jena_climate.Mode.VALID,
     )
 
-    batch_size = 32
+    batch_size = 256
+    num_workers = 4
     dataloader_train = torch_data.DataLoader(
         dataset_train,
         batch_size,
         shuffle=True,
-        num_workers=4,
+        num_workers=num_workers,
         pin_memory=True,
         worker_init_fn=worker_init_random,
     )
@@ -93,16 +96,28 @@ def main() -> None:
         dataset_valid,
         batch_size,
         shuffle=False,
-        num_workers=4,
+        num_workers=num_workers,
         pin_memory=True,
         worker_init_fn=worker_init_random,
     )
 
-    network = simple_lstm.SingleLSTM(input_length, forecast_length)
+    pl.seed_everything(random_seed)
+    input_feature = data_train.shape[1]
+    output_dims = forecast_length * input_feature
+    network = simple_lstm.DoubleLSTM(input_feature, output_dims)
     model = trainer.ForecastTrainer(network)
     model.set_dataloader(dataloader_train, dataloader_valid)
 
-    cache_dir = directory.get_interim().joinpath("single_lstm")
+    cache_dir = directory.get_interim().joinpath("double_lstm")
+    profiler = True  # if use detail profiler, pl_profiler.AdvancedProfiler()
+    model_checkpoint = pl_callbacks.ModelCheckpoint(
+        filepath=str(cache_dir),
+        monitor="val_loss",
+        save_top_k=5,
+        save_weights_only=False,
+        mode="min",
+        period=1,
+    )
     pl_trainer = pl.Trainer(
         early_stop_callback=True,
         default_save_path=str(cache_dir),
@@ -110,8 +125,11 @@ def main() -> None:
         min_epochs=10,
         max_epochs=100,
         gpus=[0] if torch.cuda.is_available() else None,
+        row_log_interval=1000,
+        progress_bar_refresh_rate=100,
+        profiler=profiler,
+        checkpoint_callback=model_checkpoint,
     )
-    init_random_seed(random_seed)
     pl_trainer.fit(model)
 
 

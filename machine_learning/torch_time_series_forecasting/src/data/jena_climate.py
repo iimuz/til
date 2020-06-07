@@ -43,13 +43,13 @@ class Dataset(torch_data.Dataset):
 
     def __getitem__(self, idx):
         idx_end = idx + self.input_length
-        data = self.data[idx:idx_end].T
+        data = self.data[idx:idx_end]
 
         if self.mode == Mode.TEST:
             return data
 
         idx_forecast_end = idx_end + self.forecast_length
-        forecast = self.data[idx_end:idx_forecast_end].T
+        forecast = self.data[idx_end:idx_forecast_end]
 
         return data, forecast
 
