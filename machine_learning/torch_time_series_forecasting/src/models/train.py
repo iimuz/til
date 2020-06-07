@@ -104,11 +104,11 @@ def main() -> None:
     pl.seed_everything(random_seed)
     input_feature = data_train.shape[1]
     output_dims = forecast_length * input_feature
-    network = simple_lstm.DoubleLSTM(input_feature, output_dims)
+    network = simple_lstm.LayeredDoubleLSTM(input_feature, output_dims)
     model = trainer.ForecastTrainer(network)
     model.set_dataloader(dataloader_train, dataloader_valid)
 
-    cache_dir = directory.get_interim().joinpath("double_lstm")
+    cache_dir = directory.get_interim().joinpath("layered_double_lstm")
     profiler = True  # if use detail profiler, pl_profiler.AdvancedProfiler()
     model_checkpoint = pl_callbacks.ModelCheckpoint(
         filepath=str(cache_dir),

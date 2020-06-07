@@ -87,8 +87,9 @@ class LayeredDoubleLSTM(nn.Module):
     def __init__(self, input_feature: int, output_size: int) -> None:
         super(LayeredDoubleLSTM, self).__init__()
 
-        self.hidden_size = np.array([32, 16])
-        self.layer_size = np.array([2, 2])
+        self.hidden_size = np.array([32, 16]) * 4
+        self.layer_size = np.array([4, 2]) * 4
+        self.dropout = np.array([0.2, 0.1])
 
         self.lstm1 = nn.LSTM(
             input_feature,
@@ -96,7 +97,7 @@ class LayeredDoubleLSTM(nn.Module):
             num_layers=self.layer_size[0],
             bias=True,
             batch_first=True,
-            dropout=0,
+            dropout=self.dropout[0],
             bidirectional=False,
         )
         self.lstm2 = nn.LSTM(
@@ -105,7 +106,7 @@ class LayeredDoubleLSTM(nn.Module):
             num_layers=self.layer_size[1],
             bias=True,
             batch_first=True,
-            dropout=0,
+            dropout=self.dropout[1],
             bidirectional=False,
         )
         self.fc = nn.Linear(self.hidden_size[1], output_size, bias=True)
@@ -118,7 +119,7 @@ class LayeredDoubleLSTM(nn.Module):
         """
         output, _ = self.lstm1(x)
         _, (h_n, _) = self.lstm2(output)
-        output = F.relu(h_n.view((x.shape[0], -1)))
+        output = F.relu(h_n[-1].view((x.shape[0], -1)))
         output = self.fc(output)
 
         return output
