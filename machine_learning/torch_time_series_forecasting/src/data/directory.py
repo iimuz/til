@@ -17,6 +17,15 @@ def get_data() -> pathlib.Path:
     return pathlib.Path("data")
 
 
+def get_interim() -> pathlib.Path:
+    """interim データディレクトリのパスを返す.
+
+    Returns:
+        pathlib.Path: interimデータディレクトリ.
+    """
+    return get_data().joinpath("interim")
+
+
 def get_raw() -> pathlib.Path:
     """rawデータディレクトリのパスを返す.
 
