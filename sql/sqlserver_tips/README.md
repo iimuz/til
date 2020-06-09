@@ -38,6 +38,19 @@ pip install pyodbc
 apt install unixodbc-dev
 ```
 
-- 参考: [fatal error: sql.h: No such file or directory][mkleehammer]
+場合によっては、上記パッケージだけでは python からアクセスするときにドライバエラーが発生します。
+その場合は、追加で下記を実施してください。
+
+```sh
+curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+sudo bash -c "curl https://packages.microsoft.com/config/ubuntu/18.04/prod.list > /etc/apt/sources.list.d/mssql-release.list"
+apt-get update
+ACCEPT_EULA=Y apt-get install msodbcsql17
+```
+
+- 参考
+  - [fatal error: sql.h: No such file or directory][mkleehammer]
+  - [Microsoft ODBC Driver for SQL Server をインストールする (Linux)][ms_odbc_driver]
 
 [mkleehammer]: https://github.com/mkleehammer/pyodbc/issues/441
+[ms_odbc_driver]: https://docs.microsoft.com/ja-jp/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server
