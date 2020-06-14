@@ -17,6 +17,8 @@
 - GitHub [albumentations-team/albumentations][albumentations]
 - GitHub [AntixK/PyTorch-VAE][antixk]
   - PyTorch で VAE のモデルが幾つか実装されています。
+- [Model Zoo][modelzoo]
+  - 各種フレームワークでの実装とコードの対応が記載されています。
 
 [albumentations]: https://github.com/albumentations-team/albumentations
 [antixk]: https://github.com/AntixK/PyTorch-VAE
@@ -24,5 +26,6 @@
 [facebookresearch]: https://github.com/facebookresearch/detectron2
 [lukemelas]: https://github.com/lukemelas/EfficientNet-PyTorch
 [mmdetection]: https://github.com/open-mmlab/mmdetection
+[modelzoo]: https://modelzoo.co/
 [qubvel]: https://github.com/qubvel/segmentation_models.pytorch
 [rwightman]: https://github.com/rwightman/pytorch-image-models
