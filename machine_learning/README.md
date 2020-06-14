@@ -29,3 +29,10 @@
 [modelzoo]: https://modelzoo.co/
 [qubvel]: https://github.com/qubvel/segmentation_models.pytorch
 [rwightman]: https://github.com/rwightman/pytorch-image-models
+
+## その他
+
+- 2019.1.20 [PyTorch の便利な周辺ライブラリまとめ][noconote]
+  - 各種実装が記載されたページの一覧が作成されています。
+
+[noconote]: https://www.noconote.work/entry/2019/01/08/020022
