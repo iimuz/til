@@ -1,6 +1,6 @@
-## Machine Learning
+# Machine Learning
 
-### Deep Learning Models
+## Deep Learning Models
 
 - GitHub [Cadene/pretrained-models.pytorch][cadene]
   - CNN 系の学習済みモデルとネットワーク実装がある。
@@ -15,8 +15,11 @@
 - GitHub [open-mmlab/mmdetection][mmdetection]
   - 物体検出系のモデルの実装。
 - GitHub [albumentations-team/albumentations][albumentations]
+- GitHub [AntixK/PyTorch-VAE][antixk]
+  - PyTorch で VAE のモデルが幾つか実装されています。
 
 [albumentations]: https://github.com/albumentations-team/albumentations
+[antixk]: https://github.com/AntixK/PyTorch-VAE
 [cadene]: https://github.com/Cadene/pretrained-models.pytorch
 [facebookresearch]: https://github.com/facebookresearch/detectron2
 [lukemelas]: https://github.com/lukemelas/EfficientNet-PyTorch
