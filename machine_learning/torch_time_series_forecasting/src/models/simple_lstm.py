@@ -130,7 +130,14 @@ def _main() -> None:
     logging.basicConfig(level=logging.INFO)
 
     # show layer
+    logger.info("single lstm")
     logger.info(SingleLSTM(input_feature=8, output_size=2))
+
+    logger.info("double lstm")
+    logger.info(DoubleLSTM(input_feature=8, output_size=2))
+
+    logger.info("layered double lstm")
+    logger.info(LayeredDoubleLSTM(input_feature=8, output_size=2))
 
 
 if __name__ == "__main__":

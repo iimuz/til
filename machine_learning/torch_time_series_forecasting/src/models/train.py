@@ -24,6 +24,7 @@ import yaml
 import src.data.dataset as dataset
 import src.data.directory as directory
 import src.data.jena_climate as jena_climate
+import src.models.dilated_cnn as dilated_cnn
 import src.models.simple_lstm as simple_lstm
 import src.models.trainer as trainer
 
@@ -67,12 +68,14 @@ def create_dataset(filepath: pathlib.Path) -> np.ndarray:
 
 
 def get_network(name: str, params: t.Dict) -> t.Optional[nn.Module]:
-    if "SimpleLSTM" == name:
-        return simple_lstm.SingleLSTM(**params)
+    if "DilatedCNN" == name:
+        return dilated_cnn.DCNN(**params)
     if "DoubleLSTM" == name:
         return simple_lstm.DoubleLSTM(**params)
     if "LayeredDoubleLSTM" == name:
         return simple_lstm.LayeredDoubleLSTM(**params)
+    if "SimpleLSTM" == name:
+        return simple_lstm.SingleLSTM(**params)
 
     logger.error(f"unknown network name: {name}")
     return None
