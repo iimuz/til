@@ -1,6 +1,7 @@
 """プロジェクトのディレクトリ構成を共通で管理するためのモジュールです."""
 # default
 import logging
+import os
 import pathlib
 import traceback
 
@@ -14,7 +15,8 @@ def get_data() -> pathlib.Path:
     Returns:
         pathlib.Path: データディレクトリ.
     """
-    return pathlib.Path("data")
+    data_dir = os.environ.get("DATA_DIR", "data")
+    return pathlib.Path(data_dir)
 
 
 def get_interim() -> pathlib.Path:
@@ -32,7 +34,7 @@ def get_raw() -> pathlib.Path:
     Returns:
         pathlib.Path: rawデータディレクトリ.
     """
-    return pathlib.Path("data").joinpath("raw")
+    return get_data().joinpath("raw")
 
 
 def _main() -> None:
