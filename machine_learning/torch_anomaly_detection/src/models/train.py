@@ -37,7 +37,7 @@ def main() -> None:
     transforms = tv_transforms.Compose(
         [
             tv_transforms.Grayscale(num_output_channels=1),
-            tv_transforms.Resize((256, 256)),
+            tv_transforms.Resize((128, 128)),
             tv_transforms.ToTensor(),
         ]
     )
@@ -48,7 +48,7 @@ def main() -> None:
         filelist[num_train:], transforms, mvtec_ad.Mode.VALID
     )
 
-    batch_size = 128
+    batch_size = 32
     num_workers = 2
     dataloader_train = torch_data.DataLoader(
         dataset_train,

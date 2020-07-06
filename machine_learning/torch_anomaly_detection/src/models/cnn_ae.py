@@ -51,7 +51,7 @@ class Simple(nn.Module):
     def __init__(self, in_channels: int, out_channels: int,) -> None:
         super(Simple, self).__init__()
 
-        self.channels = np.array([32, 64, 128, 64, 32])
+        self.channels = np.array([32, 64, 128, 64, 32]) * 4
 
         self.encoder = nn.Sequential(
             CBR2d(in_channels, self.channels[0], (3, 3), padding=1),
@@ -64,7 +64,13 @@ class Simple(nn.Module):
             CBR2d(self.channels[1], self.channels[1], (3, 3), padding=1),
             CBR2d(self.channels[1], self.channels[2], (3, 3), padding=1),
             nn.MaxPool2d((2, 2), stride=2),
-            CBR2d(self.channels[2], self.channels[2], (3, 3), padding=1, use_activation=False),
+            CBR2d(
+                self.channels[2],
+                self.channels[2],
+                (3, 3),
+                padding=1,
+                use_activation=False,
+            ),
             # CBR2d(self.channels[2], self.channels[3], (3, 3), padding=1),
             # CBR2d(self.channels[3], self.channels[4], (3, 3), padding=1),
             # CBR2d(
