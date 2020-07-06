@@ -48,6 +48,11 @@ class CBR2d(nn.Module):
 
 
 class Simple(nn.Module):
+    """簡単なネットワーク.
+
+    Notes:
+        - 参考資料: `https://github.com/cheapthrillandwine/Improving_Unsupervised_Defect_Segmentation/blob/master/Improving_AutoEncoder_Samples.ipynb`
+    """
     def __init__(self, in_channels: int, out_channels: int,) -> None:
         super(Simple, self).__init__()
 
