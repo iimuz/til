@@ -41,7 +41,7 @@ class CBR2d(nn.Module):
             nn.BatchNorm2d(out_channels),
         )
         if use_activation:
-            self.conv.add_module("activation", nn.ReLU())
+            self.conv.add_module("activation", nn.ReLU(inplace=True))
 
     def forward(self, x):
         return self.conv(x)
