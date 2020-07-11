@@ -16,6 +16,7 @@ import src.data.mvtec_ad as mvtec_ad
 import src.data.directories as directories
 import src.data.log_utils as log_utils
 import src.models.cnn_ae as cnn_ae
+import src.models.vanila_vae as vanila_vae
 import src.models.trainer as trainer
 
 # logger
@@ -30,14 +31,17 @@ def main() -> None:
     """学習処理の実行スクリプト."""
     log_utils.init_root_logger()
 
-    train_dir = directories.get_raw().joinpath("hazelnut/train")
-    filelist = sorted(list(train_dir.glob("**/*.png")))
-    num_train = 300
+    # train_dir = directories.get_raw().joinpath("hazelnut/train")
+    # filelist = sorted(list(train_dir.glob("**/*.png")))
+    train_dir = directories.get_raw().joinpath("img_align_celeba")
+    filelist = sorted(list(train_dir.glob("**/*.jpg")))
+    num_train = int(len(filelist) * 0.8)
 
+    image_size = (64, 64)
     transforms = tv_transforms.Compose(
         [
-            tv_transforms.Grayscale(num_output_channels=1),
-            tv_transforms.Resize((128, 128)),
+            # tv_transforms.Grayscale(num_output_channels=1),
+            tv_transforms.Resize(image_size),
             tv_transforms.ToTensor(),
         ]
     )
@@ -48,8 +52,8 @@ def main() -> None:
         filelist[num_train:], transforms, mvtec_ad.Mode.VALID
     )
 
-    batch_size = 64
-    num_workers = 2
+    batch_size = 512
+    num_workers = 4
     dataloader_train = torch_data.DataLoader(
         dataset_train,
         batch_size,
@@ -69,8 +73,8 @@ def main() -> None:
 
     random_seed = 42
     pl.seed_everything(random_seed)
-    in_channels = 1
-    out_channels = 1
+    in_channels = 3
+    out_channels = 3
     hparams = {
         "batch_size": batch_size,
         "num_workers": num_workers,
@@ -78,8 +82,10 @@ def main() -> None:
         "out_channels": out_channels,
         "random_seed": random_seed,
     }
-    network = cnn_ae.SimpleCBR(in_channels, out_channels)
-    model = trainer.AETrainer(network, hparams)
+    # network = cnn_ae.SimpleCBR(in_channels, out_channels)
+    network = vanila_vae.VAE(in_channels, out_channels, image_size)
+    # model = trainer.AETrainer(network, hparams)
+    model = trainer.VAETrainer(network, hparams)
     model.set_dataloader(dataloader_train, dataloader_valid)
 
     log_dir = "simple_cnn"
