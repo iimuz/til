@@ -27,7 +27,10 @@ class AETrainer(pl.LightningModule):
 
         self.network = network
         self.hparams = argparse.Namespace(**hparams)
-        self.criterion = nn.BCELoss()
+        # self.criterion = nn.L1Loss()
+        # self.criterion = nn.MSELoss()
+        # self.criterion = nn.BCELoss()
+        self.criterion = nn.BCEWithLogitsLoss()
         self.learning_rate = 1e-2
         self.sgd_momentum = 0.9
 

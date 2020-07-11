@@ -48,7 +48,7 @@ def main() -> None:
         filelist[num_train:], transforms, mvtec_ad.Mode.VALID
     )
 
-    batch_size = 32
+    batch_size = 64
     num_workers = 2
     dataloader_train = torch_data.DataLoader(
         dataset_train,
@@ -78,14 +78,14 @@ def main() -> None:
         "out_channels": out_channels,
         "random_seed": random_seed,
     }
-    network = cnn_ae.Simple(in_channels, out_channels)
+    network = cnn_ae.SimpleCBR(in_channels, out_channels)
     model = trainer.AETrainer(network, hparams)
     model.set_dataloader(dataloader_train, dataloader_valid)
 
     log_dir = "simple_cnn"
     save_top_k = 5
     early_stop = True
-    min_epochs = 1000
+    min_epochs = 100
     max_epochs = 10000
     progress_bar_refresh_rate = 1
     cache_dir = directories.get_interim().joinpath(log_dir)
