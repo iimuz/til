@@ -135,9 +135,7 @@ class VAE(nn.Module):
 def loss_function(x, decode, mean, logvar):
     coef_kl_loss = 8e-4
 
-    # sse_loss = nn.BCELoss()(decode, x)
     reconstruct_loss = F.mse_loss(decode, x)
-    # kl_loss = -0.5 * torch.sum(1 + logvar - mean.pow(2) - logvar.exp())
     kl_loss = torch.mean(
         -0.5 * torch.sum(1 + logvar - mean ** 2 - logvar.exp(), dim=1), dim=0
     )

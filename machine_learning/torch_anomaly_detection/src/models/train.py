@@ -17,7 +17,9 @@ import src.data.directories as directories
 import src.data.log_utils as log_utils
 import src.models.cnn_ae as cnn_ae
 import src.models.vanila_vae as vanila_vae
+import src.models.vanila_gan as vanila_gan
 import src.models.trainer as trainer
+import src.models.trainer_gan as trainer_gan
 
 # logger
 logger = logging.getLogger(__name__)
@@ -83,12 +85,15 @@ def main() -> None:
         "random_seed": random_seed,
     }
     # network = cnn_ae.SimpleCBR(in_channels, out_channels)
-    network = vanila_vae.VAE(in_channels, out_channels, image_size)
+    # network = vanila_vae.VAE(in_channels, out_channels, image_size)
+    generator = vanila_gan.Generator(62)
+    discriminator = vanila_gan.Discriminator(in_channels, 1)
     # model = trainer.AETrainer(network, hparams)
-    model = trainer.VAETrainer(network, hparams)
+    # model = trainer.VAETrainer(network, hparams)
+    model = trainer_gan.GANTrainer(generator, discriminator, hparams)
     model.set_dataloader(dataloader_train, dataloader_valid)
 
-    log_dir = "simple_cnn"
+    log_dir = "vanila_gan"
     save_top_k = 5
     early_stop = True
     min_epochs = 30
