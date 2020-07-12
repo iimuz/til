@@ -12,6 +12,7 @@ import typing as t
 import numpy as np
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 # logger
 logger = logging.getLogger(__name__)
@@ -47,7 +48,7 @@ class CBA2d(nn.Module):
             nn.BatchNorm2d(out_channels),
         )
         if use_activation:
-            self.conv.add_module("Act", nn.ReLU(inplace=True))
+            self.conv.add_module("Act", nn.LeakyReLU(inplace=True))
 
     def forward(self, x):
         return self.conv(x)
@@ -58,9 +59,9 @@ class VAE(nn.Module):
         self, in_channels: int, out_channels: int, image_size: t.Tuple[int, int]
     ) -> None:
         super(VAE, self).__init__()
-        self.channels = np.array([64, 128, 256, 512])
+        self.channels = np.array([32, 64, 128, 256, 512])
         self.image_size = image_size
-        self.down_ratio = 16
+        self.down_ratio = 2 ** 5
         self.encoded_size = (
             self.image_size[0] // self.down_ratio,
             self.image_size[1] // self.down_ratio,
@@ -71,33 +72,40 @@ class VAE(nn.Module):
         self.latent_dim = 512
 
         self.encoder = nn.Sequential(
-            CBA2d(in_channels, self.channels[0], (5, 5), stride=2, padding=2),
-            CBA2d(self.channels[0], self.channels[1], (5, 5), stride=2, padding=2),
-            CBA2d(self.channels[1], self.channels[2], (5, 5), stride=2, padding=2),
-            CBA2d(self.channels[2], self.channels[3], (5, 5), stride=2, padding=2),
+            CBA2d(in_channels, self.channels[0], (3, 3), stride=2, padding=1),
+            CBA2d(self.channels[0], self.channels[1], (3, 3), stride=2, padding=1),
+            CBA2d(self.channels[1], self.channels[2], (3, 3), stride=2, padding=1),
+            CBA2d(self.channels[2], self.channels[3], (3, 3), stride=2, padding=1),
+            CBA2d(self.channels[3], self.channels[4], (3, 3), stride=2, padding=1),
         )
         self.fc_mean = nn.Linear(self.encoded_dim, self.latent_dim)
         self.fc_logvar = nn.Linear(self.encoded_dim, self.latent_dim)
 
-        self.fc_decode = nn.Linear(self.latent_dim, self.encoded_dim)
+        self.decode_input = nn.Linear(self.latent_dim, self.encoded_dim)
         self.decoder = nn.Sequential(
             nn.UpsamplingNearest2d(scale_factor=2),
-            CBA2d(self.channels[3], self.channels[2], (5, 5), padding=2),
+            CBA2d(self.channels[4], self.channels[3], (3, 3), padding=1),
             nn.UpsamplingNearest2d(scale_factor=2),
-            CBA2d(self.channels[2], self.channels[1], (5, 5), padding=2),
+            CBA2d(self.channels[3], self.channels[2], (3, 3), padding=1),
             nn.UpsamplingNearest2d(scale_factor=2),
-            CBA2d(self.channels[1], self.channels[0], (5, 5), padding=2),
+            CBA2d(self.channels[2], self.channels[1], (3, 3), padding=1),
             nn.UpsamplingNearest2d(scale_factor=2),
-            CBA2d(self.channels[0], out_channels, (5, 5), padding=2),
+            CBA2d(self.channels[1], self.channels[0], (3, 3), padding=1),
+        )
+        self.decode_final = nn.Sequential(
+            nn.UpsamplingNearest2d(scale_factor=2),
+            CBA2d(self.channels[0], self.channels[0], (3, 3), padding=1),
+            CBA2d(self.channels[0], out_channels, (3, 3), padding=1),
             nn.Tanh(),
         )
 
     def decode(self, z):
-        decoded = self.fc_decode(z)
+        decoded = self.decode_input(z)
         decoded = decoded.view(
-            -1, self.channels[3], self.encoded_size[0], self.encoded_size[1]
+            -1, self.channels[-1], self.encoded_size[0], self.encoded_size[1]
         )
         decoded = self.decoder(decoded)
+        decoded = self.decode_final(decoded)
 
         return decoded
 
@@ -118,17 +126,21 @@ class VAE(nn.Module):
 
     def reparametrize(self, mean, logvar):
         std = torch.exp(0.5 * logvar)
-        eps = torch.randn_like(std, device="cuda:0")
+        eps = torch.randn_like(std)
         z = mean + eps * std
 
         return z
 
 
 def loss_function(x, decode, mean, logvar):
-    coef_kl_loss = 5e-3
+    coef_kl_loss = 8e-4
 
-    sse_loss = nn.BCELoss()(decode, x)
-    kl_loss = -0.5 * torch.sum(1 + logvar - mean.pow(2) - logvar.exp())
-    loss = sse_loss + coef_kl_loss * kl_loss
+    # sse_loss = nn.BCELoss()(decode, x)
+    reconstruct_loss = F.mse_loss(decode, x)
+    # kl_loss = -0.5 * torch.sum(1 + logvar - mean.pow(2) - logvar.exp())
+    kl_loss = torch.mean(
+        -0.5 * torch.sum(1 + logvar - mean ** 2 - logvar.exp(), dim=1), dim=0
+    )
+    loss = reconstruct_loss + coef_kl_loss * kl_loss
 
     return loss

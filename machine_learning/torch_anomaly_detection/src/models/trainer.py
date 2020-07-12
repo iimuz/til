@@ -132,8 +132,9 @@ class VAETrainer(pl.LightningModule):
         self.network = network
         self.hparams = argparse.Namespace(**hparams)
         self.criterion = vanila_vae.loss_function
-        self.learning_rate = 1e-4
-        self.sgd_momentum = 0.9
+        self.learning_rate = 0.005
+        self.weight_decay = 0.0
+        self.scheduler_gamma = 0.95
 
     def forward(self, x):
         return self.network(x)
@@ -185,7 +186,7 @@ class VAETrainer(pl.LightningModule):
     def validation_epoch_end(self, outputs):
         avg_loss = torch.stack([x["val_loss"] for x in outputs]).mean()
 
-        img_logs = outputs[0]["img"]
+        img_logs = outputs[-1]["img"]
         self.logger.experiment.add_figure(
             tag="valid/overlap",
             figure=_create_graph(img_logs["batch"], img_logs["decode"]),
@@ -199,11 +200,10 @@ class VAETrainer(pl.LightningModule):
         return {"val_loss": avg_loss, "log": tensorboard_logs}
 
     def configure_optimizers(self):
-        # optimizer = optim.SGD(
-        #     self.parameters(), lr=self.learning_rate, momentum=self.sgd_momentum
-        # )
-        optimizer = optim.Adam(self.parameters(), lr=self.learning_rate)
-        scheduler = lr_scheduler.ReduceLROnPlateau(optimizer)
+        optimizer = optim.Adam(
+            self.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay
+        )
+        scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=self.scheduler_gamma)
 
         return [optimizer], [scheduler]
 

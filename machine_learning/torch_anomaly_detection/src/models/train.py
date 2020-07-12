@@ -52,7 +52,7 @@ def main() -> None:
         filelist[num_train:], transforms, mvtec_ad.Mode.VALID
     )
 
-    batch_size = 512
+    batch_size = 144
     num_workers = 4
     dataloader_train = torch_data.DataLoader(
         dataset_train,
@@ -91,7 +91,7 @@ def main() -> None:
     log_dir = "simple_cnn"
     save_top_k = 5
     early_stop = True
-    min_epochs = 100
+    min_epochs = 30
     max_epochs = 10000
     progress_bar_refresh_rate = 1
     cache_dir = directories.get_interim().joinpath(log_dir)
