@@ -43,8 +43,11 @@ def main() -> None:
     transforms = tv_transforms.Compose(
         [
             # tv_transforms.Grayscale(num_output_channels=1),
+            tv_transforms.RandomHorizontalFlip(),
+            tv_transforms.CenterCrop(148),
             tv_transforms.Resize(image_size),
             tv_transforms.ToTensor(),
+            tv_transforms.Lambda(lambda x: 2.0 * x - 1.0),
         ]
     )
     dataset_train = mvtec_ad.Dataset(
@@ -85,12 +88,12 @@ def main() -> None:
         "random_seed": random_seed,
     }
     # network = cnn_ae.SimpleCBR(in_channels, out_channels)
-    # network = vanila_vae.VAE(in_channels, out_channels, image_size)
-    generator = vanila_gan.Generator(62)
-    discriminator = vanila_gan.Discriminator(in_channels, 1)
+    network = vanila_vae.VAE(in_channels, out_channels, image_size)
+    # generator = vanila_gan.Generator(62)
+    # discriminator = vanila_gan.Discriminator(in_channels, 1)
     # model = trainer.AETrainer(network, hparams)
-    # model = trainer.VAETrainer(network, hparams)
-    model = trainer_gan.GANTrainer(generator, discriminator, hparams)
+    model = trainer.VAETrainer(network, hparams)
+    # model = trainer_gan.GANTrainer(generator, discriminator, hparams)
     model.set_dataloader(dataloader_train, dataloader_valid)
 
     log_dir = "vanila_gan"
