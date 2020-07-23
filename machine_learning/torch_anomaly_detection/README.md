@@ -20,3 +20,14 @@ poetry run pip install setuptools --upgrade
 
 [37ma5ras]: http://37ma5ras.blogspot.com/2017/12/loss-function.html
 [acro-engineer]: http://acro-engineer.hatenablog.com/entry/2019/12/25/130000
+
+### リポジトリ
+
+- GitHub [AntixK/PyTorch-VAE][antixk]:
+  PyTorch を利用して色々な種類の VAE を実装し、
+  Celeba データセットで再構成結果とサンプリング結果を比較しています。
+- GitHub [rasbt/deeplearning-models][rasbt]:
+  基本的なネットワークアーキテクチャに関して pytorch で実装し、 ipynb 形式で公開している。
+
+[antixk]: https://github.com/AntixK/PyTorch-VAE
+[rasbt]: https://github.com/rasbt/deeplearning-models
