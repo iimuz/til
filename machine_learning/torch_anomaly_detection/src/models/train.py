@@ -8,6 +8,7 @@ import traceback
 import pytorch_lightning as pl
 import pytorch_lightning.callbacks as pl_callbacks
 import torch.cuda as torch_cuda
+from torch.nn.modules import transformer
 import torch.utils.data as torch_data
 import torchvision.transforms as tv_transforms
 
@@ -16,6 +17,7 @@ import src.data.mvtec_ad as mvtec_ad
 import src.data.directories as directories
 import src.data.log_utils as log_utils
 import src.models.cnn_ae as cnn_ae
+import src.models.transfer_vae as transfer_vae
 import src.models.vanila_vae as vanila_vae
 import src.models.vanila_gan as vanila_gan
 import src.models.trainer as trainer
@@ -47,7 +49,7 @@ def main() -> None:
             tv_transforms.CenterCrop(148),
             tv_transforms.Resize(image_size),
             tv_transforms.ToTensor(),
-            tv_transforms.Lambda(lambda x: 2.0 * x - 1.0),
+            # tv_transforms.Lambda(lambda x: 2.0 * x - 1.0),
         ]
     )
     dataset_train = mvtec_ad.Dataset(
@@ -88,7 +90,8 @@ def main() -> None:
         "random_seed": random_seed,
     }
     # network = cnn_ae.SimpleCBR(in_channels, out_channels)
-    network = vanila_vae.VAE(in_channels, out_channels, image_size)
+    # network = vanila_vae.VAE(in_channels, out_channels, image_size)
+    network = transfer_vae.TransferVAE(in_channels, out_channels, image_size)
     # generator = vanila_gan.Generator(62)
     # discriminator = vanila_gan.Discriminator(in_channels, 1)
     # model = trainer.AETrainer(network, hparams)

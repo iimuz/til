@@ -132,7 +132,7 @@ class VAETrainer(pl.LightningModule):
         self.network = network
         self.hparams = argparse.Namespace(**hparams)
         self.criterion = vanila_vae.loss_function
-        self.learning_rate = 0.005
+        self.learning_rate = 1e-3  # default 0.005
         self.weight_decay = 0.0
         self.scheduler_gamma = 0.95
 
