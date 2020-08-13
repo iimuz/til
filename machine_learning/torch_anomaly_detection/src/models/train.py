@@ -8,7 +8,6 @@ import traceback
 import pytorch_lightning as pl
 import pytorch_lightning.callbacks as pl_callbacks
 import torch.cuda as torch_cuda
-from torch.nn.modules import transformer
 import torch.utils.data as torch_data
 import torchvision.transforms as tv_transforms
 

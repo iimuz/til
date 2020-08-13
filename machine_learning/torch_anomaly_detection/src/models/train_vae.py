@@ -1,7 +1,6 @@
-"""Autoencoder 系の学習用スクリプト."""
+"""Variational Autoencoder 系の学習用スクリプト."""
 # default
 import argparse
-import dataclassses as dc
 import logging
 import traceback
 import typing as t
@@ -15,35 +14,33 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.optim.lr_scheduler as lr_scheduler
 import torch.utils.data as torch_data
-import torchvision.transforms as tv_transforms
 
 # my packages
-import src.data.dataset as dataset
-import src.data.directories as directories
-import src.data.log_utils as lu
+import src.models.vanila_vae as vanila_vae
 
 # logger
 logger = logging.getLogger(__name__)
 
 
-class AETrainer(pl.LightningModule):
-    """Autoencoder 用の学習クラス."""
+class VAETrainer(pl.LightningModule):
+    """Variational Autoencoder 用の学習クラス."""
 
     def __init__(self, network: nn.Module, hparams: t.Dict = dict()) -> None:
-        super(AETrainer, self).__init__()
+        super(VAETrainer, self).__init__()
 
         self.network = network
         self.hparams = argparse.Namespace(**hparams)
-        self.criterion = nn.BCEWithLogitsLoss()
-        self.learning_rate = 1e-2
-        self.sgd_momentum = 0.9
+        self.criterion = vanila_vae.loss_function
+        self.learning_rate = 1e-3  # default 0.005
+        self.weight_decay = 0.0
+        self.scheduler_gamma = 0.95
 
     def forward(self, x):
         return self.network(x)
 
     def training_step(self, batch, batch_nb):
-        decode = self.forward(batch)
-        loss = self.criterion(decode, batch)
+        decode, mean, logvar = self.forward(batch)
+        loss = self.criterion(batch, decode, mean, logvar)
 
         tensorboard_logs = {"loss": loss}
 
@@ -73,8 +70,8 @@ class AETrainer(pl.LightningModule):
         return {"train_loss": avg_loss, "log": tensorboard_logs}
 
     def validation_step(self, batch, batch_nb):
-        decode = self.forward(batch)
-        loss = self.criterion(decode, batch)
+        decode, mean, logvar = self.forward(batch)
+        loss = self.criterion(batch, decode, mean, logvar)
 
         num_display = 4
         img_logs = {
@@ -88,7 +85,7 @@ class AETrainer(pl.LightningModule):
     def validation_epoch_end(self, outputs):
         avg_loss = torch.stack([x["val_loss"] for x in outputs]).mean()
 
-        img_logs = outputs[0]["img"]
+        img_logs = outputs[-1]["img"]
         self.logger.experiment.add_figure(
             tag="valid/overlap",
             figure=_create_graph(img_logs["batch"], img_logs["decode"]),
@@ -102,10 +99,10 @@ class AETrainer(pl.LightningModule):
         return {"val_loss": avg_loss, "log": tensorboard_logs}
 
     def configure_optimizers(self):
-        optimizer = optim.SGD(
-            self.parameters(), lr=self.learning_rate, momentum=self.sgd_momentum
+        optimizer = optim.Adam(
+            self.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay
         )
-        scheduler = lr_scheduler.ReduceLROnPlateau(optimizer)
+        scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=self.scheduler_gamma)
 
         return [optimizer], [scheduler]
 
@@ -147,50 +144,17 @@ def _create_graph(batch: np.ndarray, decode: np.ndarray) -> None:
     return fig
 
 
-@dc.dataclass
-class Config:
-    train_list_path: str = "path/to/train/list.csv"
-    valid_list_path: str = "path/to/valid/list.csv"
+def _main():
+    """簡易実行テスト用スクリプト."""
+    logging.basicConfig(level=logging.INFO)
 
-    image_size: t.Tuple[int, int] = (64, 64)
-
-
-def get_transforms(image_size: t.Tuple[int, int]) -> tv_transforms.Compose:
-    """データ変換コンポーネントの取得.
-
-    Args:
-        image_size (Tuple[int, int]): 最終的に取得する画像サイズ.
-
-    Returns:
-        torchvision.transforms.Compose: データ変換コンポーネント
-    """
-    transforms = tv_transforms.Compose(
-        [
-            tv_transforms.RandomHorizontalFlip(),
-            tv_transforms.CenterCrop(148),
-            tv_transforms.Resize(image_size),
-            tv_transforms.ToTensor(),
-        ]
-    )
-
-    return transforms
-
-
-def train(config: Config):
-    """学習処理の実行スクリプト."""
-    transforms = get_transforms(config.image_size)
-    dataset_train = dataset.ImageDataset(
-        config.train_list_path, transforms, dataset.Mode.TRAIN
-    )
-    dataset_valid = dataset.ImageDataset(
-        config.valid_list_path, transforms, dataset.Mode.VALID
-    )
+    # show trainer
+    logger.info(VAETrainer(nn.Module()))
 
 
 if __name__ == "__main__":
     try:
-        lu.init_root_logger()
-        train()
+        _main()
     except Exception as e:
         logger.error(e)
         logger.error(traceback.format_exc())
