@@ -2,10 +2,9 @@
 #
 # 接続されているディスクをホームディレクトリとして設定します。
 
-DEVICE_ID=sdb
+DEVICE=google-gpu-home
 
 cd /
 sudo rm -rf /home/*
-echo UUID=`sudo blkid -s UUID -o value /dev/$DEVICE_ID` /home ext4 discard,defaults,nofail 0 2 | sudo tee -a /etc/fstab
+echo UUID=`sudo blkid -s UUID -o value /dev/disk/by-id/$DEVICE` /home ext4 discard,defaults,nofail 0 2 | sudo tee -a /etc/fstab
 sudo reboot
-
