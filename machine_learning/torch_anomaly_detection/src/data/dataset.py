@@ -1,11 +1,11 @@
 """データセットのダウンロードなどファイルの処理を実施するモジュール."""
 # default package
+import abc
 import dataclasses
 import enum
 import logging
 import pathlib
 import tarfile
-import traceback
 import typing as t
 import urllib.request as request
 
@@ -17,11 +17,34 @@ import tqdm as tqdm_std
 
 # my packaegs
 import src.data.directories as directories
-import src.data.log_utils as log_utils
 import src.data.utils as utils
 
 # logger
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
+
+
+class Dataset(metaclass=abc.ABCMeta):
+    def __init__(self) -> None:
+        self.name = self.__class__.__name__
+        self.path = directories.get_raw().joinpath(self.name)
+
+    def load(self) -> "Dataset":
+        self.load_dataset()
+
+        return self
+
+    @abc.abstractmethod
+    def load_dataset(self) -> None:
+        raise NotImplementedError
+
+    def save(self, reprocess: bool = False) -> "Dataset":
+        self.save_dataset(reprocess)
+
+        return self
+
+    @abc.abstractmethod
+    def save_dataset(self, reprocess: bool) -> None:
+        raise NotImplementedError
 
 
 class Mode(enum.Enum):
@@ -127,7 +150,7 @@ def download(config: Config) -> pathlib.Path:
     )
     filepath = download_dir.joinpath(filename)
     if filepath.exists():
-        logger.info(f"file already exists: {filepath}")
+        _logger.info(f"file already exists: {filepath}")
     else:
         filepath.parent.mkdir(exist_ok=True, parents=True)
         with TqdmUpTo(
@@ -164,20 +187,19 @@ def get_dataset_url(name: DatasetName) -> str:
 
 def _main() -> None:
     """実行用スクリプト."""
-    log_utils.init_root_logger()
+    ut.init_root_logger()
 
     config = utils.load_config_from_input_args(lambda x: Config(**x))
     if config is None:
-        logger.error("config error.")
+        _logger.error("config error.")
         return
 
     filepath = download(config)
-    logger.info(f"download path: {filepath}")
+    _logger.info(f"download path: {filepath}")
 
 
 if __name__ == "__main__":
     try:
         _main()
     except Exception as e:
-        logger.error(e)
-        logger.error(traceback.format_exc())
+        _logger.exception(e)

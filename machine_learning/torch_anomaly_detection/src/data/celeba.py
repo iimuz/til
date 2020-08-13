@@ -4,26 +4,71 @@ Notes:
     - `http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html`
 """
 # default packages
-import csv
 import logging
 import pathlib
-import traceback
+import shutil
 import typing as t
 import zipfile
 
 # third party packages
+import pandas as pd
 import requests
 import tqdm as tqdm_std
 
 # my packages
-import src.data.directories as directories
-import src.data.log_utils as log_utils
+import src.data.dataset as dataset
+import src.data.utils as ut
 
 # logger
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
-def download(filepath: pathlib.Path, chunksize: int = 32768) -> None:
+class Celeba(dataset.Dataset):
+    def __init__(self) -> None:
+        super().__init__()
+        self.archive_file = self.path.joinpath("img_align_celeba.zip")
+        self.datadir = self.path.joinpath("img_align_celeba")
+        self.train_list = self.path.joinpath("train.csv")
+        self.valid_list = self.path.joinpath("valid.csv")
+
+    def save_dataset(self, reprocess: bool) -> None:
+        if reprocess:
+            _logger.info("=== reporcess mode. delete existing data.")
+            shutil.rmtree(self.path)
+
+        self.path.mkdir(exist_ok=True)
+
+        _logger.info("=== download zip file.")
+        if not self.archive_file.exists():
+            _download(self.archive_file)
+
+        _logger.info("=== unzip.")
+        if not self.datadir.exists():
+            with zipfile.ZipFile(str(self.archive_file)) as z:
+                z.extractall(str(self.path))
+
+        _logger.info("=== create train and valid file list.")
+        if not self.train_list.exists() and not self.valid_list.exists():
+            filelist = sorted(
+                [p.relative_to(self.path) for p in self.path.glob("**/*.jpg")]
+            )
+            train_ratio = 0.8
+            train_num = int(len(filelist) * train_ratio)
+
+            if not self.train_list.exists():
+                train_list = pd.DataFrame({"filepath": filelist[:train_num]})
+                train_list.to_csv(self.train_list, index=False)
+
+            if not self.valid_list.exists():
+                valid_list = pd.DataFrame({"filepath": filelist[train_num:]})
+                valid_list.to_csv(self.valid_list, index=False)
+
+    def load_dataset(self) -> None:
+        self.train_ = pd.read_csv(self.train_list)
+        self.valid_ = pd.read_csv(self.valid_list)
+
+
+def _download(filepath: pathlib.Path, chunksize: int = 32768) -> None:
     """Download CelebA Dataset.
 
     Args:
@@ -41,13 +86,13 @@ def download(filepath: pathlib.Path, chunksize: int = 32768) -> None:
         params: t.Dict[str, t.Any] = dict(id=ID)
         response = session.get(URL, params=params, stream=True)
 
-        params["confirm"] = get_confirm_token(response)
+        params["confirm"] = _get_confirm_token(response)
         response = session.get(URL, params=params, stream=True)
 
-        save_response_content(response, filepath, chunksize)
+        _save_response_content(response, filepath, chunksize)
 
 
-def get_confirm_token(response: requests.Response) -> t.Optional[str]:
+def _get_confirm_token(response: requests.Response) -> t.Optional[str]:
     """トークンを生成する.
 
     Args:
@@ -63,7 +108,7 @@ def get_confirm_token(response: requests.Response) -> t.Optional[str]:
     return None
 
 
-def save_response_content(
+def _save_response_content(
     response: requests.Response, filepath: pathlib.Path, chunksize: int = 32768,
 ) -> None:
     """レスポンス内容をファイルとして保存する.
@@ -80,41 +125,14 @@ def save_response_content(
 
 
 def main() -> None:
-    """CelebA データセットをダウンロードし、学習及びテスト用のファイルリストを生成する."""
-    log_utils.init_root_logger()
-
-    logger.info("=== download and extract files.")
-    filepath = directories.get_raw().joinpath("img_align_celeba.zip")
-    if filepath.exists() is False:
-        download(filepath)
-
-    logger.info("=== unzip.")
-    extractpath = directories.get_raw()
-    with zipfile.ZipFile(str(filepath)) as z:
-        z.extractall(str(extractpath))
-
-    logger.info("=== create train and valid file list.")
-    filelist = sorted(
-        [p.relative_to(extractpath) for p in extractpath.glob("**/*.jpg")]
-    )
-    train_num = int(len(filelist) * 0.8)
-    train_list = filelist[:train_num]
-    valid_list = filelist[train_num:]
-
-    train_path = directories.get_interim().joinpath("celeba_train.csv")
-    with open(str(train_path), "w") as ft:
-        writer = csv.writer(ft)
-        writer.writerows([[p] for p in train_list])
-
-    valid_path = directories.get_interim().joinpath("celeba_valid.csv")
-    with open(str(valid_path), "w") as fv:
-        writer = csv.writer(fv)
-        writer.writerows([[p] for p in valid_list])
+    """Celeba データセットをダウンロードし、学習及びテスト用のファイルリストを生成する."""
+    celeba = Celeba()
+    celeba.save()
 
 
 if __name__ == "__main__":
     try:
+        ut.init_root_logger()
         main()
     except Exception as e:
-        logger.error(e)
-        logger.error(traceback.format_exc())
+        _logger.exception(e)
