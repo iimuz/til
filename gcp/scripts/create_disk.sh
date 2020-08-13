@@ -14,4 +14,3 @@ gcloud compute disks create $DISK_NAME \
   --size $DISK_SIZE \
   --type $DISK_TYPE \
   --zone asia-northeast1-b
-

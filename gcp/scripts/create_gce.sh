@@ -15,11 +15,11 @@
 #   * preemptible e2-medium, 50GB Storage: 0.016 $/hour, 12.01 $/month
 #   * preemptible e2-standard, 50GB Storage: 0.029 $/hour, 21.43 $/month
 #   * preemptible n1-standard-2, 50GB Storage, Tesla T4: 0.14 $/hour, 102.25 $/month
-INSTANCE_NAME=${1:-dev}
-MACHINE_TYPE=${2:-e2-medium}
-DISK_SIZE=${3:-50GB}
-ATATCH_DISK=${4:-dev-home}
-USE_GPU=${5:-false}
+INSTANCE_NAME=${1:-gpu}
+MACHINE_TYPE=${2:-n1-standard-4}
+DISK_SIZE=${3:-200GB}
+ATATCH_DISK=${4:-gpu-home}
+USE_GPU=${5:-true}
 
 gpu_option=""
 if "${USE_GPU}"; then
@@ -36,7 +36,7 @@ gcloud compute \
   --no-restart-on-failure \
   --maintenance-policy=TERMINATE \
   --preemptible \
-  --image=ubuntu-1804-bionic-v20200317 \
+  --image=ubuntu-1804-bionic-v20200701 \
   --image-project=ubuntu-os-cloud \
   --boot-disk-size=$DISK_SIZE \
   --boot-disk-type=pd-standard \
