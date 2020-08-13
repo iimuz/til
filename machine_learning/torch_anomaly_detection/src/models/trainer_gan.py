@@ -32,12 +32,12 @@ class GANTrainer(pl.LightningModule):
         self.criterion_g = nn.BCELoss()
         self.criterion_d = nn.BCELoss()
 
-        self.lr_g = 0.0002
-        self.lr_d = 0.0002
+        self.lr_g = 2e-4  # default 0.0002
+        self.lr_d = 2e-4  # default 0.0002
         self.optim_betas_g = (0.5, 0.999)
         self.optim_betas_d = (0.5, 0.999)
-        self.scheduler_gmma_g = 0.95
-        self.scheduler_gmma_d = 0.95
+        self.scheduler_gmma_g = 0.90  # default 0.95
+        self.scheduler_gmma_d = 0.90  # default 0.95
 
     def forward(self, x):
         return self.generator(x)
@@ -151,9 +151,9 @@ class GANTrainer(pl.LightningModule):
         return [optimizer_g, optimizer_d], [scheduler_g, scheduler_d]
 
     def on_epoch_end(self) -> None:
-        z = torch.randn(8, self.generator.latent_dim, device=self.last_imgs.device)
+        z = torch.randn(64, self.generator.latent_dim, device=self.last_imgs.device)
         sample_imgs = self(z)
-        grid = torchvision_utils.make_grid(sample_imgs)
+        grid = torchvision_utils.make_grid(sample_imgs, nrow=8)
         self.logger.experiment.add_image("generated_images", grid, self.current_epoch)
 
     @pl.data_loader
