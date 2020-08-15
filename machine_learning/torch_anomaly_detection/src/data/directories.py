@@ -3,13 +3,12 @@
 import logging
 import os
 import pathlib
-import traceback
 
 # my packages
-import src.data.log_utils as log_utils
+import src.data.utils as ut
 
 # logger
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 def get_data() -> pathlib.Path:
@@ -31,6 +30,15 @@ def get_interim() -> pathlib.Path:
     return get_data().joinpath("interim")
 
 
+def get_processed() -> pathlib.Path:
+    """processed データディレクトリのパスを返す.
+
+    Returns:
+        pathlib.Path: interimデータディレクトリ.
+    """
+    return get_data().joinpath("processed")
+
+
 def get_raw() -> pathlib.Path:
     """rawデータディレクトリのパスを返す.
 
@@ -40,18 +48,15 @@ def get_raw() -> pathlib.Path:
     return get_data().joinpath("raw")
 
 
-def _main() -> None:
+def main() -> None:
     """実行確認用スクリプト."""
-    log_utils.init_root_logger()
-
-    # show directory path
-    logger.info(f"data directory: {get_data()}")
-    logger.info(f"raw directory: {get_raw()}")
+    _logger.info(f"data directory: {get_data()}")
+    _logger.info(f"raw directory: {get_raw()}")
 
 
 if __name__ == "__main__":
     try:
-        _main()
+        ut.init_root_logger()
+        main()
     except Exception as e:
-        logger.error(e)
-        logger.error(traceback.format_exc())
+        logging.exception(e)
