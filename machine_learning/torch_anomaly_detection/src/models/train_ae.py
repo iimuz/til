@@ -1,39 +1,47 @@
 """Autoencoder 系の学習用スクリプト."""
 # default
 import argparse
-import dataclassses as dc
+import dataclasses as dc
+import enum
 import logging
-import traceback
+import pprint
+import random
+import shutil
+import sys
 import typing as t
 
 # third party
 import matplotlib.pyplot as plt
 import numpy as np
 import pytorch_lightning as pl
+import pytorch_lightning.callbacks as pl_callbacks
+import pytorch_lightning.logging as pl_logging
 import torch
 import torch.nn as nn
+import torch.cuda as tc
 import torch.optim as optim
 import torch.optim.lr_scheduler as lr_scheduler
-import torch.utils.data as torch_data
+import torch.utils.data as td
 import torchvision.transforms as tv_transforms
 
 # my packages
-import src.data.dataset as dataset
+import src.data.celeba_torch as celeba
+import src.data.dataset_torch as ds
 import src.data.directories as directories
-import src.data.log_utils as lu
+import src.models.cnn_ae as cnn_ae
 
 # logger
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 class AETrainer(pl.LightningModule):
     """Autoencoder 用の学習クラス."""
 
-    def __init__(self, network: nn.Module, hparams: t.Dict = dict()) -> None:
+    def __init__(self, network: nn.Module, record_params: t.Dict = dict()) -> None:
         super(AETrainer, self).__init__()
 
         self.network = network
-        self.hparams = argparse.Namespace(**hparams)
+        self.hparams = argparse.Namespace(**record_params)
         self.criterion = nn.BCEWithLogitsLoss()
         self.learning_rate = 1e-2
         self.sgd_momentum = 0.9
@@ -45,60 +53,52 @@ class AETrainer(pl.LightningModule):
         decode = self.forward(batch)
         loss = self.criterion(decode, batch)
 
-        tensorboard_logs = {"loss": loss}
+        if batch_nb % 100 == 0:
+            num_display = 4
+            fig = _create_graph(
+                batch[:num_display].detach().cpu().numpy(),
+                decode[:num_display].detach().cpu().numpy(),
+            )
+            self.logger.experiment.add_figure(
+                tag="train/reconstruct", figure=fig, global_step=self.global_step,
+            )
+            fig.clf()
+            plt.close()
 
-        num_display = 4
-        img_logs = {
-            "batch": batch[:num_display].detach().cpu().numpy(),
-            "decode": decode[:num_display].detach().cpu().numpy(),
-            "global_step": self.global_step,
-        }
+        tensorboard_logs = {"train/loss": loss}
 
-        return {"loss": loss, "log": tensorboard_logs, "img": img_logs}
+        return {"loss": loss, "log": tensorboard_logs}
 
     def training_epoch_end(self, outputs):
         avg_loss = torch.stack([x["loss"] for x in outputs]).mean()
 
-        img_logs = outputs[0]["img"]
-        self.logger.experiment.add_figure(
-            tag="train/overlap",
-            figure=_create_graph(img_logs["batch"], img_logs["decode"]),
-            global_step=img_logs["global_step"],
-        )
-        plt.cla()
-        plt.clf()
-        plt.close()
-
-        tensorboard_logs = {"train_loss": avg_loss}
+        tensorboard_logs = {"train/epoch_loss": avg_loss}
         return {"train_loss": avg_loss, "log": tensorboard_logs}
 
     def validation_step(self, batch, batch_nb):
         decode = self.forward(batch)
         loss = self.criterion(decode, batch)
 
-        num_display = 4
-        img_logs = {
-            "batch": batch[:num_display].detach().cpu().numpy(),
-            "decode": decode[:num_display].detach().cpu().numpy(),
-            "global_step": self.global_step,
-        }
+        if batch_nb % 100 == 0:
+            num_display = 4
+            fig = _create_graph(
+                batch[:num_display].detach().cpu().numpy(),
+                decode[:num_display].detach().cpu().numpy(),
+            )
+            self.logger.experiment.add_figure(
+                tag="valid/reconstruct", figure=fig, global_step=self.global_step,
+            )
+            fig.clf()
+            plt.close()
 
-        return {"val_loss": loss, "img": img_logs}
+        tensorboard_logs = {"valid/loss": loss}
+
+        return {"val_loss": loss, "log": tensorboard_logs}
 
     def validation_epoch_end(self, outputs):
         avg_loss = torch.stack([x["val_loss"] for x in outputs]).mean()
 
-        img_logs = outputs[0]["img"]
-        self.logger.experiment.add_figure(
-            tag="valid/overlap",
-            figure=_create_graph(img_logs["batch"], img_logs["decode"]),
-            global_step=img_logs["global_step"],
-        )
-        plt.cla()
-        plt.clf()
-        plt.close()
-
-        tensorboard_logs = {"val_loss": avg_loss}
+        tensorboard_logs = {"valid/epoch_loss": avg_loss}
         return {"val_loss": avg_loss, "log": tensorboard_logs}
 
     def configure_optimizers(self):
@@ -117,42 +117,72 @@ class AETrainer(pl.LightningModule):
     def val_dataloader(self):
         return self.dataloader_valid
 
-    def set_dataloader(
-        self, train: torch_data.DataLoader, valid: torch_data.DataLoader
-    ) -> None:
+    def set_dataloader(self, train: td.DataLoader, valid: td.DataLoader) -> None:
         self.dataloader_train = train
         self.dataloader_valid = valid
 
 
-def _create_graph(batch: np.ndarray, decode: np.ndarray) -> None:
-    batch = batch.transpose(0, 2, 3, 1)
-    decode = decode.transpose(0, 2, 3, 1)
-
-    params_imshow = dict()
-    if batch.shape[3] == 1:
-        batch = batch.reshape(batch.shape[:3])
-        decode = decode.reshape(decode.shape[:3])
-        params_imshow["cmap"] = "gray"
-
-    rows, cols = 2, batch.shape[0]
-    figsize = (4 * cols, 4 * rows)
-    fig, axes = plt.subplots(rows, cols, figsize=figsize)
-    for idx in range(cols):
-        ax = axes[0, idx]
-        ax.imshow(batch[idx], **params_imshow)
-
-        ax = axes[1, idx]
-        ax.imshow(decode[idx], **params_imshow)
-
-    return fig
-
-
 @dc.dataclass
 class Config:
-    train_list_path: str = "path/to/train/list.csv"
-    valid_list_path: str = "path/to/valid/list.csv"
+    network_name: str = "SimpleCBR"
+    in_channels: int = 3
+    out_channels: int = 3
+    resize_image: t.Tuple[int, int] = (64, 64)
 
-    image_size: t.Tuple[int, int] = (64, 64)
+    batch_size: int = 144
+    num_workers: int = 4
+
+    random_seed: int = 42
+
+    cache_dir: str = "train_ae"
+    save_top_k: int = 5
+    save_weights_only: bool = False
+
+    experiments_dir: str = "experiments"
+    experiment_version: int = 0
+    resume: bool = True
+
+    early_stop: bool = True
+    min_epochs: int = 30
+    max_epochs: int = 10000
+
+    log_dir: str = "train_ae"
+    use_gpu: bool = True
+    progress_bar_refresh_rate: int = 1
+    profiler: bool = True
+
+
+class NetworkName(enum.Enum):
+    """ネットワークを指定するための設定値."""
+
+    SIMPLE_CBR = "SimpleCBR"
+    SIMPLE_CR = "SimpleCR"
+
+    @classmethod
+    def value_of(cls, name: str) -> "NetworkName":
+        """設定値の文字列から Enum 値を返す.
+
+        Raises:
+            ValueError: 指定した文字列が設定値にない場合
+
+        Returns:
+            [type]: Enum の値
+        """
+        for e in NetworkName:
+            if e.value == name:
+                return e
+
+        raise ValueError(f"invalid value: {name}")
+
+
+def get_network(name: NetworkName, **kwargs) -> nn.Module:
+    if name == NetworkName.SIMPLE_CBR:
+        return cnn_ae.SimpleCBR(**kwargs)
+
+    if name == NetworkName.SIMPLE_CR:
+        return cnn_ae.SimpleCR(**kwargs)
+
+    raise Exception(f"not implemented network: {name}")
 
 
 def get_transforms(image_size: t.Tuple[int, int]) -> tv_transforms.Compose:
@@ -178,19 +208,110 @@ def get_transforms(image_size: t.Tuple[int, int]) -> tv_transforms.Compose:
 
 def train(config: Config):
     """学習処理の実行スクリプト."""
-    transforms = get_transforms(config.image_size)
-    dataset_train = dataset.ImageDataset(
-        config.train_list_path, transforms, dataset.Mode.TRAIN
+    transforms = get_transforms(config.resize_image)
+    dataset_train = celeba.DatasetAE(transforms=transforms, mode=ds.Mode.TRAIN)
+    dataset_valid = celeba.DatasetAE(transforms=transforms, mode=ds.Mode.VALID)
+
+    dataloader_train = td.DataLoader(
+        dataset_train,
+        config.batch_size,
+        shuffle=True,
+        num_workers=config.num_workers,
+        pin_memory=True,
+        worker_init_fn=_worker_init_random,
     )
-    dataset_valid = dataset.ImageDataset(
-        config.valid_list_path, transforms, dataset.Mode.VALID
+    dataloader_valid = td.DataLoader(
+        dataset_valid,
+        config.batch_size,
+        shuffle=False,
+        num_workers=config.num_workers,
+        pin_memory=True,
+        worker_init_fn=_worker_init_random,
     )
+
+    params = dc.asdict(config)
+    pl.seed_everything(config.random_seed)
+
+    network = get_network(NetworkName.value_of(config.network_name))
+    model = AETrainer(network, params)
+    model.set_dataloader(dataloader_train, dataloader_valid)
+
+    cache_dir = directories.get_processed().joinpath(config.cache_dir)
+    model_checkpoint = pl_callbacks.ModelCheckpoint(
+        filepath=str(cache_dir),
+        monitor="val_loss",
+        save_top_k=config.save_top_k,
+        save_weights_only=config.save_weights_only,
+        mode="min",
+        period=1,
+    )
+
+    exp_dir = cache_dir.joinpath(config.experiments_dir)
+    exp_log_dir = exp_dir.joinpath("default", f"version_{config.experiment_version}")
+    pl_logger = pl_logging.TensorBoardLogger(
+        save_dir=str(exp_dir), version=config.experiment_version
+    )
+    if config.resume and exp_log_dir.exists():
+        shutil.rmtree(exp_log_dir)
+
+    pl_trainer = pl.Trainer(
+        early_stop_callback=config.early_stop,
+        default_root_dir=str(cache_dir),
+        fast_dev_run=False,
+        min_epochs=config.min_epochs,
+        max_epochs=config.max_epochs,
+        gpus=[0] if config.use_gpu and tc.is_available() else None,
+        progress_bar_refresh_rate=config.progress_bar_refresh_rate,
+        profiler=config.profiler,
+        checkpoint_callback=model_checkpoint,
+        logger=pl_logger,
+    )
+    pl_trainer.fit(model)
+
+
+def _create_graph(batch: np.ndarray, decode: np.ndarray) -> None:
+    batch = batch.transpose(0, 2, 3, 1)
+    decode = decode.transpose(0, 2, 3, 1)
+
+    params_imshow = dict()
+    if batch.shape[3] == 1:
+        batch = batch.reshape(batch.shape[:3])
+        decode = decode.reshape(decode.shape[:3])
+        params_imshow["cmap"] = "gray"
+
+    rows, cols = 2, batch.shape[0]
+    figsize = (4 * cols, 4 * rows)
+    fig, axes = plt.subplots(rows, cols, figsize=figsize)
+    for idx in range(cols):
+        ax = axes[0, idx]
+        ax.imshow(batch[idx], **params_imshow)
+
+        ax = axes[1, idx]
+        ax.imshow(decode[idx], **params_imshow)
+
+    return fig
+
+
+def _worker_init_random(worker_id: int) -> None:
+    random.seed(worker_id)
 
 
 if __name__ == "__main__":
     try:
-        lu.init_root_logger()
-        train()
+        logging.basicConfig(level=logging.INFO)
+
+        if len(sys.argv) == 1:
+            config = Config()
+        elif len(sys.argv) == 2:
+            config = Config()
+        else:
+            raise Exception(
+                "input arguments error."
+                " usage: python path/to/script.py"
+                " or python path/to/script.py path/to/config.yml"
+            )
+        _logger.info(f"config: {pprint.pformat(dc.asdict(config))}")
+
+        train(config)
     except Exception as e:
-        logger.error(e)
-        logger.error(traceback.format_exc())
+        _logger.exception(e)

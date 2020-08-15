@@ -37,9 +37,10 @@ class DatasetAE(td.Dataset):
             raise NotImplementedError
 
     def __getitem__(self, idx):
-        img = Image.open(self.datalist[idx])
+        filepath = self.dataset.path.joinpath(self.datalist["filepath"].iloc[idx])
+        img = Image.open(filepath)
 
-        if self.transform is None:
+        if self.transforms is None:
             img = np.array(img).transpose(0, 3, 1, 2)
         else:
             img = self.transforms(img)

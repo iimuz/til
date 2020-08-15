@@ -30,6 +30,15 @@ def get_interim() -> pathlib.Path:
     return get_data().joinpath("interim")
 
 
+def get_processed() -> pathlib.Path:
+    """processed データディレクトリのパスを返す.
+
+    Returns:
+        pathlib.Path: interimデータディレクトリ.
+    """
+    return get_data().joinpath("processed")
+
+
 def get_raw() -> pathlib.Path:
     """rawデータディレクトリのパスを返す.
 

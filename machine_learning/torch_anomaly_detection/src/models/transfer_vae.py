@@ -14,7 +14,7 @@ import torchvision.models as tv_models
 import torchsummary as ts
 
 # my packages
-import src.data.log_utils as log_utils
+import src.data.utils as ut
 
 # logger
 logger = logging.getLogger(__name__)
@@ -180,7 +180,7 @@ def loss_function(x, decode, mean, logvar):
 
 
 def _main() -> None:
-    log_utils.init_root_logger()
+    ut.init_root_logger()
 
     network = TransferVAE(3, 3, (64, 64))
     network = network.to("cuda")
