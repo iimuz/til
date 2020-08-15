@@ -11,6 +11,7 @@ import urllib.request as request
 
 # third party packages
 import numpy as np
+import pandas as pd
 import PIL.Image as Image
 import torch.utils.data as torch_data
 import tqdm as tqdm_std
@@ -27,6 +28,8 @@ class Dataset(metaclass=abc.ABCMeta):
     def __init__(self) -> None:
         self.name = self.__class__.__name__
         self.path = directories.get_raw().joinpath(self.name)
+        self.train = pd.DataFrame()
+        self.valid = pd.DataFrame()
 
     def load(self) -> "Dataset":
         self.load_dataset()

@@ -64,8 +64,8 @@ class Celeba(dataset.Dataset):
                 valid_list.to_csv(self.valid_list, index=False)
 
     def load_dataset(self) -> None:
-        self.train_ = pd.read_csv(self.train_list)
-        self.valid_ = pd.read_csv(self.valid_list)
+        self.train = pd.read_csv(self.train_list)
+        self.valid = pd.read_csv(self.valid_list)
 
 
 def _download(filepath: pathlib.Path, chunksize: int = 32768) -> None:
