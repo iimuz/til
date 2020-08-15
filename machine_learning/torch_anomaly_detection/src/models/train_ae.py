@@ -140,7 +140,7 @@ class Config:
 
     experiments_dir: str = "experiments"
     experiment_version: int = 0
-    resume: bool = True
+    resume: bool = False
 
     early_stop: bool = True
     min_epochs: int = 30
@@ -251,8 +251,10 @@ def train(config: Config):
     pl_logger = pl_logging.TensorBoardLogger(
         save_dir=str(exp_dir), version=config.experiment_version
     )
-    if config.resume and exp_log_dir.exists():
+    if not config.resume and exp_log_dir.exists():
         shutil.rmtree(exp_log_dir)
+        for filepath in cache_dir.glob("epoch=*.ckpt"):
+            filepath.unlink()
 
     pl_trainer = pl.Trainer(
         early_stop_callback=config.early_stop,

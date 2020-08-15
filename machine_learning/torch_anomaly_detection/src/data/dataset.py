@@ -30,6 +30,7 @@ class Dataset(metaclass=abc.ABCMeta):
         self.path = directories.get_raw().joinpath(self.name)
         self.train = pd.DataFrame()
         self.valid = pd.DataFrame()
+        self.test = pd.DataFrame()
 
     def load(self) -> "Dataset":
         self.load_dataset()
