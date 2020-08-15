@@ -25,6 +25,8 @@ import torch.utils.data as td
 import torchvision.transforms as tv_transforms
 
 # my packages
+import src.data.mvtecad as mvtecad
+import src.data.mvtecad_torch as mvtecad_torch
 import src.data.celeba_torch as celeba
 import src.data.dataset_torch as ds
 import src.data.directories as directories
@@ -124,6 +126,7 @@ class AETrainer(pl.LightningModule):
 
 @dc.dataclass
 class Config:
+    dataset_name: str = "CelebA"
     network_name: str = "SimpleCBR"
     in_channels: int = 3
     out_channels: int = 3
@@ -152,6 +155,29 @@ class Config:
     profiler: bool = True
 
 
+class DatasetName(enum.Enum):
+    """データセットを指定するための設定値."""
+
+    CELEBA = "CelebA"
+    MVTECAD_HAZELNUT = "MVTecAD_Hazelnut"
+
+    @classmethod
+    def value_of(cls, name: str) -> "DatasetName":
+        """設定値の文字列から Enum 値を返す.
+
+        Raises:
+            ValueError: 指定した文字列が設定値にない場合
+
+        Returns:
+            [type]: Enum の値
+        """
+        for e in DatasetName:
+            if e.value == name:
+                return e
+
+        raise ValueError(f"invalid value: {name}")
+
+
 class NetworkName(enum.Enum):
     """ネットワークを指定するための設定値."""
 
@@ -173,6 +199,26 @@ class NetworkName(enum.Enum):
                 return e
 
         raise ValueError(f"invalid value: {name}")
+
+
+def get_dataset(
+    name: DatasetName, transforms: tv_transforms.Compose, **kwargs
+) -> t.Tuple[td.Dataset, td.Dataset]:
+    if name == DatasetName.CELEBA:
+        dataset_train = celeba.DatasetAE(transforms=transforms, mode=ds.Mode.TRAIN)
+        dataset_valid = celeba.DatasetAE(transforms=transforms, mode=ds.Mode.VALID)
+        return dataset_train, dataset_valid
+
+    if name == DatasetName.MVTECAD_HAZELNUT:
+        dataset_train = mvtecad_torch.DatasetAE(
+            kind=mvtecad.Kind.HAZELNUT, transforms=transforms, mode=ds.Mode.TRAIN
+        )
+        dataset_valid = mvtecad_torch.DatasetAE(
+            kind=mvtecad.Kind.HAZELNUT, transforms=transforms, mode=ds.Mode.VALID
+        )
+        return dataset_train, dataset_valid
+
+    raise Exception(f"not implemented dataset: {name}")
 
 
 def get_network(name: NetworkName, **kwargs) -> nn.Module:
@@ -209,8 +255,8 @@ def get_transforms(image_size: t.Tuple[int, int]) -> tv_transforms.Compose:
 def train(config: Config):
     """学習処理の実行スクリプト."""
     transforms = get_transforms(config.resize_image)
-    dataset_train = celeba.DatasetAE(transforms=transforms, mode=ds.Mode.TRAIN)
-    dataset_valid = celeba.DatasetAE(transforms=transforms, mode=ds.Mode.VALID)
+    dataset_type = DatasetName.value_of(config.dataset_name)
+    dataset_train, dataset_valid = get_dataset(dataset_type, transforms)
 
     dataloader_train = td.DataLoader(
         dataset_train,
