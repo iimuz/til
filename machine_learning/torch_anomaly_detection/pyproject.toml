@@ -14,6 +14,7 @@ torch = "^1.5.1"
 torchvision = "^0.6.1"
 torchsummary = "^1.5.1"
 pandas = "^1.1.0"
+jupyter = "^1.0.0"
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"

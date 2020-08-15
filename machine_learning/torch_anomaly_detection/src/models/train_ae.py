@@ -126,7 +126,7 @@ class AETrainer(pl.LightningModule):
 
 @dc.dataclass
 class Config:
-    dataset_name: str = "CelebA"
+    dataset_name: str = "MVTecAD_Hazelnut"
     network_name: str = "SimpleCBR"
     in_channels: int = 3
     out_channels: int = 3
@@ -137,17 +137,16 @@ class Config:
 
     random_seed: int = 42
 
-    cache_dir: str = "train_ae"
-    save_top_k: int = 5
+    cache_dir: str = "simple_cbr_mvtecad_hazelnut"
+    save_top_k: int = 2
     save_weights_only: bool = False
 
-    experiments_dir: str = "experiments"
     experiment_version: int = 0
     resume: bool = False
 
     early_stop: bool = True
-    min_epochs: int = 30
-    max_epochs: int = 10000
+    min_epochs: int = 2
+    max_epochs: int = 2
 
     log_dir: str = "train_ae"
     use_gpu: bool = True
@@ -243,7 +242,7 @@ def get_transforms(image_size: t.Tuple[int, int]) -> tv_transforms.Compose:
     transforms = tv_transforms.Compose(
         [
             tv_transforms.RandomHorizontalFlip(),
-            tv_transforms.CenterCrop(148),
+            # tv_transforms.CenterCrop(148),
             tv_transforms.Resize(image_size),
             tv_transforms.ToTensor(),
         ]
@@ -278,7 +277,11 @@ def train(config: Config):
     params = dc.asdict(config)
     pl.seed_everything(config.random_seed)
 
-    network = get_network(NetworkName.value_of(config.network_name))
+    network = get_network(
+        NetworkName.value_of(config.network_name),
+        in_channels=config.in_channels,
+        out_channels=config.out_channels,
+    )
     model = AETrainer(network, params)
     model.set_dataloader(dataloader_train, dataloader_valid)
 
@@ -286,19 +289,24 @@ def train(config: Config):
     model_checkpoint = pl_callbacks.ModelCheckpoint(
         filepath=str(cache_dir),
         monitor="val_loss",
+        save_last=True,
         save_top_k=config.save_top_k,
         save_weights_only=config.save_weights_only,
         mode="min",
         period=1,
     )
 
-    exp_dir = cache_dir.joinpath(config.experiments_dir)
-    exp_log_dir = exp_dir.joinpath("default", f"version_{config.experiment_version}")
-    pl_logger = pl_logging.TensorBoardLogger(
-        save_dir=str(exp_dir), version=config.experiment_version
+    experiment_dir = cache_dir.joinpath(
+        "default", f"version_{config.experiment_version}"
     )
-    if not config.resume and exp_log_dir.exists():
-        shutil.rmtree(exp_log_dir)
+    pl_logger = pl_logging.TensorBoardLogger(
+        save_dir=str(experiment_dir), version=config.experiment_version
+    )
+    trainer_params = dict()
+    if config.resume:
+        trainer_params["resume_from_checkpoint"] = str(cache_dir.joinpath("last.ckpt"))
+    elif experiment_dir.exists():
+        shutil.rmtree(experiment_dir)
         for filepath in cache_dir.glob("epoch=*.ckpt"):
             filepath.unlink()
 
@@ -313,8 +321,13 @@ def train(config: Config):
         profiler=config.profiler,
         checkpoint_callback=model_checkpoint,
         logger=pl_logger,
+        **trainer_params,
     )
     pl_trainer.fit(model)
+
+    ckptfile = sorted(cache_dir.glob("epoch*.ckpt"))[-1]
+    model = model.load_from_checkpoint(str(ckptfile), network, params)
+    torch.save(model.network.state_dict(), cache_dir.joinpath(ckptfile.stem))
 
 
 def _create_graph(batch: np.ndarray, decode: np.ndarray) -> None:

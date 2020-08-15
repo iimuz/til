@@ -27,7 +27,7 @@ class DatasetAE(td.Dataset):
         mode: ds.Mode = ds.Mode.TRAIN,
     ) -> None:
         self.kind = kind
-        self.dataset = mvtecad.MVTecAD(kind).load()
+        self.dataset = mvtecad.MVTecAd(kind).load()
         self.transforms = transforms
 
         self.mode = mode
