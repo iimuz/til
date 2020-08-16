@@ -131,7 +131,7 @@ class Config:
     network_name: str = "SimpleCBR"
     in_channels: int = 3
     out_channels: int = 3
-    resize_image: t.Tuple[int, int] = (64, 64)
+    resize_image: t.Tuple[int, int] = (128, 128)
 
     batch_size: int = 144
     num_workers: int = 4
@@ -149,7 +149,7 @@ class Config:
     min_epochs: int = 30
     max_epochs: int = 1000
 
-    log_dir: str = "train_ae"
+    log_dir: str = "ae_train"
     use_gpu: bool = True
     progress_bar_refresh_rate: int = 1
     profiler: bool = True
@@ -331,7 +331,7 @@ def train(config: Config):
     pl_trainer.fit(model)
 
     for ckptfile in cache_dir.glob("*.ckpt"):
-        pthfile = cache_dir.joinpath("ckptfile.stem" + ".pth")
+        pthfile = cache_dir.joinpath(ckptfile.stem + ".pth")
         model = model.load_from_checkpoint(str(ckptfile), network, params)
         torch.save(model.network.state_dict(), pthfile)
 
