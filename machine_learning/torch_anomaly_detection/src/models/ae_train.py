@@ -146,8 +146,8 @@ class Config:
     resume: bool = False
 
     early_stop: bool = True
-    min_epochs: int = 2
-    max_epochs: int = 2
+    min_epochs: int = 30
+    max_epochs: int = 1000
 
     log_dir: str = "train_ae"
     use_gpu: bool = True
@@ -302,7 +302,7 @@ def train(config: Config):
         "default", f"version_{config.experiment_version}"
     )
     pl_logger = pl_logging.TensorBoardLogger(
-        save_dir=str(experiment_dir), version=config.experiment_version
+        save_dir=str(cache_dir), version=config.experiment_version
     )
     trainer_params = dict()
     if config.resume:
