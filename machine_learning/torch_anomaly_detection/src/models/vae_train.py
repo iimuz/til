@@ -102,7 +102,7 @@ class VAETrainer(pl.LightningModule):
     def validation_epoch_end(self, outputs):
         avg_loss = torch.stack([x["val_loss"] for x in outputs]).mean()
 
-        tensorboard_logs = {"val_loss": avg_loss}
+        tensorboard_logs = {"valid/epoch_loss": avg_loss}
         return {"val_loss": avg_loss, "log": tensorboard_logs}
 
     def configure_optimizers(self):
