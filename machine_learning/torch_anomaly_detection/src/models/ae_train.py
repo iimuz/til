@@ -31,7 +31,7 @@ import src.data.celeba_torch as celeba
 import src.data.dataset_torch as ds
 import src.data.directories as directories
 import src.data.utils as ut
-import src.models.cnn_ae as cnn_ae
+import src.models.ae_cnn as ae_cnn
 
 # logger
 _logger = logging.getLogger(__name__)
@@ -223,10 +223,10 @@ def get_dataset(
 
 def get_network(name: NetworkName, **kwargs) -> nn.Module:
     if name == NetworkName.SIMPLE_CBR:
-        return cnn_ae.SimpleCBR(**kwargs)
+        return ae_cnn.SimpleCBR(**kwargs)
 
     if name == NetworkName.SIMPLE_CR:
-        return cnn_ae.SimpleCR(**kwargs)
+        return ae_cnn.SimpleCR(**kwargs)
 
     raise Exception(f"not implemented network: {name}")
 
