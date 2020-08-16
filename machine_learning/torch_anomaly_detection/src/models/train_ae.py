@@ -309,7 +309,9 @@ def train(config: Config):
         trainer_params["resume_from_checkpoint"] = str(cache_dir.joinpath("last.ckpt"))
     elif experiment_dir.exists():
         shutil.rmtree(experiment_dir)
-        for filepath in cache_dir.glob("epoch=*.ckpt"):
+        for filepath in cache_dir.glob("*.ckpt"):
+            filepath.unlink()
+        for filepath in cache_dir.glob("*.pth"):
             filepath.unlink()
 
     pl_trainer = pl.Trainer(
