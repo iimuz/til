@@ -30,6 +30,7 @@ import src.data.mvtecad_torch as mvtecad_torch
 import src.data.celeba_torch as celeba
 import src.data.dataset_torch as ds
 import src.data.directories as directories
+import src.data.utils as ut
 import src.models.cnn_ae as cnn_ae
 
 # logger
@@ -362,17 +363,17 @@ if __name__ == "__main__":
         logging.basicConfig(level=logging.INFO)
 
         if len(sys.argv) == 1:
-            config = Config()
+            _config = Config()
         elif len(sys.argv) == 2:
-            config = Config()
+            _config = ut.load_yaml(sys.argv[1], lambda d: Config(**d))
         else:
             raise Exception(
                 "input arguments error."
                 " usage: python path/to/script.py"
                 " or python path/to/script.py path/to/config.yml"
             )
-        _logger.info(f"config: {pprint.pformat(dc.asdict(config))}")
+        _logger.info(f"config: {pprint.pformat(dc.asdict(_config))}")
 
-        train(config)
+        train(_config)
     except Exception as e:
         _logger.exception(e)
