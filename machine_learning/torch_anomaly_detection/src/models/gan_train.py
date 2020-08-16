@@ -30,7 +30,7 @@ import src.data.directories as directories
 import src.data.mvtecad as mvtecad
 import src.data.mvtecad_torch as mvtecad_torch
 import src.data.utils as ut
-import src.models.vanila_gan as vanila_gan
+import src.models.gan_vanila as gan_vanila
 
 # logger
 _logger = logging.getLogger(__name__)
@@ -299,8 +299,8 @@ def get_network(
 ) -> t.Tuple[nn.Module, nn.Module]:
     if name == NetworkName.VANILA:
         return (
-            vanila_gan.Generator(**genenerator_params),
-            vanila_gan.Discriminator(**discriminator_params),
+            gan_vanila.Generator(**genenerator_params),
+            gan_vanila.Discriminator(**discriminator_params),
         )
 
     raise Exception(f"not implemented network: {name}")
