@@ -327,9 +327,10 @@ def train(config: Config):
     )
     pl_trainer.fit(model)
 
-    ckptfile = sorted(cache_dir.glob("epoch*.ckpt"))[-1]
-    model = model.load_from_checkpoint(str(ckptfile), network, params)
-    torch.save(model.network.state_dict(), cache_dir.joinpath(ckptfile.stem))
+    for ckptfile in cache_dir.glob("*.ckpt"):
+        pthfile = cache_dir.joinpath("ckptfile.stem" + ".pth")
+        model = model.load_from_checkpoint(str(ckptfile), network, params)
+        torch.save(model.network.state_dict(), pthfile)
 
 
 def _create_graph(batch: np.ndarray, decode: np.ndarray) -> None:
