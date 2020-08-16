@@ -31,8 +31,8 @@ import src.data.celeba_torch as celeba_torch
 import src.data.mvtecad as mvtecad
 import src.data.mvtecad_torch as mvtecad_torch
 import src.data.utils as ut
-import src.models.vanila_vae as vanila_vae
-import src.models.transfer_vae as transfer_vae
+import src.models.vae_transfer as vae_transfer
+import src.models.vae_vanila as vae_vanila
 
 # logger
 _logger = logging.getLogger(__name__)
@@ -228,10 +228,10 @@ def get_dataset(
 
 def get_network(name: NetworkName, **kwargs) -> nn.Module:
     if name == NetworkName.VANILA:
-        return vanila_vae.VAE(**kwargs)
+        return vae_vanila.VAE(**kwargs)
 
     if name == NetworkName.TRANSFER:
-        return transfer_vae.TransferVAE(**kwargs)
+        return vae_transfer.TransferVAE(**kwargs)
 
     raise Exception(f"not implemented network: {name}")
 
