@@ -30,7 +30,8 @@ import src.data.mvtecad_torch as mvtecad_torch
 import src.data.celeba_torch as celeba
 import src.data.dataset_torch as ds
 import src.data.directories as directories
-import src.models.cnn_ae as cnn_ae
+import src.data.utils as ut
+import src.models.ae_cnn as ae_cnn
 
 # logger
 _logger = logging.getLogger(__name__)
@@ -130,7 +131,7 @@ class Config:
     network_name: str = "SimpleCBR"
     in_channels: int = 3
     out_channels: int = 3
-    resize_image: t.Tuple[int, int] = (64, 64)
+    resize_image: t.Tuple[int, int] = (128, 128)
 
     batch_size: int = 144
     num_workers: int = 4
@@ -145,10 +146,10 @@ class Config:
     resume: bool = False
 
     early_stop: bool = True
-    min_epochs: int = 2
-    max_epochs: int = 2
+    min_epochs: int = 30
+    max_epochs: int = 1000
 
-    log_dir: str = "train_ae"
+    log_dir: str = "ae_train"
     use_gpu: bool = True
     progress_bar_refresh_rate: int = 1
     profiler: bool = True
@@ -222,10 +223,10 @@ def get_dataset(
 
 def get_network(name: NetworkName, **kwargs) -> nn.Module:
     if name == NetworkName.SIMPLE_CBR:
-        return cnn_ae.SimpleCBR(**kwargs)
+        return ae_cnn.SimpleCBR(**kwargs)
 
     if name == NetworkName.SIMPLE_CR:
-        return cnn_ae.SimpleCR(**kwargs)
+        return ae_cnn.SimpleCR(**kwargs)
 
     raise Exception(f"not implemented network: {name}")
 
@@ -286,6 +287,7 @@ def train(config: Config):
     model.set_dataloader(dataloader_train, dataloader_valid)
 
     cache_dir = directories.get_processed().joinpath(config.cache_dir)
+    cache_dir.mkdir(exist_ok=True)
     model_checkpoint = pl_callbacks.ModelCheckpoint(
         filepath=str(cache_dir),
         monitor="val_loss",
@@ -300,14 +302,16 @@ def train(config: Config):
         "default", f"version_{config.experiment_version}"
     )
     pl_logger = pl_logging.TensorBoardLogger(
-        save_dir=str(experiment_dir), version=config.experiment_version
+        save_dir=str(cache_dir), version=config.experiment_version
     )
     trainer_params = dict()
     if config.resume:
         trainer_params["resume_from_checkpoint"] = str(cache_dir.joinpath("last.ckpt"))
     elif experiment_dir.exists():
         shutil.rmtree(experiment_dir)
-        for filepath in cache_dir.glob("epoch=*.ckpt"):
+        for filepath in cache_dir.glob("*.ckpt"):
+            filepath.unlink()
+        for filepath in cache_dir.glob("*.pth"):
             filepath.unlink()
 
     pl_trainer = pl.Trainer(
@@ -321,13 +325,15 @@ def train(config: Config):
         profiler=config.profiler,
         checkpoint_callback=model_checkpoint,
         logger=pl_logger,
+        log_gpu_memory=True,
         **trainer_params,
     )
     pl_trainer.fit(model)
 
-    ckptfile = sorted(cache_dir.glob("epoch*.ckpt"))[-1]
-    model = model.load_from_checkpoint(str(ckptfile), network, params)
-    torch.save(model.network.state_dict(), cache_dir.joinpath(ckptfile.stem))
+    for ckptfile in cache_dir.glob("*.ckpt"):
+        pthfile = cache_dir.joinpath(ckptfile.stem + ".pth")
+        model = model.load_from_checkpoint(str(ckptfile), network, params)
+        torch.save(model.network.state_dict(), pthfile)
 
 
 def _create_graph(batch: np.ndarray, decode: np.ndarray) -> None:
@@ -362,17 +368,17 @@ if __name__ == "__main__":
         logging.basicConfig(level=logging.INFO)
 
         if len(sys.argv) == 1:
-            config = Config()
+            _config = Config()
         elif len(sys.argv) == 2:
-            config = Config()
+            _config = ut.load_yaml(sys.argv[1], lambda d: Config(**d))
         else:
             raise Exception(
                 "input arguments error."
                 " usage: python path/to/script.py"
                 " or python path/to/script.py path/to/config.yml"
             )
-        _logger.info(f"config: {pprint.pformat(dc.asdict(config))}")
+        _logger.info(f"config: {pprint.pformat(dc.asdict(_config))}")
 
-        train(config)
+        train(_config)
     except Exception as e:
         _logger.exception(e)

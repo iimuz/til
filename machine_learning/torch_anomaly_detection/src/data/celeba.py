@@ -38,17 +38,17 @@ class Celeba(dataset.Dataset):
 
         self.path.mkdir(exist_ok=True)
 
-        _logger.info("=== download zip file.")
-        if not self.archive_file.exists():
-            _download(self.archive_file)
-
-        _logger.info("=== unzip.")
         if not self.datadir.exists():
+            if not self.archive_file.exists():
+                _logger.info("=== download zip file.")
+                _download(self.archive_file)
+
+            _logger.info("=== unzip.")
             with zipfile.ZipFile(str(self.archive_file)) as z:
                 z.extractall(str(self.path))
 
-        _logger.info("=== create train and valid file list.")
         if not self.train_list.exists() and not self.valid_list.exists():
+            _logger.info("=== create train and valid file list.")
             filelist = sorted(
                 [p.relative_to(self.path) for p in self.path.glob("**/*.jpg")]
             )

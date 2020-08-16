@@ -131,14 +131,14 @@ class VAE(nn.Module):
 
         return z
 
+    @classmethod
+    def loss_function(cls, x, decode, mean, logvar):
+        coef_kl_loss = 8e-4  # batch_size / (train or valid image_num)
 
-def loss_function(x, decode, mean, logvar):
-    coef_kl_loss = 8e-4
+        reconstruct_loss = F.mse_loss(decode, x)
+        kl_loss = torch.mean(
+            -0.5 * torch.sum(1 + logvar - mean ** 2 - logvar.exp(), dim=1), dim=0
+        )
+        loss = reconstruct_loss + coef_kl_loss * kl_loss
 
-    reconstruct_loss = F.mse_loss(decode, x)
-    kl_loss = torch.mean(
-        -0.5 * torch.sum(1 + logvar - mean ** 2 - logvar.exp(), dim=1), dim=0
-    )
-    loss = reconstruct_loss + coef_kl_loss * kl_loss
-
-    return loss
+        return loss
