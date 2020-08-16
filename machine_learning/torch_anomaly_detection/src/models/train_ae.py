@@ -287,6 +287,7 @@ def train(config: Config):
     model.set_dataloader(dataloader_train, dataloader_valid)
 
     cache_dir = directories.get_processed().joinpath(config.cache_dir)
+    cache_dir.mkdir(exist_ok=True)
     model_checkpoint = pl_callbacks.ModelCheckpoint(
         filepath=str(cache_dir),
         monitor="val_loss",
