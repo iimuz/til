@@ -325,6 +325,7 @@ def train(config: Config):
         profiler=config.profiler,
         checkpoint_callback=model_checkpoint,
         logger=pl_logger,
+        log_gpu_memory=True,
         **trainer_params,
     )
     pl_trainer.fit(model)
