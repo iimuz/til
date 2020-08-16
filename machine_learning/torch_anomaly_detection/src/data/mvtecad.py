@@ -58,20 +58,21 @@ class MVTecAd(ds.Dataset):
             shutil.rmtree(self.datadir)
             self.train_list.unlink()
             self.valid_list.unlink()
+            self.test_list.unlink()
 
         self.path.mkdir(exist_ok=True)
 
-        _logger.info("=== download zip file.")
-        if not self.archive_file.exists():
-            _download(self.archive_file)
-
-        _logger.info("=== extract all.")
         if not self.datadir.exists():
+            if not self.archive_file.exists():
+                _logger.info("=== download zip file.")
+                _download(self.archive_file)
+
+            _logger.info("=== extract all.")
             with tarfile.open(self.archive_file, "r") as tar:
                 tar.extractall(self.path)
 
-        _logger.info("=== create train and valid file list.")
         if not self.train_list.exists() and not self.valid_list.exists():
+            _logger.info("=== create train and valid file list.")
             filelist = sorted(
                 [p.relative_to(self.path) for p in self.datadir.glob("train/**/*.png")]
             )
@@ -87,6 +88,7 @@ class MVTecAd(ds.Dataset):
                 valid_list.to_csv(self.valid_list, index=False)
 
         if not self.test_list.exists():
+            _logger.info("=== create test file list.")
             filelist = sorted(
                 [p.relative_to(self.path) for p in self.datadir.glob("test/**/*.png")]
             )
