@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytorch_lightning as pl
 import pytorch_lightning.callbacks as pl_callbacks
-import pytorch_lightning.logging as pl_logging
+import pytorch_lightning.loggers as pl_loggers
 import torch
 import torch.nn as nn
 import torch.cuda as tc
@@ -111,18 +111,6 @@ class AETrainer(pl.LightningModule):
         scheduler = lr_scheduler.ReduceLROnPlateau(optimizer)
 
         return [optimizer], [scheduler]
-
-    @pl.data_loader
-    def train_dataloader(self):
-        return self.dataloader_train
-
-    @pl.data_loader
-    def val_dataloader(self):
-        return self.dataloader_valid
-
-    def set_dataloader(self, train: td.DataLoader, valid: td.DataLoader) -> None:
-        self.dataloader_train = train
-        self.dataloader_valid = valid
 
 
 @dc.dataclass
@@ -258,23 +246,6 @@ def train(config: Config):
     dataset_type = DatasetName.value_of(config.dataset_name)
     dataset_train, dataset_valid = get_dataset(dataset_type, transforms)
 
-    dataloader_train = td.DataLoader(
-        dataset_train,
-        config.batch_size,
-        shuffle=True,
-        num_workers=config.num_workers,
-        pin_memory=True,
-        worker_init_fn=_worker_init_random,
-    )
-    dataloader_valid = td.DataLoader(
-        dataset_valid,
-        config.batch_size,
-        shuffle=False,
-        num_workers=config.num_workers,
-        pin_memory=True,
-        worker_init_fn=_worker_init_random,
-    )
-
     params = dc.asdict(config)
     pl.seed_everything(config.random_seed)
 
@@ -284,7 +255,6 @@ def train(config: Config):
         out_channels=config.out_channels,
     )
     model = AETrainer(network, params)
-    model.set_dataloader(dataloader_train, dataloader_valid)
 
     cache_dir = directories.get_processed().joinpath(config.cache_dir)
     cache_dir.mkdir(exist_ok=True)
@@ -301,7 +271,7 @@ def train(config: Config):
     experiment_dir = cache_dir.joinpath(
         "default", f"version_{config.experiment_version}"
     )
-    pl_logger = pl_logging.TensorBoardLogger(
+    pl_logger = pl_loggers.TensorBoardLogger(
         save_dir=str(cache_dir), version=config.experiment_version
     )
     trainer_params = dict()
@@ -314,6 +284,22 @@ def train(config: Config):
         for filepath in cache_dir.glob("*.pth"):
             filepath.unlink()
 
+    dataloader_train = td.DataLoader(
+        dataset_train,
+        config.batch_size,
+        shuffle=True,
+        num_workers=config.num_workers,
+        pin_memory=True,
+        worker_init_fn=_worker_init_random,
+    )
+    dataloader_valid = td.DataLoader(
+        dataset_valid,
+        config.batch_size,
+        shuffle=False,
+        num_workers=config.num_workers,
+        pin_memory=True,
+        worker_init_fn=_worker_init_random,
+    )
     pl_trainer = pl.Trainer(
         early_stop_callback=config.early_stop,
         default_root_dir=str(cache_dir),
@@ -328,7 +314,7 @@ def train(config: Config):
         log_gpu_memory=True,
         **trainer_params,
     )
-    pl_trainer.fit(model)
+    pl_trainer.fit(model, dataloader_train, dataloader_valid)
 
     for ckptfile in cache_dir.glob("*.ckpt"):
         pthfile = cache_dir.joinpath(ckptfile.stem + ".pth")
