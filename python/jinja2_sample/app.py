@@ -20,7 +20,7 @@ def main(config: Config):
     env = jinja2.Environment(loader=jinja2.FileSystemLoader(".", encoding="utf8"))
 
     tmpl = env.get_template("index.j2")
-    html = tmpl.render(shop="テスト")
+    html = tmpl.render(comment="hoge")
 
     outdir = pathlib.Path(config.outdir)
     outdir.mkdir(exist_ok=True)
