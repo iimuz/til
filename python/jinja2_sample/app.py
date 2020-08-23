@@ -2,6 +2,7 @@
 # default packages
 import dataclasses as dc
 import logging
+import pathlib
 
 # third party packages
 import jinja2
@@ -12,7 +13,7 @@ _logger = logging.getLogger(__name__)
 
 @dc.dataclass
 class Config:
-    pass
+    outdir: str = "path/to/output"
 
 
 def main(config: Config):
@@ -21,14 +22,18 @@ def main(config: Config):
     tmpl = env.get_template("index.j2")
     html = tmpl.render(shop="テスト")
 
-    _logger.info(html)
+    outdir = pathlib.Path(config.outdir)
+    outdir.mkdir(exist_ok=True)
+    filepath = outdir.joinpath("index.html")
+    with open(str(filepath), "w") as f:
+        f.write(html)
 
 
 if __name__ == "__main__":
     try:
         logging.basicConfig(level=logging.INFO)
 
-        _config = Config()
+        _config = Config(outdir="output")
         main(_config)
     except Exception as e:
         _logger.exception(e)
