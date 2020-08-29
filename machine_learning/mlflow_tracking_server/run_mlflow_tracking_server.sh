@@ -3,7 +3,7 @@
 # Run MLflow traking server.
 # Usage: bash run_mlflow_tracking_server.sh
 
-set -eux
+set -eu
 
 readonly SCRIPT_DIR=$(cd $(dirname $0); pwd)
 readonly PROJECT_DIR=$SCRIPT_DIR
