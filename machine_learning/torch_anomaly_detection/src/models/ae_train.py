@@ -4,15 +4,19 @@ import argparse
 import dataclasses as dc
 import enum
 import logging
+import os
 import pathlib
 import pprint
 import random
 import shutil
+import subprocess
 import sys
 import typing as t
 
 # third party
 import matplotlib.pyplot as plt
+import mlflow
+import mlflow.pytorch as mlf_pytorch
 import numpy as np
 import pytorch_lightning as pl
 import pytorch_lightning.callbacks as pl_callbacks
@@ -274,7 +278,16 @@ def train(config: Config):
     experiment_dir = cache_dir.joinpath(
         "default", f"version_{config.experiment_version}"
     )
-    pl_logger = pl_loggers.MLFlowLogger(experiment_name="example")
+    cmd = "git rev-parse --short HEAD"
+    commid_id = subprocess.check_output(cmd.split()).strip().decode("utf-8")
+    pl_logger = pl_loggers.MLFlowLogger(
+        experiment_name="example",
+        tracking_uri=os.environ.get("MLFLOW_TRACKING_URI", None),
+        tags={
+            "mlflow.source.name": pathlib.Path(__file__).name,
+            "mlflow.source.git.commit": commid_id,
+        },
+    )
     trainer_params = dict()
     if config.resume:
         trainer_params["resume_from_checkpoint"] = str(cache_dir.joinpath("last.ckpt"))
@@ -316,6 +329,12 @@ def train(config: Config):
         **trainer_params,
     )
     pl_trainer.fit(model, dataloader_train, dataloader_valid)
+
+    mlf_client = mlflow.tracking.MlflowClient()
+    mlf_model_path = cache_dir.joinpath("best")
+    mlf_pytorch.save_model(model.network, mlf_model_path)
+    mlf_client.log_artifact(pl_logger.run_id, mlf_model_path)
+    shutil.rmtree(mlf_model_path)
 
     for ckptfile in cache_dir.glob("*.ckpt"):
         pthfile = cache_dir.joinpath(ckptfile.stem + ".pth")
