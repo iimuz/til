@@ -64,19 +64,14 @@ class AETrainer(pl.LightningModule):
 
         if batch_nb % 100 == 0:
             num_display = 4
-            fig = _create_graph(
+            _save_artifact_image(
                 batch[:num_display].detach().cpu().numpy(),
                 decode[:num_display].detach().cpu().numpy(),
+                filename=f"train_{self.global_step:04}.png",
+                mlflog=self.logger,
             )
-            with tempfile.TemporaryDirectory() as dname:
-                filepath = pathlib.Path(dname).joinpath(f"train_{self.global_step}.png")
-                fig.savefig(filepath, bbox_inches="tight", pad_inches=0)
-                fig.clf()
-                plt.close()
-                self.logger.experiment.log_artifact(self.logger.run_id, filepath)
 
         tensorboard_logs = {"train/loss": loss}
-
         return {"loss": loss, "log": tensorboard_logs}
 
     def training_epoch_end(self, outputs):
@@ -91,20 +86,14 @@ class AETrainer(pl.LightningModule):
 
         if batch_nb % 100 == 0:
             num_display = 4
-            fig = _create_graph(
+            _save_artifact_image(
                 batch[:num_display].detach().cpu().numpy(),
                 decode[:num_display].detach().cpu().numpy(),
+                filename=f"valid_{self.global_step:04}.png",
+                mlflog=self.logger,
             )
-            with tempfile.TemporaryDirectory() as dname:
-                filepath = pathlib.Path(dname).joinpath(f"valid_{self.global_step}.png")
-                fig.savefig(filepath, bbox_inches="tight", pad_inches=0)
-                fig.clf()
-                plt.close()
-                self.logger.experiment.log_artifact(self.logger.run_id, filepath)
 
-        tensorboard_logs = {"valid/loss": loss}
-
-        return {"val_loss": loss, "log": tensorboard_logs}
+        return {"val_loss": loss}
 
     def validation_epoch_end(self, outputs):
         avg_loss = torch.stack([x["val_loss"] for x in outputs]).mean()
@@ -343,7 +332,12 @@ def train(config: Config):
         torch.save(model.network.state_dict(), pthfile)
 
 
-def _create_graph(batch: np.ndarray, decode: np.ndarray) -> None:
+def _save_artifact_image(
+    batch: np.ndarray,
+    decode: np.ndarray,
+    filename: str,
+    mlflog: pl_loggers.MLFlowLogger,
+) -> None:
     batch = batch.transpose(0, 2, 3, 1)
     decode = decode.transpose(0, 2, 3, 1)
 
@@ -363,7 +357,12 @@ def _create_graph(batch: np.ndarray, decode: np.ndarray) -> None:
         ax = axes[1, idx]
         ax.imshow(decode[idx], **params_imshow)
 
-    return fig
+    with tempfile.TemporaryDirectory() as dname:
+        filepath = pathlib.Path(dname).joinpath(filename)
+        fig.savefig(filepath, bbox_inches="tight", pad_inches=0)
+        fig.clf()
+        plt.close()
+        mlflog.experiment.log_artifact(mlflog.run_id, filepath)
 
 
 def _worker_init_random(worker_id: int) -> None:
