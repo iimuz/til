@@ -124,7 +124,7 @@ class Config:
     random_seed: int = 42
 
     cache_dir: str = "simple_cbr_mvtecad_hazelnut"
-    save_top_k: int = 0
+    save_top_k: int = 1
     save_weights_only: bool = False
 
     experiment_version: int = 0
@@ -283,10 +283,10 @@ def train(config: Config):
         trainer_params["resume_from_checkpoint"] = str(cache_dir.joinpath("last.ckpt"))
     elif experiment_dir.exists():
         shutil.rmtree(experiment_dir)
-        for filepath in cache_dir.glob("*.ckpt"):
-            filepath.unlink()
-        for filepath in cache_dir.glob("*.pth"):
-            filepath.unlink()
+    for filepath in cache_dir.glob("*.ckpt"):
+        filepath.unlink()
+    for filepath in cache_dir.glob("*.pth"):
+        filepath.unlink()
 
     dataloader_train = td.DataLoader(
         dataset_train,
@@ -326,15 +326,12 @@ def train(config: Config):
             mlf_client.log_metric(pl_logger.run_id, key, v, step=idx)
         mlf_client.log_metric(pl_logger.run_id, f"{key}_mean", np.mean(val))
         mlf_client.log_metric(pl_logger.run_id, f"{key}_sum", np.sum(val))
-    with tempfile.TemporaryDirectory() as dname:
-        mlf_model_path = pathlib.Path(dname).joinpath("best")
-        mlf_pytorch.save_model(model.network, mlf_model_path)
-        mlf_client.log_artifact(pl_logger.run_id, mlf_model_path)
-
-    for ckptfile in cache_dir.glob("*.ckpt"):
-        pthfile = cache_dir.joinpath(ckptfile.stem + ".pth")
+    for ckptfile in cache_dir.glob("epoch*.ckpt"):
         model = model.load_from_checkpoint(str(ckptfile), network, params)
-        torch.save(model.network.state_dict(), pthfile)
+        with tempfile.TemporaryDirectory() as dname:
+            mlf_model_path = pathlib.Path(dname).joinpath(ckptfile.stem)
+            mlf_pytorch.save_model(model.network, mlf_model_path)
+            mlf_client.log_artifact(pl_logger.run_id, mlf_model_path)
 
 
 def _save_artifact_image(
