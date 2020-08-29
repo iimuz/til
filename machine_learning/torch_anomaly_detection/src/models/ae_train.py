@@ -56,17 +56,17 @@ class AETrainer(pl.LightningModule):
         decode = self.forward(batch)
         loss = self.criterion(decode, batch)
 
-        if batch_nb % 100 == 0:
-            num_display = 4
-            fig = _create_graph(
-                batch[:num_display].detach().cpu().numpy(),
-                decode[:num_display].detach().cpu().numpy(),
-            )
-            self.logger.experiment.add_figure(
-                tag="train/reconstruct", figure=fig, global_step=self.global_step,
-            )
-            fig.clf()
-            plt.close()
+        # if batch_nb % 100 == 0:
+        #     num_display = 4
+        #     fig = _create_graph(
+        #         batch[:num_display].detach().cpu().numpy(),
+        #         decode[:num_display].detach().cpu().numpy(),
+        #     )
+        #     self.logger.experiment.add_figure(
+        #         tag="train/reconstruct", figure=fig, global_step=self.global_step,
+        #     )
+        #     fig.clf()
+        #     plt.close()
 
         tensorboard_logs = {"train/loss": loss}
 
@@ -82,17 +82,17 @@ class AETrainer(pl.LightningModule):
         decode = self.forward(batch)
         loss = self.criterion(decode, batch)
 
-        if batch_nb % 100 == 0:
-            num_display = 4
-            fig = _create_graph(
-                batch[:num_display].detach().cpu().numpy(),
-                decode[:num_display].detach().cpu().numpy(),
-            )
-            self.logger.experiment.add_figure(
-                tag="valid/reconstruct", figure=fig, global_step=self.global_step,
-            )
-            fig.clf()
-            plt.close()
+        # if batch_nb % 100 == 0:
+        #     num_display = 4
+        #     fig = _create_graph(
+        #         batch[:num_display].detach().cpu().numpy(),
+        #         decode[:num_display].detach().cpu().numpy(),
+        #     )
+        #     self.logger.experiment.add_figure(
+        #         tag="valid/reconstruct", figure=fig, global_step=self.global_step,
+        #     )
+        #     fig.clf()
+        #     plt.close()
 
         tensorboard_logs = {"valid/loss": loss}
 
@@ -271,9 +271,7 @@ def train(config: Config):
     experiment_dir = cache_dir.joinpath(
         "default", f"version_{config.experiment_version}"
     )
-    pl_logger = pl_loggers.TensorBoardLogger(
-        save_dir=str(cache_dir), version=config.experiment_version
-    )
+    pl_logger = pl_loggers.MLFlowLogger(experiment_name="example")
     trainer_params = dict()
     if config.resume:
         trainer_params["resume_from_checkpoint"] = str(cache_dir.joinpath("last.ckpt"))
