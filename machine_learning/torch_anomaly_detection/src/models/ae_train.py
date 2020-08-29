@@ -11,6 +11,7 @@ import random
 import shutil
 import subprocess
 import sys
+import tempfile
 import typing as t
 
 # third party
@@ -67,12 +68,12 @@ class AETrainer(pl.LightningModule):
                 batch[:num_display].detach().cpu().numpy(),
                 decode[:num_display].detach().cpu().numpy(),
             )
-            filepath = pathlib.Path(f"data/interim/train_{self.global_step}.png")
-            fig.savefig(filepath, bbox_inches="tight", pad_inches=0)
-            fig.clf()
-            plt.close()
-            self.logger.experiment.log_artifact(self.logger.run_id, filepath)
-            filepath.unlink()
+            with tempfile.TemporaryDirectory() as dname:
+                filepath = pathlib.Path(dname).joinpath(f"train_{self.global_step}.png")
+                fig.savefig(filepath, bbox_inches="tight", pad_inches=0)
+                fig.clf()
+                plt.close()
+                self.logger.experiment.log_artifact(self.logger.run_id, filepath)
 
         tensorboard_logs = {"train/loss": loss}
 
@@ -94,12 +95,12 @@ class AETrainer(pl.LightningModule):
                 batch[:num_display].detach().cpu().numpy(),
                 decode[:num_display].detach().cpu().numpy(),
             )
-            filepath = pathlib.Path(f"data/interim/valid_{self.global_step}.png")
-            fig.savefig(filepath, bbox_inches="tight", pad_inches=0)
-            fig.clf()
-            plt.close()
-            self.logger.experiment.log_artifact(self.logger.run_id, filepath)
-            filepath.unlink()
+            with tempfile.TemporaryDirectory() as dname:
+                filepath = pathlib.Path(dname).joinpath(f"valid_{self.global_step}.png")
+                fig.savefig(filepath, bbox_inches="tight", pad_inches=0)
+                fig.clf()
+                plt.close()
+                self.logger.experiment.log_artifact(self.logger.run_id, filepath)
 
         tensorboard_logs = {"valid/loss": loss}
 
@@ -330,11 +331,11 @@ def train(config: Config):
     )
     pl_trainer.fit(model, dataloader_train, dataloader_valid)
 
-    mlf_client = mlflow.tracking.MlflowClient()
-    mlf_model_path = cache_dir.joinpath("best")
-    mlf_pytorch.save_model(model.network, mlf_model_path)
-    mlf_client.log_artifact(pl_logger.run_id, mlf_model_path)
-    shutil.rmtree(mlf_model_path)
+    with tempfile.TemporaryDirectory() as dname:
+        mlf_client = mlflow.tracking.MlflowClient()
+        mlf_model_path = pathlib.Path(dname).joinpath("best")
+        mlf_pytorch.save_model(model.network, mlf_model_path)
+        mlf_client.log_artifact(pl_logger.run_id, mlf_model_path)
 
     for ckptfile in cache_dir.glob("*.ckpt"):
         pthfile = cache_dir.joinpath(ckptfile.stem + ".pth")
