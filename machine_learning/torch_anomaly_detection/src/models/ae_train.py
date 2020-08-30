@@ -19,7 +19,6 @@ import numpy as np
 import pytorch_lightning as pl
 import pytorch_lightning.callbacks as pl_callbacks
 import pytorch_lightning.loggers as pl_loggers
-import torch
 import torch.nn as nn
 import torch.cuda as tc
 import torch.optim as optim
@@ -65,14 +64,15 @@ class AETrainer(pl.LightningModule):
                 mlflog=self.logger,
             )
 
-        tensorboard_logs = {"train/loss": loss}
-        return {"loss": loss, "log": tensorboard_logs}
-
-    def training_epoch_end(self, outputs):
-        avg_loss = torch.stack([x["loss"] for x in outputs]).mean()
-
-        tensorboard_logs = {"train/epoch_loss": avg_loss}
-        return {"train_loss": avg_loss, "log": tensorboard_logs}
+        self.logger.experiment.log_metric(
+            self.logger.run_id,
+            "step_train_loss_temp",
+            loss.detach().cpu().item(),
+            step=self.global_step,
+        )
+        result = pl.TrainResult(minimize=loss, checkpoint_on=loss)
+        result.log("train_loss", loss, on_step=True, on_epoch=True)
+        return result
 
     def validation_step(self, batch, batch_nb):
         decode = self.forward(batch)
@@ -87,19 +87,18 @@ class AETrainer(pl.LightningModule):
                 mlflog=self.logger,
             )
 
-        return {"val_loss": loss}
-
-    def validation_epoch_end(self, outputs):
-        avg_loss = torch.stack([x["val_loss"] for x in outputs]).mean()
-
-        tensorboard_logs = {"valid/epoch_loss": avg_loss}
-        return {"val_loss": avg_loss, "log": tensorboard_logs}
+        result = pl.EvalResult(checkpoint_on=loss)
+        result.log("val_loss", loss)
+        return result
 
     def configure_optimizers(self):
         optimizer = optim.SGD(
             self.parameters(), lr=self.learning_rate, momentum=self.sgd_momentum
         )
-        scheduler = lr_scheduler.ReduceLROnPlateau(optimizer)
+        scheduler = {
+            "scheduler": lr_scheduler.ReduceLROnPlateau(optimizer),
+            "monitor": "checkpoint_on",
+        }
 
         return [optimizer], [scheduler]
 
@@ -129,6 +128,7 @@ class Config:
     min_epochs: int = 30
     max_epochs: int = 1000
 
+    experiment_name: str = "MVTecADHazelnut"
     log_dir: str = "ae_train"
     use_gpu: bool = True
     progress_bar_refresh_rate: int = 1
@@ -240,9 +240,19 @@ def train(config: Config):
     params = dc.asdict(config)
     pl.seed_everything(config.random_seed)
 
-    # 中間データの保存設定
+    # 学習を途中から再開する場合などの設定
     cache_dir = directories.get_processed().joinpath(config.cache_dir)
     cache_dir.mkdir(exist_ok=True)
+    trainer_params = dict()
+    lastckpt = cache_dir.joinpath("last.ckpt")
+    if config.resume:
+        trainer_params["resume_from_checkpoint"] = str(lastckpt)
+    elif lastckpt.exists():
+        lastckpt.unlink()
+    for filepath in cache_dir.glob("epoch*.ckpt"):
+        filepath.unlink()
+
+    # 中間データの保存設定
     model_checkpoint = pl_callbacks.ModelCheckpoint(
         filepath=str(cache_dir),
         monitor="val_loss",
@@ -252,23 +262,19 @@ def train(config: Config):
         mode="min",
         period=1,
     )
+    early_stop = None
+    if config.early_stop:
+        early_stop = pl_callbacks.EarlyStopping()
 
     # ログ設定
     pl_logger = pl_loggers.MLFlowLogger(
-        experiment_name="example",
+        experiment_name=config.experiment_name,
         tracking_uri=os.environ.get("MLFLOW_TRACKING_URI", None),
         tags={
             "mlflow.source.name": pathlib.Path(__file__).name,
             "mlflow.source.git.commit": ut.get_commit_id(),
         },
     )
-
-    # 学習を途中から再開する場合などの設定
-    trainer_params = dict()
-    if config.resume:
-        trainer_params["resume_from_checkpoint"] = str(cache_dir.joinpath("last.ckpt"))
-    for filepath in cache_dir.glob("epoch*.ckpt"):
-        filepath.unlink()
 
     # ネットワーク、データセットの取得及び学習
     network = get_network(
@@ -278,7 +284,7 @@ def train(config: Config):
     )
     model = AETrainer(network, params)
     pl_trainer = pl.Trainer(
-        early_stop_callback=config.early_stop,
+        early_stop_callback=early_stop,
         default_root_dir=str(cache_dir),
         fast_dev_run=False,
         min_epochs=config.min_epochs,
@@ -302,8 +308,6 @@ def train(config: Config):
     # ログに追加情報を設定
     mlf_client = mlflow.tracking.MlflowClient()
     for key, val in pl_trainer.profiler.recorded_durations.items():
-        for idx, v in enumerate(val):
-            mlf_client.log_metric(pl_logger.run_id, key, v, step=idx)
         mlf_client.log_metric(pl_logger.run_id, f"{key}_mean", np.mean(val))
         mlf_client.log_metric(pl_logger.run_id, f"{key}_sum", np.sum(val))
     for ckptfile in cache_dir.glob("epoch*.ckpt"):
