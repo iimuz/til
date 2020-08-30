@@ -265,24 +265,17 @@ def train(config: Config):
         period=1,
     )
 
-    experiment_dir = cache_dir.joinpath(
-        "default", f"version_{config.experiment_version}"
-    )
-    cmd = "git rev-parse --short HEAD"
-    commid_id = subprocess.check_output(cmd.split()).strip().decode("utf-8")
     pl_logger = pl_loggers.MLFlowLogger(
         experiment_name="example",
         tracking_uri=os.environ.get("MLFLOW_TRACKING_URI", None),
         tags={
             "mlflow.source.name": pathlib.Path(__file__).name,
-            "mlflow.source.git.commit": commid_id,
+            "mlflow.source.git.commit": _get_commit_id(),
         },
     )
     trainer_params = dict()
     if config.resume:
         trainer_params["resume_from_checkpoint"] = str(cache_dir.joinpath("last.ckpt"))
-    elif experiment_dir.exists():
-        shutil.rmtree(experiment_dir)
     for filepath in cache_dir.glob("*.ckpt"):
         filepath.unlink()
     for filepath in cache_dir.glob("*.pth"):
@@ -332,6 +325,18 @@ def train(config: Config):
             mlf_model_path = pathlib.Path(dname).joinpath(ckptfile.stem)
             mlf_pytorch.save_model(model.network, mlf_model_path)
             mlf_client.log_artifact(pl_logger.run_id, mlf_model_path)
+
+
+def _get_commit_id() -> str:
+    """Get current git commit hash.
+
+    Returns:
+        str: git commit hash.
+    """
+    cmd = "git rev-parse --short HEAD"
+    commid_id = subprocess.check_output(cmd.split()).strip().decode("utf-8")
+
+    return commid_id
 
 
 def _save_artifact_image(
