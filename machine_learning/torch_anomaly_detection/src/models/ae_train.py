@@ -106,6 +106,8 @@ class AETrainer(pl.LightningModule):
 
 @dc.dataclass
 class Config:
+    """AEを学習するために必要な設定値."""
+
     dataset_name: str = "MVTecAD_Hazelnut"
     network_name: str = "SimpleCBR"
     in_channels: int = 3
@@ -182,6 +184,20 @@ class NetworkName(enum.Enum):
 def get_datamodule(
     name: DatasetName, image_size: t.Tuple[int, int], batch_size: int, num_workers: int,
 ) -> pl.LightningDataModule:
+    """指定したデータセットローダーを取得する.
+
+    Args:
+        name (DatasetName): データセット名.
+        image_size (t.Tuple[int, int]): 生成する画像サイズ.
+        batch_size (int): バッチサイズ.
+        num_workers (int): worker数.
+
+    Raises:
+        ValueError: 指定したデータセットを取得できない場合.
+
+    Returns:
+        pl.LightningDataModule: データセットローダー.
+    """
     if name == DatasetName.CELEBA:
         return celeba_lightning.DataModuleAE(
             image_size=image_size, batch_size=batch_size, num_workers=num_workers
@@ -199,13 +215,24 @@ def get_datamodule(
 
 
 def get_network(name: NetworkName, **kwargs) -> nn.Module:
+    """指定したネットワークを取得する.
+
+    Args:
+        name (NetworkName): ネットワーク名.
+
+    Raises:
+        ValueError: 指定したネットワークが取得できない場合.
+
+    Returns:
+        nn.Module: ネットワーク.
+    """
     if name == NetworkName.SIMPLE_CBR:
         return ae_cnn.SimpleCBR(**kwargs)
 
     if name == NetworkName.SIMPLE_CR:
         return ae_cnn.SimpleCR(**kwargs)
 
-    raise Exception(f"not implemented network: {name}")
+    raise ValueError(f"not implemented network: {name}")
 
 
 def train(config: Config):
@@ -293,6 +320,14 @@ def _save_artifact_image(
     filename: str,
     mlflog: pl_loggers.MLFlowLogger,
 ) -> None:
+    """学習途中の中間画像をMLFlowのArtifactとして保存する.
+
+    Args:
+        batch (np.ndarray): 入力した画像.
+        decode (np.ndarray): 再構成した画像.
+        filename (str): 保存するときの名称.
+        mlflog (pl_loggers.MLFlowLogger): Artifactを登録するロガー.
+    """
     batch = batch.transpose(0, 2, 3, 1)
     decode = decode.transpose(0, 2, 3, 1)
 
