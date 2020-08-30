@@ -87,7 +87,7 @@ class AETrainer(pl.LightningModule):
                 mlflog=self.logger,
             )
 
-        result = pl.EvalResult(checkpoint_on=loss)
+        result = pl.EvalResult(checkpoint_on=loss, early_stop_on=loss)
         result.log("val_loss", loss)
         return result
 
@@ -124,9 +124,9 @@ class Config:
 
     resume: bool = False
 
-    early_stop: bool = True
+    early_stop: bool = False
     min_epochs: int = 30
-    max_epochs: int = 1000
+    max_epochs: int = 500
 
     experiment_name: str = "MVTecADHazelnut"
     log_dir: str = "ae_train"
@@ -262,9 +262,6 @@ def train(config: Config):
         mode="min",
         period=1,
     )
-    early_stop = None
-    if config.early_stop:
-        early_stop = pl_callbacks.EarlyStopping()
 
     # ログ設定
     pl_logger = pl_loggers.MLFlowLogger(
@@ -284,7 +281,7 @@ def train(config: Config):
     )
     model = AETrainer(network, params)
     pl_trainer = pl.Trainer(
-        early_stop_callback=early_stop,
+        early_stop_callback=config.early_stop,
         default_root_dir=str(cache_dir),
         fast_dev_run=False,
         min_epochs=config.min_epochs,
