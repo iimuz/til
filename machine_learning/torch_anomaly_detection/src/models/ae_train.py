@@ -7,9 +7,6 @@ import logging
 import os
 import pathlib
 import pprint
-import random
-import shutil
-import subprocess
 import sys
 import tempfile
 import typing as t
@@ -27,14 +24,11 @@ import torch.nn as nn
 import torch.cuda as tc
 import torch.optim as optim
 import torch.optim.lr_scheduler as lr_scheduler
-import torch.utils.data as td
-import torchvision.transforms as tv_transforms
 
 # my packages
+import src.data.celeba_lightning as celeba_lightning
 import src.data.mvtecad as mvtecad
-import src.data.mvtecad_torch as mvtecad_torch
-import src.data.celeba_torch as celeba
-import src.data.dataset_torch as ds
+import src.data.mvtecad_lightning as mvtech_lighning
 import src.data.directories as directories
 import src.data.utils as ut
 import src.models.ae_cnn as ae_cnn
@@ -127,7 +121,6 @@ class Config:
     save_top_k: int = 1
     save_weights_only: bool = False
 
-    experiment_version: int = 0
     resume: bool = False
 
     early_stop: bool = True
@@ -186,24 +179,23 @@ class NetworkName(enum.Enum):
         raise ValueError(f"invalid value: {name}")
 
 
-def get_dataset(
-    name: DatasetName, transforms: tv_transforms.Compose, **kwargs
-) -> t.Tuple[td.Dataset, td.Dataset]:
+def get_datamodule(
+    name: DatasetName, image_size: t.Tuple[int, int], batch_size: int, num_workers: int,
+) -> pl.LightningDataModule:
     if name == DatasetName.CELEBA:
-        dataset_train = celeba.DatasetAE(transforms=transforms, mode=ds.Mode.TRAIN)
-        dataset_valid = celeba.DatasetAE(transforms=transforms, mode=ds.Mode.VALID)
-        return dataset_train, dataset_valid
+        return celeba_lightning.DataModuleAE(
+            image_size=image_size, batch_size=batch_size, num_workers=num_workers
+        )
 
     if name == DatasetName.MVTECAD_HAZELNUT:
-        dataset_train = mvtecad_torch.DatasetAE(
-            kind=mvtecad.Kind.HAZELNUT, transforms=transforms, mode=ds.Mode.TRAIN
+        return mvtech_lighning.DataModuleAE(
+            kind=mvtecad.Kind.HAZELNUT,
+            image_size=image_size,
+            batch_size=batch_size,
+            num_workers=num_workers,
         )
-        dataset_valid = mvtecad_torch.DatasetAE(
-            kind=mvtecad.Kind.HAZELNUT, transforms=transforms, mode=ds.Mode.VALID
-        )
-        return dataset_train, dataset_valid
 
-    raise Exception(f"not implemented dataset: {name}")
+    raise ValueError(f"not implemented dataset: {name}")
 
 
 def get_network(name: NetworkName, **kwargs) -> nn.Module:
@@ -216,43 +208,12 @@ def get_network(name: NetworkName, **kwargs) -> nn.Module:
     raise Exception(f"not implemented network: {name}")
 
 
-def get_transforms(image_size: t.Tuple[int, int]) -> tv_transforms.Compose:
-    """データ変換コンポーネントの取得.
-
-    Args:
-        image_size (Tuple[int, int]): 最終的に取得する画像サイズ.
-
-    Returns:
-        torchvision.transforms.Compose: データ変換コンポーネント
-    """
-    transforms = tv_transforms.Compose(
-        [
-            tv_transforms.RandomHorizontalFlip(),
-            # tv_transforms.CenterCrop(148),
-            tv_transforms.Resize(image_size),
-            tv_transforms.ToTensor(),
-        ]
-    )
-
-    return transforms
-
-
 def train(config: Config):
     """学習処理の実行スクリプト."""
-    transforms = get_transforms(config.resize_image)
-    dataset_type = DatasetName.value_of(config.dataset_name)
-    dataset_train, dataset_valid = get_dataset(dataset_type, transforms)
-
     params = dc.asdict(config)
     pl.seed_everything(config.random_seed)
 
-    network = get_network(
-        NetworkName.value_of(config.network_name),
-        in_channels=config.in_channels,
-        out_channels=config.out_channels,
-    )
-    model = AETrainer(network, params)
-
+    # 中間データの保存設定
     cache_dir = directories.get_processed().joinpath(config.cache_dir)
     cache_dir.mkdir(exist_ok=True)
     model_checkpoint = pl_callbacks.ModelCheckpoint(
@@ -265,38 +226,30 @@ def train(config: Config):
         period=1,
     )
 
+    # ログ設定
     pl_logger = pl_loggers.MLFlowLogger(
         experiment_name="example",
         tracking_uri=os.environ.get("MLFLOW_TRACKING_URI", None),
         tags={
             "mlflow.source.name": pathlib.Path(__file__).name,
-            "mlflow.source.git.commit": _get_commit_id(),
+            "mlflow.source.git.commit": ut.get_commit_id(),
         },
     )
+
+    # 学習を途中から再開する場合などの設定
     trainer_params = dict()
     if config.resume:
         trainer_params["resume_from_checkpoint"] = str(cache_dir.joinpath("last.ckpt"))
-    for filepath in cache_dir.glob("*.ckpt"):
-        filepath.unlink()
-    for filepath in cache_dir.glob("*.pth"):
+    for filepath in cache_dir.glob("epoch*.ckpt"):
         filepath.unlink()
 
-    dataloader_train = td.DataLoader(
-        dataset_train,
-        config.batch_size,
-        shuffle=True,
-        num_workers=config.num_workers,
-        pin_memory=True,
-        worker_init_fn=_worker_init_random,
+    # ネットワーク、データセットの取得及び学習
+    network = get_network(
+        NetworkName.value_of(config.network_name),
+        in_channels=config.in_channels,
+        out_channels=config.out_channels,
     )
-    dataloader_valid = td.DataLoader(
-        dataset_valid,
-        config.batch_size,
-        shuffle=False,
-        num_workers=config.num_workers,
-        pin_memory=True,
-        worker_init_fn=_worker_init_random,
-    )
+    model = AETrainer(network, params)
     pl_trainer = pl.Trainer(
         early_stop_callback=config.early_stop,
         default_root_dir=str(cache_dir),
@@ -311,8 +264,15 @@ def train(config: Config):
         log_gpu_memory=True,
         **trainer_params,
     )
-    pl_trainer.fit(model, dataloader_train, dataloader_valid)
+    datamodule = get_datamodule(
+        DatasetName.value_of(config.dataset_name),
+        image_size=config.resize_image,
+        batch_size=config.batch_size,
+        num_workers=config.num_workers,
+    )
+    pl_trainer.fit(model, datamodule)
 
+    # ログに追加情報を設定
     mlf_client = mlflow.tracking.MlflowClient()
     for key, val in pl_trainer.profiler.recorded_durations.items():
         for idx, v in enumerate(val):
@@ -325,18 +285,6 @@ def train(config: Config):
             mlf_model_path = pathlib.Path(dname).joinpath(ckptfile.stem)
             mlf_pytorch.save_model(model.network, mlf_model_path)
             mlf_client.log_artifact(pl_logger.run_id, mlf_model_path)
-
-
-def _get_commit_id() -> str:
-    """Get current git commit hash.
-
-    Returns:
-        str: git commit hash.
-    """
-    cmd = "git rev-parse --short HEAD"
-    commid_id = subprocess.check_output(cmd.split()).strip().decode("utf-8")
-
-    return commid_id
 
 
 def _save_artifact_image(
@@ -370,10 +318,6 @@ def _save_artifact_image(
         fig.clf()
         plt.close()
         mlflog.experiment.log_artifact(mlflog.run_id, filepath)
-
-
-def _worker_init_random(worker_id: int) -> None:
-    random.seed(worker_id)
 
 
 if __name__ == "__main__":

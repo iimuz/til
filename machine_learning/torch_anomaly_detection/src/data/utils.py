@@ -4,6 +4,8 @@ import errno
 import logging
 import os
 import pathlib
+import random
+import subprocess
 import sys
 import typing as t
 
@@ -36,6 +38,18 @@ class TqdmUpTo(tqdm.tqdm):
         if tsize is not None:
             self.total = tsize
         self.update(b * bsize - self.n)
+
+
+def get_commit_id() -> str:
+    """Get current git commit hash.
+
+    Returns:
+        str: git commit hash.
+    """
+    cmd = "git rev-parse --short HEAD"
+    commid_id = subprocess.check_output(cmd.split()).strip().decode("utf-8")
+
+    return commid_id
 
 
 def handler_stdout(level: int = logging.INFO) -> logging.Handler:
@@ -80,3 +94,7 @@ def init_root_logger(level: int = logging.INFO) -> None:
     root = logging.getLogger()
     root.setLevel(level)
     root.addHandler(handler_stdout(level))
+
+
+def worker_init_random(worker_id: int) -> None:
+    random.seed(worker_id)
