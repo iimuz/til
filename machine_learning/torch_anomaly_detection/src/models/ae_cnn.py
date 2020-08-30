@@ -111,15 +111,15 @@ class SimpleCBR(nn.Module):
         )
         self.decoder = nn.Sequential(
             CBR2d(self.channels[2], self.channels[2], (3, 3), padding=1),
-            nn.Upsample(scale_factor=2, mode="bilinear"),
+            nn.Upsample(scale_factor=2, mode="bilinear", align_corners=True),
             CBR2d(self.channels[2], self.channels[1], (3, 3), padding=1),
             CBR2d(self.channels[1], self.channels[1], (3, 3), padding=1),
-            nn.Upsample(scale_factor=2, mode="bilinear"),
+            nn.Upsample(scale_factor=2, mode="bilinear", align_corners=True),
             CBR2d(self.channels[1], self.channels[0], (3, 3), padding=1),
             CBR2d(self.channels[0], self.channels[0], (3, 3), padding=1),
-            nn.Upsample(scale_factor=2, mode="bilinear"),
+            nn.Upsample(scale_factor=2, mode="bilinear", align_corners=True),
             CBR2d(self.channels[0], self.channels[0], (3, 3), padding=1),
-            nn.Upsample(scale_factor=2, mode="bilinear"),
+            nn.Upsample(scale_factor=2, mode="bilinear", align_corners=True),
             CBR2d(
                 self.channels[0], out_channels, (3, 3), padding=1, use_activation=False
             ),
@@ -174,15 +174,15 @@ class SimpleCR(nn.Module):
             CR2d(self.channels[4], self.channels[3], (3, 3), padding=1),
             CR2d(self.channels[3], self.channels[2], (3, 3), padding=1),
             CR2d(self.channels[2], self.channels[2], (3, 3), padding=1),
-            nn.Upsample(scale_factor=2, mode="bilinear"),
+            nn.Upsample(scale_factor=2, mode="bilinear", align_corners=True),
             CR2d(self.channels[2], self.channels[1], (3, 3), padding=1),
             CR2d(self.channels[1], self.channels[1], (3, 3), padding=1),
-            nn.Upsample(scale_factor=2, mode="bilinear"),
+            nn.Upsample(scale_factor=2, mode="bilinear", align_corners=True),
             CR2d(self.channels[1], self.channels[0], (3, 3), padding=1),
             CR2d(self.channels[0], self.channels[0], (3, 3), padding=1),
-            nn.Upsample(scale_factor=2, mode="bilinear"),
+            nn.Upsample(scale_factor=2, mode="bilinear", align_corners=True),
             CR2d(self.channels[0], self.channels[0], (3, 3), padding=1),
-            nn.Upsample(scale_factor=2, mode="bilinear"),
+            nn.Upsample(scale_factor=2, mode="bilinear", align_corners=True),
             CR2d(
                 self.channels[0], out_channels, (3, 3), padding=1, use_activation=False
             ),

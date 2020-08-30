@@ -4,31 +4,30 @@ import argparse
 import dataclasses as dc
 import enum
 import logging
+import os
+import pathlib
 import pprint
-import random
-import shutil
 import sys
+import tempfile
 import typing as t
 
 # third party
 import matplotlib.pyplot as plt
+import mlflow
+import mlflow.pytorch as mlf_pytorch
 import numpy as np
 import pytorch_lightning as pl
 import pytorch_lightning.callbacks as pl_callbacks
 import pytorch_lightning.loggers as pl_loggers
-import torch
 import torch.nn as nn
 import torch.cuda as tc
 import torch.optim as optim
 import torch.optim.lr_scheduler as lr_scheduler
-import torch.utils.data as td
-import torchvision.transforms as tv_transforms
 
 # my packages
+import src.data.celeba_lightning as celeba_lightning
 import src.data.mvtecad as mvtecad
-import src.data.mvtecad_torch as mvtecad_torch
-import src.data.celeba_torch as celeba
-import src.data.dataset_torch as ds
+import src.data.mvtecad_lightning as mvtech_lighning
 import src.data.directories as directories
 import src.data.utils as ut
 import src.models.ae_cnn as ae_cnn
@@ -58,25 +57,22 @@ class AETrainer(pl.LightningModule):
 
         if batch_nb % 100 == 0:
             num_display = 4
-            fig = _create_graph(
+            _save_artifact_image(
                 batch[:num_display].detach().cpu().numpy(),
                 decode[:num_display].detach().cpu().numpy(),
+                filename=f"train_{self.global_step:04}.png",
+                mlflog=self.logger,
             )
-            self.logger.experiment.add_figure(
-                tag="train/reconstruct", figure=fig, global_step=self.global_step,
-            )
-            fig.clf()
-            plt.close()
 
-        tensorboard_logs = {"train/loss": loss}
-
-        return {"loss": loss, "log": tensorboard_logs}
-
-    def training_epoch_end(self, outputs):
-        avg_loss = torch.stack([x["loss"] for x in outputs]).mean()
-
-        tensorboard_logs = {"train/epoch_loss": avg_loss}
-        return {"train_loss": avg_loss, "log": tensorboard_logs}
+        self.logger.experiment.log_metric(
+            self.logger.run_id,
+            "step_train_loss_temp",
+            loss.detach().cpu().item(),
+            step=self.global_step,
+        )
+        result = pl.TrainResult(minimize=loss, checkpoint_on=loss)
+        result.log("train_loss", loss, on_step=True, on_epoch=True)
+        return result
 
     def validation_step(self, batch, batch_nb):
         decode = self.forward(batch)
@@ -84,37 +80,33 @@ class AETrainer(pl.LightningModule):
 
         if batch_nb % 100 == 0:
             num_display = 4
-            fig = _create_graph(
+            _save_artifact_image(
                 batch[:num_display].detach().cpu().numpy(),
                 decode[:num_display].detach().cpu().numpy(),
+                filename=f"valid_{self.global_step:04}.png",
+                mlflog=self.logger,
             )
-            self.logger.experiment.add_figure(
-                tag="valid/reconstruct", figure=fig, global_step=self.global_step,
-            )
-            fig.clf()
-            plt.close()
 
-        tensorboard_logs = {"valid/loss": loss}
-
-        return {"val_loss": loss, "log": tensorboard_logs}
-
-    def validation_epoch_end(self, outputs):
-        avg_loss = torch.stack([x["val_loss"] for x in outputs]).mean()
-
-        tensorboard_logs = {"valid/epoch_loss": avg_loss}
-        return {"val_loss": avg_loss, "log": tensorboard_logs}
+        result = pl.EvalResult(checkpoint_on=loss, early_stop_on=loss)
+        result.log("val_loss", loss)
+        return result
 
     def configure_optimizers(self):
         optimizer = optim.SGD(
             self.parameters(), lr=self.learning_rate, momentum=self.sgd_momentum
         )
-        scheduler = lr_scheduler.ReduceLROnPlateau(optimizer)
+        scheduler = {
+            "scheduler": lr_scheduler.ReduceLROnPlateau(optimizer),
+            "monitor": "checkpoint_on",
+        }
 
         return [optimizer], [scheduler]
 
 
 @dc.dataclass
 class Config:
+    """AEを学習するために必要な設定値."""
+
     dataset_name: str = "MVTecAD_Hazelnut"
     network_name: str = "SimpleCBR"
     in_channels: int = 3
@@ -127,16 +119,16 @@ class Config:
     random_seed: int = 42
 
     cache_dir: str = "simple_cbr_mvtecad_hazelnut"
-    save_top_k: int = 2
+    save_top_k: int = 1
     save_weights_only: bool = False
 
-    experiment_version: int = 0
     resume: bool = False
 
-    early_stop: bool = True
+    early_stop: bool = False
     min_epochs: int = 30
-    max_epochs: int = 1000
+    max_epochs: int = 500
 
+    experiment_name: str = "MVTecADHazelnut"
     log_dir: str = "ae_train"
     use_gpu: bool = True
     progress_bar_refresh_rate: int = 1
@@ -189,75 +181,78 @@ class NetworkName(enum.Enum):
         raise ValueError(f"invalid value: {name}")
 
 
-def get_dataset(
-    name: DatasetName, transforms: tv_transforms.Compose, **kwargs
-) -> t.Tuple[td.Dataset, td.Dataset]:
+def get_datamodule(
+    name: DatasetName, image_size: t.Tuple[int, int], batch_size: int, num_workers: int,
+) -> pl.LightningDataModule:
+    """指定したデータセットローダーを取得する.
+
+    Args:
+        name (DatasetName): データセット名.
+        image_size (t.Tuple[int, int]): 生成する画像サイズ.
+        batch_size (int): バッチサイズ.
+        num_workers (int): worker数.
+
+    Raises:
+        ValueError: 指定したデータセットを取得できない場合.
+
+    Returns:
+        pl.LightningDataModule: データセットローダー.
+    """
     if name == DatasetName.CELEBA:
-        dataset_train = celeba.DatasetAE(transforms=transforms, mode=ds.Mode.TRAIN)
-        dataset_valid = celeba.DatasetAE(transforms=transforms, mode=ds.Mode.VALID)
-        return dataset_train, dataset_valid
+        return celeba_lightning.DataModuleAE(
+            image_size=image_size, batch_size=batch_size, num_workers=num_workers
+        )
 
     if name == DatasetName.MVTECAD_HAZELNUT:
-        dataset_train = mvtecad_torch.DatasetAE(
-            kind=mvtecad.Kind.HAZELNUT, transforms=transforms, mode=ds.Mode.TRAIN
+        return mvtech_lighning.DataModuleAE(
+            kind=mvtecad.Kind.HAZELNUT,
+            image_size=image_size,
+            batch_size=batch_size,
+            num_workers=num_workers,
         )
-        dataset_valid = mvtecad_torch.DatasetAE(
-            kind=mvtecad.Kind.HAZELNUT, transforms=transforms, mode=ds.Mode.VALID
-        )
-        return dataset_train, dataset_valid
 
-    raise Exception(f"not implemented dataset: {name}")
+    raise ValueError(f"not implemented dataset: {name}")
 
 
 def get_network(name: NetworkName, **kwargs) -> nn.Module:
+    """指定したネットワークを取得する.
+
+    Args:
+        name (NetworkName): ネットワーク名.
+
+    Raises:
+        ValueError: 指定したネットワークが取得できない場合.
+
+    Returns:
+        nn.Module: ネットワーク.
+    """
     if name == NetworkName.SIMPLE_CBR:
         return ae_cnn.SimpleCBR(**kwargs)
 
     if name == NetworkName.SIMPLE_CR:
         return ae_cnn.SimpleCR(**kwargs)
 
-    raise Exception(f"not implemented network: {name}")
-
-
-def get_transforms(image_size: t.Tuple[int, int]) -> tv_transforms.Compose:
-    """データ変換コンポーネントの取得.
-
-    Args:
-        image_size (Tuple[int, int]): 最終的に取得する画像サイズ.
-
-    Returns:
-        torchvision.transforms.Compose: データ変換コンポーネント
-    """
-    transforms = tv_transforms.Compose(
-        [
-            tv_transforms.RandomHorizontalFlip(),
-            # tv_transforms.CenterCrop(148),
-            tv_transforms.Resize(image_size),
-            tv_transforms.ToTensor(),
-        ]
-    )
-
-    return transforms
+    raise ValueError(f"not implemented network: {name}")
 
 
 def train(config: Config):
     """学習処理の実行スクリプト."""
-    transforms = get_transforms(config.resize_image)
-    dataset_type = DatasetName.value_of(config.dataset_name)
-    dataset_train, dataset_valid = get_dataset(dataset_type, transforms)
-
     params = dc.asdict(config)
     pl.seed_everything(config.random_seed)
 
-    network = get_network(
-        NetworkName.value_of(config.network_name),
-        in_channels=config.in_channels,
-        out_channels=config.out_channels,
-    )
-    model = AETrainer(network, params)
-
+    # 学習を途中から再開する場合などの設定
     cache_dir = directories.get_processed().joinpath(config.cache_dir)
     cache_dir.mkdir(exist_ok=True)
+    trainer_params = dict()
+    lastckpt = cache_dir.joinpath("last.ckpt")
+    if config.resume:
+        trainer_params["resume_from_checkpoint"] = str(lastckpt)
+    elif lastckpt.exists():
+        lastckpt.unlink()
+    for filepath in cache_dir.glob("epoch*.ckpt"):
+        filepath.unlink()
+
+    # 中間データの保存設定
     model_checkpoint = pl_callbacks.ModelCheckpoint(
         filepath=str(cache_dir),
         monitor="val_loss",
@@ -268,38 +263,23 @@ def train(config: Config):
         period=1,
     )
 
-    experiment_dir = cache_dir.joinpath(
-        "default", f"version_{config.experiment_version}"
+    # ログ設定
+    pl_logger = pl_loggers.MLFlowLogger(
+        experiment_name=config.experiment_name,
+        tracking_uri=os.environ.get("MLFLOW_TRACKING_URI", None),
+        tags={
+            "mlflow.source.name": pathlib.Path(__file__).name,
+            "mlflow.source.git.commit": ut.get_commit_id(),
+        },
     )
-    pl_logger = pl_loggers.TensorBoardLogger(
-        save_dir=str(cache_dir), version=config.experiment_version
-    )
-    trainer_params = dict()
-    if config.resume:
-        trainer_params["resume_from_checkpoint"] = str(cache_dir.joinpath("last.ckpt"))
-    elif experiment_dir.exists():
-        shutil.rmtree(experiment_dir)
-        for filepath in cache_dir.glob("*.ckpt"):
-            filepath.unlink()
-        for filepath in cache_dir.glob("*.pth"):
-            filepath.unlink()
 
-    dataloader_train = td.DataLoader(
-        dataset_train,
-        config.batch_size,
-        shuffle=True,
-        num_workers=config.num_workers,
-        pin_memory=True,
-        worker_init_fn=_worker_init_random,
+    # ネットワーク、データセットの取得及び学習
+    network = get_network(
+        NetworkName.value_of(config.network_name),
+        in_channels=config.in_channels,
+        out_channels=config.out_channels,
     )
-    dataloader_valid = td.DataLoader(
-        dataset_valid,
-        config.batch_size,
-        shuffle=False,
-        num_workers=config.num_workers,
-        pin_memory=True,
-        worker_init_fn=_worker_init_random,
-    )
+    model = AETrainer(network, params)
     pl_trainer = pl.Trainer(
         early_stop_callback=config.early_stop,
         default_root_dir=str(cache_dir),
@@ -314,15 +294,41 @@ def train(config: Config):
         log_gpu_memory=True,
         **trainer_params,
     )
-    pl_trainer.fit(model, dataloader_train, dataloader_valid)
+    datamodule = get_datamodule(
+        DatasetName.value_of(config.dataset_name),
+        image_size=config.resize_image,
+        batch_size=config.batch_size,
+        num_workers=config.num_workers,
+    )
+    pl_trainer.fit(model, datamodule)
 
-    for ckptfile in cache_dir.glob("*.ckpt"):
-        pthfile = cache_dir.joinpath(ckptfile.stem + ".pth")
+    # ログに追加情報を設定
+    mlf_client = mlflow.tracking.MlflowClient()
+    for key, val in pl_trainer.profiler.recorded_durations.items():
+        mlf_client.log_metric(pl_logger.run_id, f"{key}_mean", np.mean(val))
+        mlf_client.log_metric(pl_logger.run_id, f"{key}_sum", np.sum(val))
+    for ckptfile in cache_dir.glob("epoch*.ckpt"):
         model = model.load_from_checkpoint(str(ckptfile), network, params)
-        torch.save(model.network.state_dict(), pthfile)
+        with tempfile.TemporaryDirectory() as dname:
+            mlf_model_path = pathlib.Path(dname).joinpath(ckptfile.stem)
+            mlf_pytorch.save_model(model.network, mlf_model_path)
+            mlf_client.log_artifact(pl_logger.run_id, mlf_model_path)
 
 
-def _create_graph(batch: np.ndarray, decode: np.ndarray) -> None:
+def _save_artifact_image(
+    batch: np.ndarray,
+    decode: np.ndarray,
+    filename: str,
+    mlflog: pl_loggers.MLFlowLogger,
+) -> None:
+    """学習途中の中間画像をMLFlowのArtifactとして保存する.
+
+    Args:
+        batch (np.ndarray): 入力した画像.
+        decode (np.ndarray): 再構成した画像.
+        filename (str): 保存するときの名称.
+        mlflog (pl_loggers.MLFlowLogger): Artifactを登録するロガー.
+    """
     batch = batch.transpose(0, 2, 3, 1)
     decode = decode.transpose(0, 2, 3, 1)
 
@@ -342,11 +348,12 @@ def _create_graph(batch: np.ndarray, decode: np.ndarray) -> None:
         ax = axes[1, idx]
         ax.imshow(decode[idx], **params_imshow)
 
-    return fig
-
-
-def _worker_init_random(worker_id: int) -> None:
-    random.seed(worker_id)
+    with tempfile.TemporaryDirectory() as dname:
+        filepath = pathlib.Path(dname).joinpath(filename)
+        fig.savefig(filepath, bbox_inches="tight", pad_inches=0)
+        fig.clf()
+        plt.close()
+        mlflog.experiment.log_artifact(mlflog.run_id, filepath)
 
 
 if __name__ == "__main__":
