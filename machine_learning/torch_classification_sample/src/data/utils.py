@@ -1,7 +1,10 @@
 """小型の便利モジュール集."""
 # default packages
+import contextlib
 import logging
 import sys
+import time
+import typing as t
 
 # third party packages
 import tqdm.autonotebook as tqdm
@@ -35,6 +38,15 @@ def init_root_logger(level: int = logging.INFO) -> None:
     root = logging.getLogger()
     root.setLevel(level)
     root.addHandler(_handler_stdout(level))
+
+
+@contextlib.contextmanager
+def timer(name: str, print_log: t.Any = print) -> None:
+    start = time.time()
+    yield
+    end = time.time()
+
+    print_log("{name}: {time:.3f} sec".format(name=name, time=end - start))
 
 
 def _handler_stdout(level: int = logging.INFO) -> logging.Handler:
