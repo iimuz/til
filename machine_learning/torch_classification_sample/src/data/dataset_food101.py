@@ -109,6 +109,8 @@ class Food101(dataset.BaseDataset):
 
 
 class Food101WithLabel(torch_data.Dataset):
+    """PyTorch用ラベル付きFood101データセット."""
+
     def __init__(
         self, transforms: t.Optional[nn.Sequential], mode: dataset.Mode
     ) -> None:
@@ -134,7 +136,7 @@ class Food101WithLabel(torch_data.Dataset):
 def main() -> None:
     """データセットのダウンロードを実行するスクリプト."""
     with ut.timer(name="create dataset", print_log=_logger.info):
-        target = Food101(dataset.Mode.TRAIN).create().load()
+        Food101(dataset.Mode.TRAIN).create().load()
 
     batch_size = 64
     num_workers = 4
