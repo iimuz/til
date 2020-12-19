@@ -8,6 +8,7 @@ import typing as t
 
 # third party packages
 import pandas as pd
+import pytorch_lightning as pl
 import sklearn.model_selection as model_selection
 import sklearn.preprocessing as preprocessing
 import torch
@@ -131,6 +132,72 @@ class Food101WithLabel(torch_data.Dataset):
 
     def __len__(self) -> int:
         return self.data.data_.shape[0]
+
+
+class Food101WithLableModule(pl.LightningDataModule):
+    """PyTorchLighting用ラベル付きFood101データセット."""
+
+    def __init__(self, batch_size: int = 144, num_workers: int = 4) -> None:
+        super().__init__()
+
+        self.batch_size = batch_size
+        self.num_workers = num_workers
+        self.image_size = (224, 224)
+
+        self.transforms_train = nn.Sequential(
+            transforms.RandomHorizontalFlip(),
+            transforms.Resize(self.image_size),
+            transforms.ConvertImageDtype(torch.float32),
+        )
+        self.transforms_test = nn.Sequential(
+            transforms.Resize(self.image_size),
+            transforms.ConvertImageDtype(torch.float32),
+        )
+
+    def prepare_data(self, *args, **kwargs):
+        Food101(dataset.Mode.TRAIN).create()
+
+    def setup(self, stage: t.Optional[str] = None) -> None:
+        if stage == "fit" or stage is None:
+            self.train_ = Food101WithLabel(
+                self.transforms_train, mode=dataset.Mode.TRAIN
+            )
+            self.valid_ = Food101WithLabel(
+                self.transforms_test, mode=dataset.Mode.VALID
+            )
+
+        if stage == "test" or stage is None:
+            self.test_ = Food101WithLabel(self.transforms_test, mode=dataset.Mode.TEST)
+
+    def train_dataloader(self, *args, **kwargs) -> torch_data.DataLoader:
+        return torch_data.DataLoader(
+            self.train_,
+            self.batch_size,
+            shuffle=True,
+            num_workers=self.num_workers,
+            pin_memory=True,
+            worker_init_fn=ut.worker_init_random,
+        )
+
+    def val_dataloader(self, *args, **kwargs) -> torch_data.DataLoader:
+        return torch_data.DataLoader(
+            self.valid_,
+            self.batch_size,
+            shuffle=False,
+            num_workers=self.num_workers,
+            pin_memory=True,
+            worker_init_fn=ut.worker_init_random,
+        )
+
+    def test_dataloader(self, *args, **kwargs) -> torch_data.DataLoader:
+        return torch_data.DataLoader(
+            self.test_,
+            self.batch_size,
+            shuffle=False,
+            num_workers=self.num_workers,
+            pin_memory=True,
+            worker_init_fn=ut.worker_init_random,
+        )
 
 
 def main() -> None:
