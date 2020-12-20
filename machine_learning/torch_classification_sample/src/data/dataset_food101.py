@@ -48,6 +48,7 @@ class Food101(dataset.BaseDataset):
         tarpath = self.path.joinpath("food-101.tar.gz")
         if not tarpath.exists():
             url = "http://data.vision.ee.ethz.ch/cvl/food-101.tar.gz"
+            self.path.mkdir(exist_ok=True)
             with ut.TqdmUpTo(unit="B", unit_scale=True, miniters=1, desc=url) as pbar:
                 request.urlretrieve(
                     url,

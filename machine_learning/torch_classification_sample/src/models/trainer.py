@@ -56,7 +56,7 @@ class Config:
     log_dir: str = "data/interim/SimpleCBR"
     use_gpu: bool = True
     progress_bar_refresh_rate: int = 1
-    profiler: bool = True
+    profiler: str = "simple"
 
 
 class Trainer(pl.LightningModule):
@@ -181,7 +181,7 @@ def train(config: Config):
     # ログに追加情報を設定
     mlf_client = mlflow.tracking.MlflowClient()
     for ckptfile in cache_dir.glob("epoch*.ckpt"):
-        model = model.load_from_checkpoint(str(ckptfile), network, params)
+        model = model.load_from_checkpoint(str(ckptfile), network, **params)
         with tempfile.TemporaryDirectory() as dname:
             mlf_model_path = pathlib.Path(dname).joinpath(ckptfile.stem)
             mlf_pytorch.save_model(model.network, mlf_model_path)
