@@ -16,3 +16,20 @@ poetry run bash run_mlflow_tracking_server.sh
   削除した実験の Artifact を削除するコマンドを実行します。
 
 [mlflow]: https://mlflow.org/
+
+## 環境設定
+
+起動する URL や Port 番号、ファイル保存先は .env からの読み込みを想定しています。
+.sample.env を参考に.env を作成しスクリプト実行前に読み込んでください。
+
+```sh
+env $(cat .env | xargs) |  poetry run bash run_mlflow_tracking_server.sh
+```
+
+## Tips
+
+### Backend に SQLite を設定すると学習中に通信エラーが発生する
+
+環境によるのかもしれませんが、バックエンドに SQLite を設定しているとログの頻度か Artifact のファイルサイズの影響により、通信エラーが発生する場合がありました。
+ローカルファイルベースに全て以降すると比較的安定することを確認しています。
+(MLFlow Tracking Server を動かす環境にも、それなりのスペックが必要?)
