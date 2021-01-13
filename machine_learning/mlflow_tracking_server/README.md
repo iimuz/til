@@ -26,6 +26,23 @@ poetry run bash run_mlflow_tracking_server.sh
 env $(cat .env | xargs) |  poetry run bash run_mlflow_tracking_server.sh
 ```
 
+### Docker
+
+docker を利用して MLFlow Tracking Server を起動することが出来ます。
+
+- Dockerfile: MLFlow Tracking Server を起動するための Docker イメージ作成用
+- `docker_command.sh`: docker のイメージ作成からコンテナ起動までのオプションを設定したスクリプト
+
+例えば下記のコマンドでコンテナを起動できます。
+
+```sh
+# build image
+bash docker_command.sh build
+
+# run contaienr
+bash docker_comamnd.sh run
+```
+
 ## Tips
 
 ### Backend に SQLite を設定すると学習中に通信エラーが発生する
