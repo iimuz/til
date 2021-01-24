@@ -7,6 +7,7 @@ import pathlib
 import sys
 
 # third party packages
+import mlflow
 import pytorch_lightning as pl
 import pytorch_lightning.loggers as pl_loggers
 import torch.nn.functional as F
@@ -68,6 +69,9 @@ def main(config: Config) -> None:
         experiment_name=config.experiment_name,
         tracking_uri=MLFLOW_TRACKING_URI,
     )
+    _logger.debug(mlf_logger._run_id)
+    mlflow.log_params(dataclasses.asdict(config))
+
     model = PlModel()
     mnist = dataset.Mnist()
     trainer = pl.Trainer(logger=mlf_logger)

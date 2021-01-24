@@ -1,1 +1,6 @@
 experiment_name: "default"
+
+#  URI of project to run. A local filesystem path or a git repository URI.
+git_uri: "https://github.com/iimuz/til/machine_learning/kaggle_ops"
+# For Git-based projects, either a commit hash or a brnch name.
+git_version: "feat/kaggle-ops"
