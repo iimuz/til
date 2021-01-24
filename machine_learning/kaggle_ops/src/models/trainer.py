@@ -6,6 +6,7 @@ import sys
 
 # third party packages
 import pytorch_lightning as pl
+import pytorch_lightning.loggers as pl_loggers
 import torch.nn.functional as F
 import torch.optim as optim
 
@@ -45,9 +46,13 @@ class PlModel(pl.LightningModule):
 
 
 def main() -> None:
+    mlf_logger = pl_loggers.MLFlowLogger(
+        experiment_name="default",
+        tracking_uri="file:./data/processed/mlruns",
+    )
     model = PlModel()
     mnist = dataset.Mnist()
-    trainer = pl.Trainer()
+    trainer = pl.Trainer(logger=mlf_logger)
     trainer.fit(model, mnist)
 
 
