@@ -13,3 +13,7 @@ MLFlow を利用して KaggleOps 環境を構築するためのひな形です�
 ## Usage
 
 - GCS にバケットを生成する: `bash scripts/gcp.sh gcs`
+
+## Tips
+
+- Google colaboratory は python3.6.9
