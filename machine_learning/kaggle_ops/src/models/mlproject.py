@@ -5,6 +5,7 @@ import logging
 import os
 import pathlib
 import sys
+import typing as t
 
 # third party packages
 import mlflow.projects as mlf_projects
@@ -22,8 +23,8 @@ class Config:
 
     experiment_name: str = "default"
 
-    git_uri: str = ""
-    git_version: str = ""
+    uri: t.Optional[str] = None
+    git_version: t.Optional[str] = None
 
 
 def main(config: Config) -> None:
@@ -40,12 +41,16 @@ def main(config: Config) -> None:
     except mlf_exceptions.MlflowException:
         pass
 
+    params = {}
+    if config.git_version is not None:
+        params["version"] = config.git_version
+
     mlf_projects.run(
-        config.git_uri,
+        config.uri,
         entry_point="main",
-        version=config.git_version,
         experiment_name=config.experiment_name,
         use_conda=False,
+        **params,
     )
 
 

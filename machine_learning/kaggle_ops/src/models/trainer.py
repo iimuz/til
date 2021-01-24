@@ -9,7 +9,6 @@ import sys
 # third party packages
 import mlflow
 import pytorch_lightning as pl
-import pytorch_lightning.loggers as pl_loggers
 import torch.nn.functional as F
 import torch.optim as optim
 import yaml
@@ -17,6 +16,7 @@ import yaml
 # my packages
 import src.data.dataset as dataset
 import src.models.network as network
+import src.models.pl_utils as pl_utils
 
 # logger
 _logger = logging.getLogger(__name__)
@@ -64,12 +64,13 @@ def main(config: Config) -> None:
     MLFLOW_TRACKING_URI = os.environ.get(
         "MLFLOW_TRACKING_URI", "file:./data/processed/mlruns"
     )
-
-    mlf_logger = pl_loggers.MLFlowLogger(
-        experiment_name=config.experiment_name,
-        tracking_uri=MLFLOW_TRACKING_URI,
+    MLFLOW_ARTIFACT_LOCATION = os.environ.get(
+        "MLFLOW_ARTIFACT_LOCATION", "file:./data/processed/mlruns/artifacts"
     )
-    _logger.debug(mlf_logger._run_id)
+
+    mlf_logger = pl_utils.MLFlowLogger(
+        tracking_uri=MLFLOW_TRACKING_URI, artifact_location=MLFLOW_ARTIFACT_LOCATION
+    )
     mlflow.log_params(dataclasses.asdict(config))
 
     model = PlModel()
