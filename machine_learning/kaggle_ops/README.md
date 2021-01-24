@@ -9,3 +9,7 @@ MLFlow を利用して KaggleOps 環境を構築するためのひな形です�
 
 [gmo]: https://recruit.gmo.jp/engineer/jisedai/blog/kaggleops-mlflow/
 [yuooka]: https://github.com/yuooka/kaggleops-tutorial
+
+## Usage
+
+- GCS にバケットを生成する: `bash scripts/gcp.sh gcs`
