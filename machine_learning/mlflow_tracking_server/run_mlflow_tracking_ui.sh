@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-# Run MLflow traking server.
-# Usage: bash run_mlflow_tracking_server.sh
+# Run MLflow traking UI.
+# Usage: bash run_mlflow_tracking_ui.sh
 
 set -eu
 
@@ -12,7 +12,8 @@ readonly PORT=${SERVER_PORT:-"5000"}
 readonly BACKEND_STORE_URI=${BACKEND_STORE_URI:-"sqlite:///mlruns/tracking.db"}
 readonly ARTIFACT_STORE=${ARTIFACT_STORE:-"$PROJECT_DIR/mlruns"}
 
-mlflow server \
+mlflow ui \
   --backend-store-uri=$BACKEND_STORE_URI \
   --default-artifact-root=$ARTIFACT_STORE \
-  --host=$HOST
+  --host=$HOST \
+  --port=$PORT
