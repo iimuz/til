@@ -15,7 +15,7 @@ import yaml
 
 # my packages
 import src.data.dataset as dataset
-import src.models.net_cnn as net_cnn
+import src.models.network as network
 
 # logger
 _logger = logging.getLogger(__name__)
@@ -32,7 +32,7 @@ class PlModel(pl.LightningModule):
     def __init__(self):
         super().__init__()
 
-        self.network = net_cnn.Mnist()
+        self.network = network.Mnist()
 
     def forward(self, x):
         return self.network(x)
