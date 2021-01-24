@@ -20,7 +20,7 @@ readonly SCRIPT_DIR=$(cd $(dirname $SCRIPT_PATH); pwd)
 readonly PROJECT_DIR=$(cd $SCRIPT_DIR/..; pwd)
 
 # GCP settings
-readonly GCS_BUCKET_NAME="kaggleops-mlflow"
+readonly GCS_BUCKET_NAME=${GCS_BUCKET_NAME:-"hogehoge"}
 readonly GCLOUD_PROJECT=${GCLOUD_PROJECT_ID:-$(gcloud config get-value project 2> /dev/null)}
 readonly GCLOUD_REGION=${GCLOUD_REGION:-$(gcloud config get-value compute/region 2> /dev/null)}
 
