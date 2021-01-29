@@ -62,6 +62,7 @@ fi
 case "$sub_command" in
   "build" ) _build;;
   "exec" ) docker exec -it $CONTAINER_NAME bash;;
+  "gc" ) docker exec -it $CONTAINER_NAME bash mlflow_gc.sh;;
   "logs" ) docker logs $CONTAINER_NAME;;
   "rebuild" )
     docker stop $CONTAINER_NAME
