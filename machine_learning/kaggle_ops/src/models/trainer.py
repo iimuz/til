@@ -85,7 +85,12 @@ def main(config: Config) -> None:
 
     model = PlModel()
     mnist = dataset.Mnist()
-    trainer = pl.Trainer(logger=mlf_logger, callbacks=[checkpoint_callback])
+    trainer = pl.Trainer(
+        min_epochs=1,
+        max_epochs=5,
+        logger=mlf_logger,
+        callbacks=[checkpoint_callback],
+    )
     trainer.fit(model, mnist)
 
 
