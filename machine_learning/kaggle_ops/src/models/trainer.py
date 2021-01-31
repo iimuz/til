@@ -68,9 +68,12 @@ def main(config: Config) -> None:
         "MLFLOW_ARTIFACT_LOCATION", "file:./data/processed/mlruns/artifacts"
     )
 
+    # mlflow で何かを保存する前に PyTorch Lightning の logger 側で active run を作る必要がある。
+    # これをしないと、 mlflow から呼び出した run id と logger の run id が別になる。
     mlf_logger = pl_utils.MLFlowLogger(
         tracking_uri=MLFLOW_TRACKING_URI, artifact_location=MLFLOW_ARTIFACT_LOCATION
     )
+    _ = mlf_logger.experiment
     mlflow.log_params(dataclasses.asdict(config))
 
     model = PlModel()
