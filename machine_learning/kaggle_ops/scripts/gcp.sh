@@ -24,12 +24,10 @@ readonly GCS_BUCKET_NAME=${GCS_BUCKET_NAME:-"hogehoge"}
 readonly GCLOUD_PROJECT=${GCLOUD_PROJECT_ID:-$(gcloud config get-value project 2> /dev/null)}
 readonly GCLOUD_REGION=${GCLOUD_REGION:-$(gcloud config get-value compute/region 2> /dev/null)}
 
-function _create_gcs_bucket() {
-  if ! type gsutil > /dev/null 2>&1; then
-    echo "gsutil command not found."
-    exit 1;
-  fi
+# MLFlow
+readonly MLFLOW_DIR=${MLFLOW_DIR:-"data/processed/mlruns"}
 
+function _create_gcs_bucket() {
   NAME="gs://$GCS_BUCKET_NAME"
   PROJECT=$GCLOUD_PROJECT
   STORAGE_CLASS="Standard"
@@ -38,10 +36,17 @@ function _create_gcs_bucket() {
   gsutil mb -p $GCLOUD_PROJECT -c $STORAGE_CLASS -l $LOCATION -b on $NAME
 }
 
+function _copy_gcs_files() {
+  NAME="gs://$GCS_BUCKET_NAME"
+  MLRUNS_DIR="$NAME/mlruns/*"
+  gsutil -mq cp -rn $MLRUNS_DIR $MLFLOW_DIR
+}
+
 readonly SUB_COMMAND=${1}
 shift
 readonly OPTIONS=$*
 
 case "$SUB_COMMAND" in
-  "gcs" ) _create_gcs_bucket $OPTIONS;;
+  "cp" ) _copy_gcs_files;;
+  "gcs" ) _create_gcs_bucket;;
 esac
