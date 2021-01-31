@@ -29,7 +29,7 @@ class Config:
 
 def main(config: Config) -> None:
     MLFLOW_ARTIFACT_LOCATION = os.environ.get(
-        "MLFLOW_ARTIFACT_LOCATION", "file:./data/processed/mlruns/artifacts"
+        "MLFLOW_ARTIFACT_LOCATION", "./data/processed/mlruns/artifacts"
     )
 
     client = mlf_tracking.MlflowClient()

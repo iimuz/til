@@ -25,7 +25,7 @@ readonly GCLOUD_PROJECT=${GCLOUD_PROJECT_ID:-$(gcloud config get-value project 2
 readonly GCLOUD_REGION=${GCLOUD_REGION:-$(gcloud config get-value compute/region 2> /dev/null)}
 
 # MLFlow
-readonly MLFLOW_DIR=${MLFLOW_DIR:-"data/processed/mlruns"}
+readonly MLFLOW_DIR=${MLFLOW_TRACKING_URI:-"data/processed/mlruns"}
 
 function _create_gcs_bucket() {
   NAME="gs://$GCS_BUCKET_NAME"

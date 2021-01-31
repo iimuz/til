@@ -64,10 +64,10 @@ class PlModel(pl.LightningModule):
 
 def main(config: Config) -> None:
     MLFLOW_TRACKING_URI = os.environ.get(
-        "MLFLOW_TRACKING_URI", "file:./data/processed/mlruns"
+        "MLFLOW_TRACKING_URI", "./data/processed/mlruns"
     )
     MLFLOW_ARTIFACT_LOCATION = os.environ.get(
-        "MLFLOW_ARTIFACT_LOCATION", "file:./data/processed/mlruns/artifacts"
+        "MLFLOW_ARTIFACT_LOCATION", "./data/processed/mlruns/artifacts"
     )
     CHECKPOINT_DIR = os.environ.get(
         "CHECKPOINT_DIR", "data/processed/pl_model_checkpoint"
