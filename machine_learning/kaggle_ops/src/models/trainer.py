@@ -10,6 +10,7 @@ import sys
 import mlflow
 import pytorch_lightning as pl
 import pytorch_lightning.callbacks as pl_callbacks
+import torch.cuda as torch_cuda
 import torch.nn.functional as F
 import torch.optim as optim
 import yaml
@@ -90,6 +91,7 @@ def main(config: Config) -> None:
         max_epochs=5,
         logger=mlf_logger,
         callbacks=[checkpoint_callback],
+        gpus=torch_cuda.device_count(),
     )
     trainer.fit(model, mnist)
 
