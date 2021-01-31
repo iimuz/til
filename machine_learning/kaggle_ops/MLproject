@@ -1,0 +1,5 @@
+name: MNIST sample
+
+entry_points:
+  main:
+    command: "python -m src.models.trainer"
