@@ -28,7 +28,7 @@ _logger = logging.getLogger(__name__)
 class Config:
     """スクリプト実行用設定値."""
 
-    experiment_name: str = "default"
+    pass
 
 
 class PlModel(pl.LightningModule):
