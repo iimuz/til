@@ -9,6 +9,7 @@ import sys
 # third party packages
 import mlflow
 import pytorch_lightning as pl
+import pytorch_lightning.callbacks as pl_callbacks
 import torch.nn.functional as F
 import torch.optim as optim
 import yaml
@@ -67,6 +68,9 @@ def main(config: Config) -> None:
     MLFLOW_ARTIFACT_LOCATION = os.environ.get(
         "MLFLOW_ARTIFACT_LOCATION", "file:./data/processed/mlruns/artifacts"
     )
+    CHECKPOINT_DIR = os.environ.get(
+        "CHECKPOINT_DIR", "data/processed/pl_model_checkpoint"
+    )
 
     # mlflow で何かを保存する前に PyTorch Lightning の logger 側で active run を作る必要がある。
     # これをしないと、 mlflow から呼び出した run id と logger の run id が別になる。
@@ -76,9 +80,15 @@ def main(config: Config) -> None:
     _ = mlf_logger.experiment
     mlflow.log_params(dataclasses.asdict(config))
 
+    checkpoint_callback = pl_callbacks.ModelCheckpoint(
+        monitor="val_loss",
+        dirpath=CHECKPOINT_DIR,
+        filename="sample_{epoch:02d}",
+    )
+
     model = PlModel()
     mnist = dataset.Mnist()
-    trainer = pl.Trainer(logger=mlf_logger)
+    trainer = pl.Trainer(logger=mlf_logger, callbacks=[checkpoint_callback])
     trainer.fit(model, mnist)
 
 
