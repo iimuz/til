@@ -2,4 +2,4 @@ name: MNIST sample
 
 entry_points:
   main:
-    command: "python ./src/models/trainer.py"
+    command: "python -m src.models.trainer"
