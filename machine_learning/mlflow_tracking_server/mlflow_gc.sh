@@ -7,6 +7,6 @@ set -eu
 
 readonly SCRIPT_DIR=$(cd $(dirname $0); pwd)
 readonly PROJECT_DIR=$SCRIPT_DIR
-readonly BACKEND_STORE_URI="sqlite:///mlruns/tracking.db"
+readonly BACKEND_STORE_URI=${BACKEND_STORE_URI:-"sqlite:///mlruns/tracking.db"}
 
 mlflow gc --backend-store-uri=$BACKEND_STORE_URI
