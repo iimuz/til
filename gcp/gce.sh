@@ -18,6 +18,7 @@ Usage:
 
 Commands:
   help:     print this.
+  init:     initialize command for instance.
   instance: command related to gce instance.
   disk:     command related to gce instance disk.
 EOF
@@ -136,8 +137,91 @@ Commands:
 EOF
 }
 
+# インスタンスの初期化コマンドのエントリポイント.
+function _init() {
+  readonly SUB_COMMAND=$1
+  shift
+  readonly SUB_OPTIONS="$@"
 
-# GCE関連のコマンドのエントリポイント。
+  case "$SUB_COMMAND" in
+    "docker-gpu" ) _init_docker_gpu;;
+    "gpu" ) _init_gpu;;
+    "help" ) _init_usage;;
+    "swap" ) _init_swap;;
+    "update" ) _init_update;;
+  esac
+}
+
+# インスタンスの初期化関連コマンドのヘルプ.
+function _init_usage() {
+  cat <<EOF
+$(basename $0) instance command is a tool for gce instance.
+
+Usage:
+$(basename $0) instance [command] [options]
+
+Commands:
+docker-gpu: install docker tools for nvidia gpu.
+gpu:        initialize gpu driver.
+help:       print this.
+swap:       create swap file and activate.
+update:     initialize instance.
+EOF
+}
+
+# docker 環境で gpu が有効にできないときの追加インストール
+function _init_docker_gpu() {
+  # install nvidia container
+  curl -s -L https://nvidia.github.io/nvidia-container-runtime/gpgkey | sudo apt-key add -
+  distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+  curl -s -L https://nvidia.github.io/nvidia-container-runtime/$distribution/nvidia-container-runtime.list | \
+    sudo tee /etc/apt/sources.list.d/nvidia-container-runtime.list
+  sudo apt-get update
+
+  sudo apt-get install -y nvidia-container-runtime
+
+  docker run --rm -it --gpus=all ubuntu:18.04 nvidia-smi
+}
+
+
+# Ubuntu 院スタンにおいてGPUドライバをインストールする.
+# - reference: `https://cloud.google.com/compute/docs/gpus/install-drivers-gpu?hl=ja`
+function _init_gpu() {
+  # Ubuntu 18.04
+  curl -O http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-repo-ubuntu1804_10.0.130-1_amd64.deb
+  sudo dpkg -i cuda-repo-ubuntu1804_10.0.130-1_amd64.deb
+  sudo apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub
+  rm cuda-repo-ubuntu1804_10.0.130-1_amd64.deb
+
+  # install driver
+  sudo apt-get update
+  sudo apt-get install -y cuda
+
+  # check driver
+  nvidia-smi
+}
+
+# swapファイルを生成し有効化します.
+function _init_swap() {
+  readonly SWAPFILE=/swapfile
+
+  sudo dd if=/dev/zero of=$SWAPFILE bs=1M count=4000
+  sudo chmod 600 $SWAPFILE
+  sudo mkswap $SWAPFILE
+  sudo swapon $SWAPFILE
+
+  sudo echo "\n$SWAPFILE none swap sw 0 0\n" >> /etc/fstab
+}
+
+# インスタンスがUbuntuと仮定して生成後の初期動作
+function _init_update() {
+  sudo apt update
+  sudo apt upgrade -y
+  sudo apt autoremove -y
+  sudo apt clean
+}
+
+# インスタンスの生成関連のコマンドのエントリポイント。
 function _instance() {
   readonly SUB_COMMAND=$1
   shift
@@ -149,11 +233,7 @@ function _instance() {
     "free" ) _instance_create_always_free;;
     "help" ) _instance_usage;;
     "home" ) _instance_home $SUB_OPTIONS;;
-    "init" ) _instance_init;;
-    "init-gpu" ) _instance_init_gpu;;
-    "init-docker-gpu" ) _instance_init_docker_gpu;;
     "recreate" ) _instance_recreate $SUB_OPTIONS;;
-    "swap" ) _instance_swap;;
   esac
 }
 
@@ -171,11 +251,7 @@ create:          create gce instance.
 free:            create always free instance.
 help:            print this.
 home:            set the disk as home direcotry. (option: --device name)
-init:            initialize instance.
-init-gpu:        initialize gpu driver.
-init-docker-gpu: install docker tools for nvidia gpu.
 recreate:        recreate gce instance.
-swap:            create swap file and activate.
 EOF
 }
 
@@ -393,45 +469,6 @@ function _instance_home() {
   sudo reboot
 }
 
-# インスタンスがUbuntuと仮定して生成後の初期動作
-function _instance_init() {
-  sudo apt update
-  sudo apt upgrade -y
-  sudo apt autoremove -y
-  sudo apt clean
-}
-
-# Ubuntu 院スタンにおいてGPUドライバをインストールする.
-# - reference: `https://cloud.google.com/compute/docs/gpus/install-drivers-gpu?hl=ja`
-function _instance_init_gpu() {
-  # Ubuntu 18.04
-  curl -O http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-repo-ubuntu1804_10.0.130-1_amd64.deb
-  sudo dpkg -i cuda-repo-ubuntu1804_10.0.130-1_amd64.deb
-  sudo apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub
-  rm cuda-repo-ubuntu1804_10.0.130-1_amd64.deb
-
-  # install driver
-  sudo apt-get update
-  sudo apt-get install -y cuda
-
-  # check driver
-  nvidia-smi
-}
-
-# docker 環境で gpu が有効にできないときの追加インストール
-function _instance_init_docker_gpu() {
-  # install nvidia container
-  curl -s -L https://nvidia.github.io/nvidia-container-runtime/gpgkey | sudo apt-key add -
-  distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
-  curl -s -L https://nvidia.github.io/nvidia-container-runtime/$distribution/nvidia-container-runtime.list | \
-    sudo tee /etc/apt/sources.list.d/nvidia-container-runtime.list
-  sudo apt-get update
-
-  sudo apt-get install -y nvidia-container-runtime
-
-  docker run --rm -it --gpus=all ubuntu:18.04 nvidia-smi
-}
-
 # 生成済みのインスタンスを削除して、同一ディスクで別のインスタンスを生成する。
 function _instance_recreate() {
   instance_name="dev"
@@ -553,18 +590,6 @@ gcloud コマンドのデフォルト値を参照し、リージョンなどを�
 EOF
 }
 
-# swapファイルを生成し有効化します.
-function _instance_swap() {
-  readonly SWAPFILE=/swapfile
-
-  sudo dd if=/dev/zero of=$SWAPFILE bs=1M count=4000
-  sudo chmod 600 $SWAPFILE
-  sudo mkswap $SWAPFILE
-  sudo swapon $SWAPFILE
-
-  sudo echo "\n$SWAPFILE none swap sw 0 0\n" >> /etc/fstab
-}
-
 # スクリプトの実行
 readonly COMMAND=$1
 shift
@@ -572,6 +597,7 @@ readonly OPTIONS="$@"
 
 case "$COMMAND" in
   "help" ) _usage;;
+  "init" ) _init $OPTIONS;;
   "instance" ) _instance $OPTIONS;;
   "disk" ) _disk $OPTIONS;;
 esac
