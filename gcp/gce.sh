@@ -145,6 +145,7 @@ function _init() {
 
   case "$SUB_COMMAND" in
     "docker-gpu" ) _init_docker_gpu;;
+    "dotfiles" ) _init_dotfiles;;
     "gpu" ) _init_gpu;;
     "help" ) _init_usage;;
     "swap" ) _init_swap;;
@@ -162,6 +163,7 @@ $(basename $0) instance [command] [options]
 
 Commands:
 docker-gpu: install docker tools for nvidia gpu.
+dotfiles:   set dotfiles.
 gpu:        initialize gpu driver.
 help:       print this.
 swap:       create swap file and activate.
@@ -181,6 +183,20 @@ function _init_docker_gpu() {
   sudo apt-get install -y nvidia-container-runtime
 
   docker run --rm -it --gpus=all ubuntu:18.04 nvidia-smi
+}
+
+# dotfilesの最低限の設定を実施.
+function _init_dotfiles() {
+  readonly DOT_PARENT_DIR="src/github.com/iimuz"
+
+  sudo apt install -y --no-install-recommends unzip
+  mkdir -p $DOT_PARENT_DIR
+  pushd $DOT_PARENT_DIR
+  git clone https://github.com/iimuz/dotfiles.git
+  pushd dotfiles
+  bash setup.sh
+  popd
+  popd
 }
 
 
@@ -283,12 +299,6 @@ function _instance_change() {
         echo "illegal option -- '$(echo $1 | sed 's/^-*//')'" 1>&2
         exit 1
         ;;
-      * )
-        if [[ ! -z "$1" ]] && [[ ! "$1" =~ ^-+ ]]; then
-          param="$param $1"
-          shift 1
-        fi
-        ;;
     esac
   done
 
@@ -349,12 +359,6 @@ function _instance_create() {
         echo "illegal option -- '$(echo $1 | sed 's/^-*//')'" 1>&2
         exit 1
         ;;
-      * )
-        if [[ ! -z "$1" ]] && [[ ! "$1" =~ ^-+ ]]; then
-          param="$param $1"
-          shift 1
-        fi
-        ;;
     esac
   done
 
@@ -366,7 +370,7 @@ function _instance_create() {
     --network-tier=PREMIUM \
     --no-restart-on-failure \
     --maintenance-policy=TERMINATE \
-    --image=ubuntu-2004-focal-v20201211 \
+    --image=ubuntu-1804-bionic-v20210129 \
     --image-project=ubuntu-os-cloud \
     --boot-disk-size=$disk_size \
     --boot-disk-type=pd-standard \
@@ -454,12 +458,6 @@ function _instance_home() {
         echo "illegal option -- '$(echo $1 | sed 's/^-*//')'" 1>&2
         exit 1
         ;;
-      * )
-        if [[ ! -z "$1" ]] && [[ ! "$1" =~ ^-+ ]]; then
-          param="$param $1"
-          shift 1
-        fi
-        ;;
     esac
   done
 
@@ -522,12 +520,6 @@ function _instance_recreate() {
       "-"* )
         echo "illegal option -- '$(echo $1 | sed 's/^-*//')'" 1>&2
         exit 1
-        ;;
-      * )
-        if [[ ! -z "$1" ]] && [[ ! "$1" =~ ^-+ ]]; then
-          param="$param $1"
-          shift 1
-        fi
         ;;
     esac
   done
