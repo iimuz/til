@@ -14,7 +14,9 @@ Usage:
   $(basename $0) [command] [options]
 
 Commands:
-  help: print this.
+  help:     print this.
+  instance: command related to gce instance.
+  disk:     command related to gce instance disk.
 EOF
 }
 
