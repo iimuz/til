@@ -23,6 +23,10 @@ readonly CONTAINER_UID=${CONTAINER_UID:-$(id -u)}
 readonly CONTAINER_GID=${CONTAINER_GID:-$(id -g)}
 readonly CONTAINER_USER=${CONTAINER_USER:-"$USER"}
 
+# sync settings.
+readonly LOCAL_MLRUNS=${LOCAL_MLRUNS:-"$PROJECT_DIR/mlruns"}
+readonly REMOTE_MLRUNS=${REMOTE_MLRUNS:-"$PROJECT_DIR/mlruns"}
+
 # HELP.
 function _usage() {
   cat <<EOF
@@ -36,6 +40,7 @@ docker:  use docker.
 gc:      garbage collection.
 help:    print this.
 server:  run mlflow tracking server.
+sync:    sync local and remote files.
 ui:      run mlflow tracking ui.
 EOF
 }
@@ -51,6 +56,7 @@ function _docker() {
     "command" ) docker exec -it $CONTAINER_NAME bash $SCRIPT_NAME $SUB_OPTIONS;;
     "daemon" ) _docker_run -d $IMAGE_NAME bash $SCRIPT_NAME $SUB_OPTIONS;;
     "exec" ) docker exec -it $CONTAINER_NAME $SUB_OPTIONS;;
+    "help") _docker_usage;;
     "logs" ) docker logs $SUB_OPTIONS $CONTAINER_NAME;;
     "rm" ) docker rm $CONTAINER_NAME;;
     "rmi" ) docker rmi $IMAGE_NAME;;
@@ -73,6 +79,7 @@ build:   build docker image.
 command: run $SCRIPT_NAME in docker container.
 daemon:  run command in docker daemon.
 exec:    execute command.
+help:    print this.
 logs:    show logs.
 rm:      remove container.
 rmi:     remove iamge.
@@ -132,6 +139,44 @@ function _server() {
   popd
 }
 
+function _sync() {
+  readonly SUB_COMMAND=$1
+  shift
+  readonly SUB_OPTIONS="$@"
+
+  case "$SUB_COMMAND" in
+    "help" ) _sync_usage;;
+    "meta" ) _sync_meta $SUB_OPTIONS;;
+    "upload") _sync_upload $SUB_OPTIONS;;
+  esac
+}
+
+# HELP for sync command.
+function _sync_usage() {
+  cat <<EOF
+$SCRIPT_NAME is a tool for sync mlruns and artifacts.
+
+Usage:
+$SCRIPT_NAME sync [command] [options]
+
+Commands:
+help:   print this.
+meta:   sync local and remote meta.yml.
+upload: upload all files.
+EOF
+}
+
+# sync meta file.
+function _sync_meta() {
+  readonly SYNC_OPTIONS="$@"
+  rsync -ahvz $SYNC_OPTIONS --include='*/' --include='meta.yaml' --exclude='*' $REMOTE_MLRUNS/ $LOCAL_MLRUNS/
+}
+
+function _sync_upload() {
+  readonly SYNC_OPTIONS="$@"
+  rsync -ahvz $SYNC_OPTIONS $LOCAL_MLRUNS/ $REMOTE_MLRUNS/
+}
+
 # Run mlflow tracking ui
 function _ui() {
   readonly SUB_OPTIONS="$@"
@@ -156,6 +201,7 @@ case "$COMMAND" in
   "docker") _docker $OPTIONS;;
   "gc" ) _gc $OPTIONS;;
   "server") _server $OPTIONS;;
+  "sync") _sync $OPTIONS;;
   "ui") _ui $OPTIONS;;
 esac
 
