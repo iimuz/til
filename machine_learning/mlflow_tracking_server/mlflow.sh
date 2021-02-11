@@ -47,13 +47,14 @@ EOF
 
 # Command using docker.
 function _docker() {
-  readonly SUB_COMMAND=$1
+  local readonly SUB_COMMAND=$1
   shift
-  readonly SUB_OPTIONS="$@"
+  local readonly SUB_OPTIONS="$@"
+
 
   case "$SUB_COMMAND" in
     "build" ) _docker_build;;
-    "command" ) docker exec -it $CONTAINER_NAME bash $SCRIPT_NAME $SUB_OPTIONS;;
+    "command" ) _docker_command $SUB_OPTIONS;;
     "daemon" ) _docker_run -d $IMAGE_NAME bash $SCRIPT_NAME $SUB_OPTIONS;;
     "exec" ) docker exec -it $CONTAINER_NAME $SUB_OPTIONS;;
     "help") _docker_usage;;
@@ -100,10 +101,19 @@ function _docker_build() {
   popd
 }
 
+function _docker_command() {
+  local readonly SUB_OPTIONS="$@"
+
+  if [ "$(docker container ls -q -f name=${CONTAINER_NAME})" ]; then
+    docker exec -it $CONTAINER_NAME bash $SCRIPT_NAME $SUB_OPTIONS
+    return
+  fi
+
+  _docker_run -it $IMAGE_NAME bash $SCRIPT_NAME $SUB_OPTIONS
+}
+
 # Run docker container.
 function _docker_run() {
-  readonly WORKSPACE="/workspace"
-
   docker run \
     --rm \
     --name $CONTAINER_NAME \
@@ -118,7 +128,7 @@ function _docker_run() {
 
 # Garbage collection.
 function _gc() {
-  readonly SUB_OPTIONS="$@"
+  local readonly SUB_OPTIONS="$@"
 
   pushd $PROJECT_DIR
   mlflow gc --backend-store-uri=$BACKEND_STORE_URI $SUB_OPTIONS
@@ -127,7 +137,7 @@ function _gc() {
 
 # Run mlflow tracking server.
 function _server() {
-  readonly SUB_OPTIONS="$@"
+  local readonly SUB_OPTIONS="$@"
 
   pushd $PROJECT_DIR
   mlflow server \
@@ -140,9 +150,9 @@ function _server() {
 }
 
 function _sync() {
-  readonly SUB_COMMAND=$1
+  local readonly SUB_COMMAND=$1
   shift
-  readonly SUB_OPTIONS="$@"
+  local readonly SUB_OPTIONS="$@"
 
   case "$SUB_COMMAND" in
     "help" ) _sync_usage;;
@@ -168,18 +178,18 @@ EOF
 
 # sync meta file.
 function _sync_meta() {
-  readonly SYNC_OPTIONS="$@"
+  local readonly SYNC_OPTIONS="$@"
   rsync -ahvz $SYNC_OPTIONS --include='*/' --include='meta.yaml' --exclude='*' $REMOTE_MLRUNS/ $LOCAL_MLRUNS/
 }
 
 function _sync_upload() {
-  readonly SYNC_OPTIONS="$@"
+  local readonly SYNC_OPTIONS="$@"
   rsync -ahvz $SYNC_OPTIONS $LOCAL_MLRUNS/ $REMOTE_MLRUNS/
 }
 
 # Run mlflow tracking ui
 function _ui() {
-  readonly SUB_OPTIONS="$@"
+  local readonly SUB_OPTIONS="$@"
 
   pushd $PROJECT_DIR
   mlflow ui \
