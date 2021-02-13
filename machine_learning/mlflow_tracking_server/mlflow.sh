@@ -27,6 +27,9 @@ readonly CONTAINER_USER=${CONTAINER_USER:-"$USER"}
 readonly LOCAL_MLRUNS=${LOCAL_MLRUNS:-"$PROJECT_DIR/mlruns"}
 readonly REMOTE_MLRUNS=${REMOTE_MLRUNS:-"$PROJECT_DIR/mlruns"}
 
+# glcoud settings.
+readonly GCLOUD_CONFIG=${GCLOUD_CONFIG:-"$HOME/.config/gcloud"}
+
 # HELP.
 function _usage() {
   cat <<EOF
@@ -61,7 +64,7 @@ function _docker() {
     "logs" ) docker logs $SUB_OPTIONS $CONTAINER_NAME;;
     "rm" ) docker rm $CONTAINER_NAME;;
     "rmi" ) docker rmi $IMAGE_NAME;;
-    "run" ) _docker_run -it $IMAGE_NAME bash $SCRIPT_NAME $SUB_OPTIONS;;
+    "run" ) _docker_run -it $IMAGE_NAME $SUB_OPTIONS;;
     "start") docker start $CONTAINER_NAME;;
     "stop") docker stop $CONTAINER_NAME;;
   esac
@@ -114,12 +117,18 @@ function _docker_command() {
 
 # Run docker container.
 function _docker_run() {
+  local gcloud_mount=""
+  if [ -d $GCLOUD_CONFIG ]; then
+    gcloud_mount="--mount=source=$GCLOUD_CONFIG,target=/opt/.config/gcloud,type=bind,consistency=cached"
+  fi
+
   docker run \
     --rm \
     --name $CONTAINER_NAME \
     --env-file=$PROJECT_DIR/.env \
     -e=TZ="Asia/Tokyo" \
     --mount=source=$PROJECT_DIR,target=$PROJECT_DIR,type=bind,consistency=cached \
+    $gcloud_mount \
     -p=127.0.0.1:$PORT:$PORT \
     -w=$PROJECT_DIR \
     --user ${CONTAINER_UID}:${CONTAINER_GID} \
@@ -214,4 +223,3 @@ case "$COMMAND" in
   "sync") _sync $OPTIONS;;
   "ui") _ui $OPTIONS;;
 esac
-
