@@ -36,12 +36,13 @@ Usage:
 $SCRIPT_NAME [command] [options]
 
 Commands:
-docker:  use docker.
-gc:      garbage collection.
-help:    print this.
-server:  run mlflow tracking server.
-sync:    sync local and remote files.
-ui:      run mlflow tracking ui.
+docker:      use docker.
+experiments: run mlflow experiments command.
+gc:          garbage collection.
+help:        print this.
+server:      run mlflow tracking server.
+sync:        sync local and remote files.
+ui:          run mlflow tracking ui.
 EOF
 }
 
@@ -124,6 +125,14 @@ function _docker_run() {
     -w=$PROJECT_DIR \
     --user ${CONTAINER_UID}:${CONTAINER_GID} \
     $@
+}
+
+function _experiments() {
+  local readonly SUB_OPTIONS="$@"
+
+  pushd $PROJECT_DIR
+  mlflow experiments $SUB_OPTIONS
+  popd
 }
 
 # Garbage collection.
@@ -213,5 +222,6 @@ case "$COMMAND" in
   "server") _server $OPTIONS;;
   "sync") _sync $OPTIONS;;
   "ui") _ui $OPTIONS;;
+  "experiments") _experiments $OPTIONS;;
 esac
 
