@@ -25,7 +25,9 @@ readonly CONTAINER_USER=${CONTAINER_USER:-"$USER"}
 
 # sync settings.
 readonly LOCAL_MLRUNS=${LOCAL_MLRUNS:-"$PROJECT_DIR/mlruns"}
+readonly LOCAL_ARTIFACTS=${LOCAL_ARTIFACTS:-"$PROJECT_DIR/artifacts"}
 readonly REMOTE_MLRUNS=${REMOTE_MLRUNS:-"$PROJECT_DIR/mlruns"}
+readonly REMOTE_ARTIFACTS=${REMOTE_ARTIFACTS:-"$PROJECT_DIR/artifacts"}
 
 # HELP.
 function _usage() {
@@ -155,6 +157,7 @@ function _sync() {
   local readonly SUB_OPTIONS="$@"
 
   case "$SUB_COMMAND" in
+    "delete" ) _sync_delete $SUB_OPTIONS;;
     "help" ) _sync_usage;;
     "meta" ) _sync_meta $SUB_OPTIONS;;
     "upload") _sync_upload $SUB_OPTIONS;;
@@ -170,21 +173,29 @@ Usage:
 $SCRIPT_NAME sync [command] [options]
 
 Commands:
+delete: delete files from local.
 help:   print this.
 meta:   sync local and remote meta.yml.
 upload: upload all files.
 EOF
 }
 
+function _sync_delete() {
+  local readonly SYNC_OPTIONS="$@"
+  rsync -ahvz --delete $SYNC_OPTIONS $REMOTE_MLRUNS/ $LOCAL_MLRUNS/
+  rsync -ahvz --delete $SYNC_OPTIONS $REMOTE_ARTIFACTS/ $LOCAL_ARTIFACTS/
+}
+
 # sync meta file.
 function _sync_meta() {
   local readonly SYNC_OPTIONS="$@"
-  rsync -ahvz $SYNC_OPTIONS --include='*/' --include='meta.yaml' --exclude='*' $REMOTE_MLRUNS/ $LOCAL_MLRUNS/
+  rsync -ahuvz $SYNC_OPTIONS --include='*/' --include='meta.yaml' --exclude='*' $REMOTE_MLRUNS/ $LOCAL_MLRUNS/
 }
 
 function _sync_upload() {
   local readonly SYNC_OPTIONS="$@"
-  rsync -ahvz $SYNC_OPTIONS $LOCAL_MLRUNS/ $REMOTE_MLRUNS/
+  rsync -ahuvz $SYNC_OPTIONS $LOCAL_MLRUNS/ $REMOTE_MLRUNS/
+  rsync -ahuvz $SYNC_OPTIONS $LOCAL_ARTIFACTS/ $REMOTE_ARTIFACTS/
 }
 
 # Run mlflow tracking ui
