@@ -42,26 +42,27 @@ $SCRIPT_NAME [command] [options]
 
 Commands:
 docker:      use docker.
-  build:   build docker image.
-  command: run $SCRIPT_NAME in docker container.
-  daemon:  run command in docker daemon.
-  exec:    execute command.
-  help:    print this.
-  logs:    show logs.
-  rm:      remove container.
-  rmi:     remove iamge.
-  run:     run command in docker container.
-  start:   start container.
-  stop:    stop container.
+  build:     build docker image.
+  command:   run $SCRIPT_NAME in docker container.
+  daemon:    run command in docker daemon.
+  exec:      execute command.
+  help:      print this.
+  logs:      show logs.
+  rm:        remove container.
+  rmi:       remove iamge.
+  run:       run command in docker container.
+  start:     start container.
+  stop:      stop container.
 experiments: run mlflow experiments command.
 gc:          garbage collection.
+gcs:         google cloud storage.
 help:        print this.
 server:      run mlflow tracking server.
 sync:        sync local and remote files.
-  delete: delete files from local.
-  help:   print this.
-  meta:   sync local and remote meta.yml.
-  upload: upload all files.
+  delete:    delete files from local.
+  help:      print this.
+  meta:      sync local and remote meta.yml.
+  upload:    upload all files.
 ui:          run mlflow tracking ui.
 EOF
 }
