@@ -31,6 +31,7 @@ readonly REMOTE_ARTIFACTS=${REMOTE_ARTIFACTS:-"$PROJECT_DIR/artifacts"}
 
 # glcoud settings.
 readonly GCLOUD_CONFIG=${GCLOUD_CONFIG:-"$HOME/.config/gcloud"}
+readonly GCS_BUCKET_NAME=${GCS_BUCKET_NAME:-""}
 
 # HELP.
 function _usage() {
@@ -56,6 +57,10 @@ docker:      use docker.
 experiments: run mlflow experiments command.
 gc:          garbage collection.
 gcs:         google cloud storage.
+  clone:     clone mlruns from gcs.
+  delete:    delete files in gcs.
+  mirror:    delete files in local.
+  upload:    upload mlruns to gcs.
 help:        print this.
 server:      run mlflow tracking server.
 sync:        sync local and remote files.
@@ -148,6 +153,45 @@ function _gc() {
   popd
 }
 
+# Google Cloud Storage.
+function _gcs() {
+  local readonly SUB_COMMAND=$1
+  shift
+  local readonly SUB_OPTIONS="$@"
+
+
+  case "$SUB_COMMAND" in
+    "clone" ) _gcs_clone $SUB_OPTIONS;;
+    "delete" ) _gcs_delete;;
+    "mirror" ) _gcs_mirror;;
+    "upload" ) _gcs_upload;;
+  esac
+}
+
+# clone mlruns from gcs.
+function _gcs_clone() {
+  local readonly GCS_MLRUNS=gs://$GCS_BUCKET_NAME/$BACKEND_STORE_URI
+  gsutil -m rsync -Jr $@ $GCS_MLRUNS $LOCAL_MLRUNS
+}
+
+# delete files in gcs.
+function _gcs_delete() {
+  local readonly GCS_MLRUNS=gs://$GCS_BUCKET_NAME/$BACKEND_STORE_URI
+  gsutil -m rsync -dJr $@ $LOCAL_MLRUNS $GCS_MLRUNS
+}
+
+# delete files in local.
+function _gcs_mirror() {
+  local readonly GCS_MLRUNS=gs://$GCS_BUCKET_NAME/$BACKEND_STORE_URI
+  gsutil -m rsync -dJr $@ $GCS_MLRUNS $LOCAL_MLRUNS
+}
+
+# upload files to gcs.
+function _gcs_upload() {
+  local readonly GCS_MLRUNS=gs://$GCS_BUCKET_NAME/$BACKEND_STORE_URI
+  gsutil -m rsync -Jr $@ $LOCAL_MLRUNS $GCS_MLRUNS
+}
+
 # Run mlflow tracking server.
 function _server() {
   local readonly SUB_OPTIONS="$@"
@@ -216,6 +260,7 @@ case "$COMMAND" in
   "help" ) _usage;;
   "docker") _docker $OPTIONS;;
   "gc" ) _gc $OPTIONS;;
+  "gcs" ) _gcs $OPTIONS;;
   "server") _server $OPTIONS;;
   "sync") _sync $OPTIONS;;
   "ui") _ui $OPTIONS;;
