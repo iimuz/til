@@ -31,6 +31,7 @@ readonly REMOTE_ARTIFACTS=${REMOTE_ARTIFACTS:-"$PROJECT_DIR/artifacts"}
 
 # glcoud settings.
 readonly GCLOUD_CONFIG=${GCLOUD_CONFIG:-"$HOME/.config/gcloud"}
+readonly GCS_BUCKET_NAME=${GCS_BUCKET_NAME:-""}
 
 # HELP.
 function _usage() {
@@ -42,11 +43,31 @@ $SCRIPT_NAME [command] [options]
 
 Commands:
 docker:      use docker.
+  build:     build docker image.
+  command:   run $SCRIPT_NAME in docker container.
+  daemon:    run command in docker daemon.
+  exec:      execute command.
+  help:      print this.
+  logs:      show logs.
+  rm:        remove container.
+  rmi:       remove iamge.
+  run:       run command in docker container.
+  start:     start container.
+  stop:      stop container.
 experiments: run mlflow experiments command.
 gc:          garbage collection.
+gcs:         google cloud storage.
+  clone:     clone mlruns from gcs.
+  delete:    delete files in gcs.
+  mirror:    delete files in local.
+  upload:    upload mlruns to gcs.
 help:        print this.
 server:      run mlflow tracking server.
 sync:        sync local and remote files.
+  delete:    delete files from local.
+  help:      print this.
+  meta:      sync local and remote meta.yml.
+  upload:    upload all files.
 ui:          run mlflow tracking ui.
 EOF
 }
@@ -63,7 +84,7 @@ function _docker() {
     "command" ) _docker_command $SUB_OPTIONS;;
     "daemon" ) _docker_run -d $IMAGE_NAME bash $SCRIPT_NAME $SUB_OPTIONS;;
     "exec" ) docker exec -it $CONTAINER_NAME $SUB_OPTIONS;;
-    "help") _docker_usage;;
+    "help") _usage;;
     "logs" ) docker logs $SUB_OPTIONS $CONTAINER_NAME;;
     "rm" ) docker rm $CONTAINER_NAME;;
     "rmi" ) docker rmi $IMAGE_NAME;;
@@ -71,29 +92,6 @@ function _docker() {
     "start") docker start $CONTAINER_NAME;;
     "stop") docker stop $CONTAINER_NAME;;
   esac
-}
-
-# HELP for command using docker.
-function _docker_usage() {
-  cat <<EOF
-$SCRIPT_NAME is a tool for mlflow using docker.
-
-Usage:
-$SCRIPT_NAME docker [command] [options]
-
-Commands:
-build:   build docker image.
-command: run $SCRIPT_NAME in docker container.
-daemon:  run command in docker daemon.
-exec:    execute command.
-help:    print this.
-logs:    show logs.
-rm:      remove container.
-rmi:     remove iamge.
-run:     run command in docker container.
-start:   start container.
-stop:    stop container.
-EOF
 }
 
 # Build docker image.
@@ -155,6 +153,45 @@ function _gc() {
   popd
 }
 
+# Google Cloud Storage.
+function _gcs() {
+  local readonly SUB_COMMAND=$1
+  shift
+  local readonly SUB_OPTIONS="$@"
+
+
+  case "$SUB_COMMAND" in
+    "clone" ) _gcs_clone $SUB_OPTIONS;;
+    "delete" ) _gcs_delete;;
+    "mirror" ) _gcs_mirror;;
+    "upload" ) _gcs_upload;;
+  esac
+}
+
+# clone mlruns from gcs.
+function _gcs_clone() {
+  local readonly GCS_MLRUNS=gs://$GCS_BUCKET_NAME/$BACKEND_STORE_URI
+  gsutil -m rsync -Jr $@ $GCS_MLRUNS $LOCAL_MLRUNS
+}
+
+# delete files in gcs.
+function _gcs_delete() {
+  local readonly GCS_MLRUNS=gs://$GCS_BUCKET_NAME/$BACKEND_STORE_URI
+  gsutil -m rsync -dJr $@ $LOCAL_MLRUNS $GCS_MLRUNS
+}
+
+# delete files in local.
+function _gcs_mirror() {
+  local readonly GCS_MLRUNS=gs://$GCS_BUCKET_NAME/$BACKEND_STORE_URI
+  gsutil -m rsync -dJr $@ $GCS_MLRUNS $LOCAL_MLRUNS
+}
+
+# upload files to gcs.
+function _gcs_upload() {
+  local readonly GCS_MLRUNS=gs://$GCS_BUCKET_NAME/$BACKEND_STORE_URI
+  gsutil -m rsync -Jr $@ $LOCAL_MLRUNS $GCS_MLRUNS
+}
+
 # Run mlflow tracking server.
 function _server() {
   local readonly SUB_OPTIONS="$@"
@@ -176,26 +213,10 @@ function _sync() {
 
   case "$SUB_COMMAND" in
     "delete" ) _sync_delete $SUB_OPTIONS;;
-    "help" ) _sync_usage;;
+    "help" ) _usage;;
     "meta" ) _sync_meta $SUB_OPTIONS;;
     "upload") _sync_upload $SUB_OPTIONS;;
   esac
-}
-
-# HELP for sync command.
-function _sync_usage() {
-  cat <<EOF
-$SCRIPT_NAME is a tool for sync mlruns and artifacts.
-
-Usage:
-$SCRIPT_NAME sync [command] [options]
-
-Commands:
-delete: delete files from local.
-help:   print this.
-meta:   sync local and remote meta.yml.
-upload: upload all files.
-EOF
 }
 
 function _sync_delete() {
@@ -239,6 +260,7 @@ case "$COMMAND" in
   "help" ) _usage;;
   "docker") _docker $OPTIONS;;
   "gc" ) _gc $OPTIONS;;
+  "gcs" ) _gcs $OPTIONS;;
   "server") _server $OPTIONS;;
   "sync") _sync $OPTIONS;;
   "ui") _ui $OPTIONS;;
