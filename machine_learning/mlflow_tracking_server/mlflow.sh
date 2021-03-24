@@ -224,6 +224,7 @@ function _sync() {
 
   case "$SUB_COMMAND" in
     "delete" ) _sync_delete $SUB_OPTIONS;;
+    "download" ) _sync_download $SUB_OPTIONS;;
     "help" ) _usage;;
     "meta" ) _sync_meta $SUB_OPTIONS;;
     "upload") _sync_upload $SUB_OPTIONS;;
@@ -234,6 +235,12 @@ function _sync_delete() {
   local readonly SYNC_OPTIONS="$@"
   rsync -ahvz --delete $SYNC_OPTIONS $REMOTE_MLRUNS/ $LOCAL_MLRUNS/
   rsync -ahvz --delete $SYNC_OPTIONS $REMOTE_ARTIFACTS/ $LOCAL_ARTIFACTS/
+}
+
+function _sync_download() {
+  local readonly SYNC_OPTIONS="$@"
+  rsync -ahuvz $SYNC_OPTIONS $REMOTE_MLRUNS/ $LOCAL_MLRUNS/
+  rsync -ahuvz $SYNC_OPTIONS $REMOTE_ARTIFACTS/ $LOCAL_ARTIFACTS/
 }
 
 # sync meta file.
