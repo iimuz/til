@@ -15,7 +15,8 @@ _logger = logging.getLogger(__name__)
 
 def main() -> None:
     """mlrunsをファイルベースで管理している場合に、meta.yamlのartifact_locationを指定したartifact_storeに変更する."""
-    dir_mlruns = pathlib.Path(os.environ.get("LOCAL_MLRUNS", "./mlruns")).resolve()
+    backend_store_uri = os.environ.get("BACKEND_STORE_URI", "file:./mlruns")
+    dir_mlruns = pathlib.Path(backend_store_uri.split(":")[1]).resolve()
     old_artifact_store = os.environ.get("OLD_ARTIFACT_STORE", "./artifacts")
     new_artifact_store = os.environ.get(
         "ARTIFACT_STORE", str(pathlib.Path("./artifacts").resolve())
