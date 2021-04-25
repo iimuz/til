@@ -123,6 +123,15 @@ function _docker_run() {
     gcloud_mount="--mount=source=$GCLOUD_CONFIG,target=/opt/.config/gcloud,type=bind,consistency=cached"
   fi
 
+  local mlruns_mount=""
+  if [ -d $LOCAL_MLRUNS ]; then
+    mlruns_mount="--mount=source=$LOCAL_MLRUNS,target=/mlflow/mlruns,type=bind,consistency=cached"
+  fi
+  local artifacts_mount=""
+  if [ -d $LOCAL_ARTIFACTS ]; then
+    artifacts_mount="--mount=source=$LOCAL_ARTIFACTS,target=/mlflow/artifacts,type=bind,consistency=cached"
+  fi
+
   docker run \
     --rm \
     --name $CONTAINER_NAME \
@@ -130,6 +139,8 @@ function _docker_run() {
     -e=TZ="Asia/Tokyo" \
     --mount=source=$PROJECT_DIR,target=$PROJECT_DIR,type=bind,consistency=cached \
     $gcloud_mount \
+    $mlruns_mount \
+    $artifacts_mount \
     -p=127.0.0.1:$PORT:$PORT \
     -w=$PROJECT_DIR \
     --user ${CONTAINER_UID}:${CONTAINER_GID} \
@@ -213,6 +224,7 @@ function _sync() {
 
   case "$SUB_COMMAND" in
     "delete" ) _sync_delete $SUB_OPTIONS;;
+    "download" ) _sync_download $SUB_OPTIONS;;
     "help" ) _usage;;
     "meta" ) _sync_meta $SUB_OPTIONS;;
     "upload") _sync_upload $SUB_OPTIONS;;
@@ -223,6 +235,12 @@ function _sync_delete() {
   local readonly SYNC_OPTIONS="$@"
   rsync -ahvz --delete $SYNC_OPTIONS $REMOTE_MLRUNS/ $LOCAL_MLRUNS/
   rsync -ahvz --delete $SYNC_OPTIONS $REMOTE_ARTIFACTS/ $LOCAL_ARTIFACTS/
+}
+
+function _sync_download() {
+  local readonly SYNC_OPTIONS="$@"
+  rsync -ahuvz $SYNC_OPTIONS $REMOTE_MLRUNS/ $LOCAL_MLRUNS/
+  rsync -ahuvz $SYNC_OPTIONS $REMOTE_ARTIFACTS/ $LOCAL_ARTIFACTS/
 }
 
 # sync meta file.
