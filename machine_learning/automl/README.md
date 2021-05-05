@@ -8,6 +8,7 @@ AutoML ライブラリを利用した機械学習モデルの作成サンプル�
 | :--------------------- | :---------------- | :----------------------------------------------------- |
 | None                   | [PCoE No.6][pcoe] | [pcoe06_turbofun.ipynb][nb_pcoe06]                     |
 | [AutoGluon][autogluon] | [PCoE No.6][pcoe] | [autogluon_pcoe06_turbofan.ipynb][nb_autogluon_pcoe06] |
+| [PyCaret][pycaret]     | [PCoE No.6][pcoe] | [pycaret_pcoe06_turbofan.ipynb][nb_pycaret_pcoe06]     |
 | [TPOT][tpot]           | [PCoE No.6][pcoe] | [tpot_pcoe06_turbofan.ipynb][nb_tpot_pcoe06]           |
 
 各ライブラリに関する簡単な比較表を下記に記載します。
@@ -25,5 +26,7 @@ AutoML ライブラリを利用した機械学習モデルの作成サンプル�
 [nb_autogluon_pcoe06]: autogluon_pcoe06_turbofan.ipynb
 [nb_pcoe06]: pcoe06_turbofun.ipynb
 [nb_tpot_pcoe06]: tpot_pcoe06_turbofan.ipynb
+[nb_pycaret_pcoe06]: pycaret_pcoe06_turbofan.ipynb
 [pcoe]: https://ti.arc.nasa.gov/tech/dash/groups/pcoe/prognostic-data-repository/
+[pycaret]: https://pycaret.readthedocs.io/en/latest/index.html
 [tpot]: http://epistasislab.github.io/tpot/
