@@ -14,12 +14,14 @@ AutoML ライブラリを利用した機械学習モデルの作成サンプル�
 各ライブラリに関する簡単な比較表を下記に記載します。
 簡単に調べた範囲なので、間違っていること、抜けている可能性はあります。
 
-| ライブラリ | Classification | Regression | 対象アルゴリズムの例  | feature importance |
-| :--------- | :------------: | :--------: | :-------------------- | :----------------: |
-| AutoGluon  |       o        |     o      | sklearn, LightGBM, NN |         o          |
-| TPOT       |       o        |     o      | sklearn, XGBoost, NN  |         o          |
+| ライブラリ | Classification | Regression | Clustering | Anomaly Detection | 対象アルゴリズムの例       | feature importance |
+| :--------- | :------------: | :--------: | :--------- | :---------------: | -------------------------- | ------------------ |
+| AutoGluon  |       o        |     o      | x          |         x         | sklearn, LightGBM, NN      | o                  |
+| PyCaret    |       o        |     o      | o          |         o         | sklearn, LightGBM, XGBoost | △(Tree 系のみ)     |
+| TPOT       |       o        |     o      | x          |         x         | sklearn, XGBoost, NN       | o                  |
 
 - AutoGluon: sklearn, LightGBM, NN などのモデルの最適化を実行する。
+- PyCaret: sklearn, LightGBM, XGBoost などのモデルを最適化する。Clustering と Anomaly Detection にも対応している。
 - TPOT: sklearn と XGBoost などのモデルを GA(Genetic Algorithm)を用いて最適化する。
 
 [autogluon]: https://auto.gluon.ai/stable/index.html
