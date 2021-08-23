@@ -8,7 +8,7 @@ black = "==19.10b0"
 flake8 = "==3.7.9"
 mypy = "==0.740"
 jupyter = "==1.0.0"
-jupyterlab = "==1.2.1"
+jupyterlab = "==1.2.21"
 jupytext = "==1.2.4"
 
 [packages]
