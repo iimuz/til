@@ -21,4 +21,8 @@ module.exports = {
       filename: "html/index.html"
     })
   ],
+  devServer: {
+    static: "dist/html",
+    open: false,
+  }
 };
