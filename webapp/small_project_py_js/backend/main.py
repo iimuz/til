@@ -1,4 +1,3 @@
-import flask
 from flask import Flask
 
 app = Flask(
@@ -20,7 +19,7 @@ def sample(path: str):
     return app.send_static_file("html/sample.html")
 
 
-@app.route("/hello")
+@app.route("/hello", methods=["GET"])
 def hello():
     return "hello"
 
