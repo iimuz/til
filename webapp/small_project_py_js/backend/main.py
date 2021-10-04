@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import request, Flask
 
 app = Flask(
     __name__,
@@ -21,7 +21,8 @@ def sample(path: str):
 
 @app.route("/hello", methods=["GET"])
 def hello():
-    return "hello"
+    query_string = request.query_string.decode()
+    return "hello&" + query_string
 
 
 if __name__ == "__main__":
