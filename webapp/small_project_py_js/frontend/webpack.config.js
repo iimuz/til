@@ -4,6 +4,10 @@ const HtmlWebpackPlugin = require("html-webpack-plugin")
 module.exports = {
   mode: 'development',
   entry: './src/main.ts',
+  output: {
+    path: path.resolve(__dirname, "dist"),
+    publicPath: "dist",
+  },
   module: {
     rules: [
       {
@@ -18,7 +22,15 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, "src", "html", "index.html"),
-      filename: "html/index.html"
+      filename: "html/index.html",
+      inject: "head",
+      hash: true,
+    }),
+    new HtmlWebpackPlugin({
+      template: path.resolve(__dirname, "src", "html", "sample.html"),
+      filename: "html/sample.html",
+      inject: "head",
+      hash: true,
     })
   ],
   devServer: {

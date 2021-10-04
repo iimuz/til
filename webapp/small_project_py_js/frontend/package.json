@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "webpack",
+    "build": "webpack --mode development",
+    "build:prod": "webpack --mode production",
     "watch": "webpack -w",
     "start": "webpack serve",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -19,5 +20,6 @@
     "webpack": "^5.52.1",
     "webpack-cli": "^4.8.0",
     "webpack-dev-server": "^4.3.0"
-  }
+  },
+  "dependencies": {}
 }
