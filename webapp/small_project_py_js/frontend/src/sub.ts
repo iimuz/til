@@ -1,13 +1,6 @@
-export const hello = (message: string): void => {
-  // log(message);
+export const hello = (): void => {
   get_message()
 };
-
-function log(message: string): void {
-  document.body.innerHTML = `${message}`;
-
-  console.log(`output ${message}`);
-}
 
 function get_message(): void {
   document.getElementById("button").addEventListener("click", loadMessage);
