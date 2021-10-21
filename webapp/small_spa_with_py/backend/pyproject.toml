@@ -6,6 +6,8 @@ authors = []
 
 [tool.poetry.dependencies]
 python = "^3.8"
+fastapi = "^0.70.0"
+uvicorn = {extras = ["starndard"], version = "^0.15.0"}
 
 [tool.poetry.dev-dependencies]
 black = "^21.9b0"
