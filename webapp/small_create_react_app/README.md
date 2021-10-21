@@ -9,6 +9,21 @@ $ node --version
 
 # 環境構築
 $ npx create-react-app ../small_create_react_app
+
+# 開発関連のパッケージをdevDependenciesに移動
+# dependenciesに"react", "react-dom"のみ残す。
+$ npm ls --prod
+small_create_react_app@0.1.0 /path/to/small_create_react_app
+├─┬ react@17.0.2
+│ ├─┬ loose-envify@1.4.0
+│ │ └── js-tokens@4.0.0
+│ └── object-assign@4.1.1
+└─┬ react-dom@17.0.2
+  ├── loose-envify@1.4.0 deduped
+  ├── object-assign@4.1.1 deduped
+  └─┬ scheduler@0.20.2
+    ├── loose-envify@1.4.0 deduped
+    └── object-assign@4.1.1 deduped
 ```
 
 ## Available Scripts
