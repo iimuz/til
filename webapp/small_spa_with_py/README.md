@@ -14,4 +14,13 @@ React と FastAPI を利用して小型の SPA アプリケーションを作成
 
 ## backend
 
+- `poetry run uvicorn main::app --reload`: start server
+  - `localhost:8000/docs`: swagger ui を利用した api ドキュメントの確認
+  - `localhost:8000/redoc`: redoc を利用した api ドキュメントの確認
+- [静的ファイルを配信][static-files]するため aiofiles を追加
+  - [FileResponse を利用してルートで html を返す][fastapi130]
+
+[fastapi130]: https://github.com/tiangolo/fastapi/issues/130
+[static-files]: https://fastapi.tiangolo.com/ja/tutorial/static-files/
+
 ## 参考資料
