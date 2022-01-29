@@ -1,5 +1,3 @@
-module plot_sin
-
 import Pkg
 Pkg.add("Plots")
 
@@ -8,5 +6,3 @@ Pkg.add("Plots")
 using Plots
 
 plot(sin)
-
-end  # module
