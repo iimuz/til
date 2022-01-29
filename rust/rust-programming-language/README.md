@@ -135,6 +135,12 @@
     関連関数は、 `String::from` のように利用し、コンストラクタに利用されることが多い。
   - `impl` ブロックは複数に分けることも可能である。
 
+## Chap.06
+
+- [defining an enum](defining-an-enum)
+  - enum が定義できる。
+  - enum に直接データを付与することもできる。
+
 ## Tips
 
 ### Blocking waiting for file lock on package cache
