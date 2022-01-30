@@ -23,3 +23,20 @@ Pkg モードで下記のコマンドで仮想環境を作成することがで�
   import Pkg
   Pkg.status()
   ```
+
+- jupyter notebook -> .jl については、 [Weave.jl][weave.jl]を利用すると変換できる。
+  - 変換のサンプルコードは、[convert_to_jl.jl](src/convert_to_jl.jl)にある。
+- .jl -> jupyter notebook についても Wave.jl で変換可能。
+  VSCode の python で利用可能な interactive モードと同様に、`# %%`の部分でセルを分割できる。
+  ただし、マークダウンを書かない場合、 `#+` を書いておかないと、すべてマークダウンセルが直前に付与される。
+  したがって、単純にコードセルを作成したいときは、コメントとして下記の 2 行を付与すればよい。
+
+  ```jl
+  # %%
+  #+
+  hogehoge
+  ```
+
+- weave.jl 自体は、大雑把に分類すると markdown, tex, pandoc, html, restructuredtext, pdf, asciidoc あたりに変換できる。
+
+[weave.jl]: https://github.com/JunoLab/Weave.jl
