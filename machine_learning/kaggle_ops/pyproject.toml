@@ -13,7 +13,7 @@ pytorch-lightning = "^1.1.5"
 pandas = "1.1.5"
 python-dotenv = "^0.15.0"
 torchinfo = "^1.4.4"
-mlflow = "^1.13.1"
+mlflow = "^1.23.1"
 PyYAML = "^5.4.1"
 
 [tool.poetry.dev-dependencies]
