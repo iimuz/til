@@ -1,1 +1,0 @@
-# speech-recognition-api-sample

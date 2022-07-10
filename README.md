@@ -4,13 +4,10 @@ Today I Learn.
 
 簡単なサンプルコードなどを持つリポジトリです。
 サンプルコードの説明は、各サブフォルダにある README.md を参照してください。
-サブフォルダの簡易説明は下記のようになります。
+単純な Tips のようなメモは Scrapbook に記載しています。
+そのため、リンク先が本リポジトリではなく Scrapbook になっているケースがあります。
 
-- bash: bash 関連のサンプルコードです。
-- cpp: c++ のサンプルコードです。
-- gcp: Google cloud platform のサンプルコードやスクリプトです。
-- javascript: html/css/javascript に関係するサンプルコードです。
-- markdown: markdown に関するサンプルコードです。
-- python: python に関するサンプルコードです。
-- r: R に関するサンプルコードです。
-- sql: SQL に関するサンプルコードです。
+## Summary
+
+- [bash tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20220702144802/)
+- [GCP Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20220702151015/)

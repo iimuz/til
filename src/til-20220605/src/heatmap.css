@@ -1,0 +1,59 @@
+.header {
+	display: flex;
+}
+
+.leadingHeader {
+	display: flex;
+	width: 100px;
+	justify-content: center;
+	align-items: center;
+	font-size: 24px;
+}
+
+.headerItem {
+  display: flex;
+  flex: 1;
+  height: 50px;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  color: rgb(153,153,153);
+  background: var(--color-light-gray);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  height: 50px;
+}
+
+.leadingRow {
+  display: flex;
+  width: 100px;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-dark-blue);
+  color: black;
+  font-weight: 600;
+}
+
+.leadingRow:hover {
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.cell {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  flex: 1;
+  justify-items: center;
+  align-items: center;
+  color: white;
+  font-weight: 900;
+}
+
+.cell:hover {
+  opacity: 0.6;
+  cursor: pointer;
+}

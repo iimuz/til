@@ -1,8 +1,0 @@
-base_image_path: "_data/hoge000.png"
-diff_image_list:
-  - "_data/hoge001.png"
-  - "_data/hoge002.png"
-  - "_data/hoge003.png"
-  - "_data/hoge004.png"
-  - "_data/hoge005.png"
-output_image_path: "_data/hoge_overlap.png"

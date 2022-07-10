@@ -1,9 +1,0 @@
-version: "3.7"
-services:
-  dev:
-    image: tensorflow/tensorflow:1.13.2-py3
-    volumes:
-      - .:/workspace:ro
-    working_dir: /workspace
-    command: python hello.py
-

@@ -1,0 +1,37 @@
+{
+  "name": "til-20220604",
+  "version": "1.0.0",
+  "description": "minimal webpack + typescript + react",
+  "scripts": {
+    "build": "webpack --mode=development",
+    "format": "prettier --write src/",
+    "lint": "eslint --ext .jsx,.js,.tsx,.ts src/",
+    "production": "webpack --mode=production",
+    "start": "webpack-dev-server --mode=developemnt"
+  },
+  "author": "iimuz",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^17.0.39",
+    "@types/react": "^18.0.11",
+    "@types/react-dom": "^18.0.5",
+    "@typescript-eslint/eslint-plugin": "^5.27.0",
+    "@typescript-eslint/parser": "^5.27.0",
+    "eslint": "^8.17.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-react-app": "^7.0.1",
+    "eslint-plugin-import": "^2.26.0",
+    "html-webpack-plugin": "^5.5.0",
+    "prettier": "^2.6.2",
+    "ts-loader": "^9.3.0",
+    "typescript": "^4.7.3",
+    "webpack": "^5.73.0",
+    "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "^4.9.1"
+  },
+  "dependencies": {
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0"
+  },
+  "private": true
+}

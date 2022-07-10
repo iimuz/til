@@ -1,6 +1,0 @@
-artifacts/*
-!artifacts/.gitkeep
-
-mlruns/*
-!mlruns/.gitkeep
-
