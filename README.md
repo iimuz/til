@@ -11,3 +11,8 @@ Today I Learn.
 
 - [bash tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20220702144802/)
 - [GCP Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20220702151015/)
+- Javascript, Typescript
+  - [til-20220604](/src/til-20220604/): minimal webpack + react.js + typescript
+  - [til-20220605](/src/til-20220605/): react.js + heatmap
+- Python
+  - [til-20220608](/src/til-20220608/): minimal python
