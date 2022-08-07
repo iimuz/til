@@ -1,0 +1,22 @@
+{
+  "editor.detectIndentation": true,
+  "workbench.colorCustomizations": {
+    "titleBar.border": "#ffffff"
+  },
+  // python
+  "autoDocstring.docstringFormat": "numpy",
+  "python.formatting.provider": "black",
+  "python.languageServer": "Pylance",
+  "python.linting.enabled": true,
+  "python.linting.flake8Enabled": true,
+  "python.linting.lintOnSave": true,
+  "python.linting.mypyEnabled": true,
+  "python.linting.pycodestyleEnabled": false,
+  "python.linting.pylintEnabled": false,
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.python",
+    "editor.formatOnSave": true,
+    "editor.insertSpaces": true,
+    "editor.tabSize": 4
+  }
+}

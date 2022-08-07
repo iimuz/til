@@ -14,5 +14,7 @@ Today I Learn.
 - Javascript, Typescript
   - [til-20220604](/src/til-20220604/): minimal webpack + react.js + typescript
   - [til-20220605](/src/til-20220605/): react.js + heatmap
+  - [til-20220801](/src/til-20220801/): frontend: react.js + vega-lite, backend: python + fastapi + altair
 - Python
   - [til-20220608](/src/til-20220608/): minimal python
+  - [til-20220801](/src/til-20220801/): frontend: typescript + react.js + vega-lite, backend: fastapi + altair

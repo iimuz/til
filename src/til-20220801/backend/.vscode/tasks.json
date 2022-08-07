@@ -1,0 +1,21 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "python run current file.",
+      "type": "shell",
+      "command": "${command:python.interpreterPath}",
+      "args": ["${relativeFile}"],
+      "options": { "env": { "PYTHONPATH": "${workspaceFolder}" } },
+      "problemMatcher": []
+    },
+    {
+      "label": "run fastapi server.",
+      "type": "shell",
+      "command": "${command:python.interpreterPath}",
+      "args": ["-m", "uvicorn", "src.main:app", "--reload"],
+      "options": { "env": { "PYTHONPATH": "${workspaceFolder}" } },
+      "problemMatcher": []
+    }
+  ]
+}
