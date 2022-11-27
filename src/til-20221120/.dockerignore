@@ -1,0 +1,4 @@
+.mpypy_cache/
+.venv/
+data/
+src/

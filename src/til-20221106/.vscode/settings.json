@@ -1,0 +1,28 @@
+{
+  "editor.detectIndentation": true,
+  "files.associations": { "*.mq4": "cpp" },
+  "workbench.colorCustomizations": {
+    "titleBar.border": "#ffffff"
+  },
+  "C_Cpp.clang_format_style": "{BasedOnStyle: Google}",
+  // c++
+  "[cpp]": {
+    "editor.defaultFormatter": "ms-vscode.cpptools",
+    "editor.formatOnSave": true,
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.rulers": [80],
+  },
+  "[markdown]": {
+    "editor.formatOnSave": true,
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.rulers": [100],
+    // 折り返し有効時には、rulerの位置で折り返す
+    "editor.wordWrap": "wordWrapColumn",
+    "editor.wordWrapColumn": 100,
+    "editor.wrappingIndent": "indent",
+    // 範囲選択 + 'gq' で強制的に折り返す処理をするための設定
+    "vim.textwidth": 100
+  }
+}

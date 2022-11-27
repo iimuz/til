@@ -1,11 +1,18 @@
-# minimal python
+# MT4 csv to DB
 
-python のコードを書くときに利用する最小限の設定です。
-ただし、ここでの対象は実行用スクリプトを開発することを想定しています。
-そのため、下記は対象外です。
+[MT4 の履歴を csv 化するスクリプト](https://github.com/iimuz/til/src/til-20221106/)で出力した csv を DB に取り込むためのスクリプトです。
 
-- pip インストール可能なライブラリ開発
-- pip インストール可能なツール開発
+## 実行方法
+
+下記の手順でデフォルトの引数で実行ができます。
+
+1. `.sample.env` を元に `.env` ファイルを作成
+1. docker compose を利用して実行
+
+   ```sh
+   docker compose build
+   docker compose run --rm -it app
+   ```
 
 ## ファイル構成
 
@@ -18,6 +25,14 @@ python のコードを書くときに利用する最小限の設定です。
 - `.vscode`: VSCode の基本設定を記述します。
 - `.devcontainer`: VSCode Remote Containers の設定を記述します。
 - `src`: 開発するスクリプトを格納します。
+
+## 環境変数
+
+下記の環境変数を利用します。
+
+- `USER_UID`, `USER_GID`: VSCode remote development の docker 環境で利用するユーザ ID とグループ ID。
+- `TIMEZONE_HOURS`: csv から読み込んだ時刻のタイムゾーンを特定するための UTC からの時差。
+  - MT4 の履歴取得ではタイムゾーンを付けた表記になっていないため、タイムゾーンを付与する。ただし、保存時は UTC に補正して保存する。
 
 ## 仮想環境の構築
 
@@ -32,7 +47,7 @@ python -m venv .venv
 # activate virtual env(linux)
 source .venv/bin/activate
 # or (windows)
-source .venv/Scripts/activate.ps1
+.venv/Scripts/activate.ps1
 
 # install packages and freeze version
 pip install -r requirements.txt
@@ -44,7 +59,7 @@ pip install -r requirements-freeze.txt
 
 ## code style
 
-コードの整形などはは下記を利用しています。
+コードの整形などは下記を利用しています。
 
 - [black](https://github.com/psf/black): python code formmater.
 - [flake8](https://github.com/PyCQA/flake8): style checker.

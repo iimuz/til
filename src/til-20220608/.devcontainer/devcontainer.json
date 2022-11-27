@@ -1,0 +1,22 @@
+{
+  "name": "minimal-python",
+  "dockerComposeFile": [
+    "../docker-compose.yml",
+    "docker-compose.extend.yml",
+    "docker-compose.local.yml"
+  ],
+  "workspaceFolder": "${localWorkspaceFolder}",
+  "service": "app",
+  "shutdownAction": "stopCompose",
+  "containerEnv": {},
+  "remoteEnv": {},
+  "extensions": [
+    "alefragnani.bookmarks",
+    "davidanson.vscode-markdownlint",
+    "eamodio.gitlens",
+    "esbenp.prettier-vscode",
+    "ms-python.python",
+    "njpwerner.autodocstring"
+  ],
+  "settings": {}
+}

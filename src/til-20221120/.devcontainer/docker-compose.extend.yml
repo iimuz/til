@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+      args:
+        USERNAME: $USER
+        USER_UID: $USER_UID
+        USER_GID: $USER_GID
+    cap_add:
+      - SYS_PTRACE
+    shm_size: 2GB
+    command: sleep infinity

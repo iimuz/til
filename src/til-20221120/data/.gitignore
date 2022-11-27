@@ -1,0 +1,7 @@
+interim/*
+processed/*
+raw/*
+
+!interim/.gitkeep
+!processed/.gitkeep
+!raw/.gitkeep
