@@ -19,6 +19,20 @@ python のコードを書くときに利用する最小限の設定です。
 - `.devcontainer`: VSCode Remote Containers の設定を記述します。
 - `src`: 開発するスクリプトを格納します。
 
+## 実行方法
+
+コマンドのみを実行できれば良い場合は下記のように実行します。
+
+```sh
+docker compose run --rm -it app
+```
+
+vscode と同様の開発環境で起動する場合は下記のように実行します。
+
+```sh
+docker compose -f docker-compose.yml -f .devcontainer/docker-compose.extend.yml -f .devcontainer/docker-compose.local.yml run --rm -it app
+```
+
 ## 仮想環境の構築
 
 仮想環境の構築には python 標準で付属している venv の利用を想定しています。
@@ -66,7 +80,7 @@ Container 環境にユーザを作成するため環境変数に下記の設定�
 - `USER_GID`: コンテナ内で利用するユーザのグループ ID
 
 リポジトリのコード実行に最低限必要な環境を `Dockerfile`, `docker-compose.yml` で定義しています。そのため、VSCode 用に必要な追加設定については、 `.devcontainer/docker-compose.extend.yml` に記載します。
-また、共通設定ではなく個人設定として、docker 環境にマウントするディレクトリを増やす場合などは、 `.devcontainer/docker-composel.local.yml` を編集します。
+また、共通設定ではなく個人設定として、docker 環境にマウントするディレクトリを増やす場合などは、 `.devcontainer/docker-compose.local.yml` を編集します。
 編集前に git で変更を検知しないように下記の設定を行ってください。下記の設定を行うことで、変更をリポジトリにコミットしないで修正可能になります。
 
 ```sh
@@ -86,3 +100,5 @@ services:
         source: $PWD
         target: $PWD
 ```
+
+python 仮想環境を named volume で用意しています。WSL で実行する場合に、named volume をマウントした位置のホスト側に root 権限で空のフォルダが作成されます。そのため、先に `mkdir .venv` などでフォルダを作成しておくことで root 権限でのフォルダ生成を回避することができます。

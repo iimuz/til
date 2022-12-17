@@ -5,6 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: production
       args:
         USERNAME: $USER
         USER_UID: $USER_UID

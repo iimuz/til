@@ -3,11 +3,31 @@
   "workbench.colorCustomizations": {
     "titleBar.border": "#ffffff"
   },
+  // auto time stamp
+  "lpubsppop01.autoTimeStamp.filenamePattern": ".md",
+  "lpubsppop01.autoTimeStamp.lineLimit": 5,
+  "lpubsppop01.autoTimeStamp.modifiedTimeStart": "lastmod: ",
+  "lpubsppop01.autoTimeStamp.momentFormat": "YYYY-MM-DD",
   // jupyter
   "jupyter.generateSVGPlots": true,
   "notebook.lineNumbers": "on",
   "workbench.editorAssociations": {
     "*.ipynb": "jupyter-notebook"
+  },
+  // markdown
+  "markdown-preview-enhanced.breakOnSingleNewLine": false,
+  "markdown-preview-enhanced.previewTheme": "github-dark.css",
+  "markdown-preview-enhanced.scrollSync": false,
+  "[markdown]": {
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2,
+    "editor.rulers": [100],
+    // 折り返し有効時には、rulerの位置で折り返す
+    "editor.wordWrap": "wordWrapColumn",
+    "editor.wordWrapColumn": 100,
+    "editor.wrappingIndent": "indent",
   },
   // python
   "autoDocstring.docstringFormat": "numpy",
@@ -23,6 +43,7 @@
     "editor.defaultFormatter": "ms-python.python",
     "editor.formatOnSave": true,
     "editor.insertSpaces": true,
-    "editor.tabSize": 4
+    "editor.tabSize": 4,
+    "editor.rulers": [88] // pep8: 79, black: 88
   }
 }
