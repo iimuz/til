@@ -9,7 +9,7 @@ Today I Learn.
 
 ## Summary
 
-- [bash tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20220702144802/)
+- [Bash Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20220702144802/)
 - [GCP Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20220702151015/)
 - [Git Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20221127091453/)
 - Javascript, Typescript
@@ -24,5 +24,7 @@ Today I Learn.
   - [til-20221106](/src/til-20221106/): MT4の取引履歴をcsvで出力するスクリプト。
   - [til-20221120](/src/til-20221120/): [til-20221106](/src/til-20221106/)で出力したcsvをDBに取り込むpythonスクリプト。
 - Python
+  - [PyTorch Tips](scrapbook-20221215132013)
   - [til-20220608](/src/til-20220608/): minimal python
   - [til-20220801](/src/til-20220801/): frontend: typescript + react.js + vega-lite, backend: fastapi + altair
+- [Scoop Tips](scrapbook-20221217120338)
