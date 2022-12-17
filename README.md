@@ -9,6 +9,8 @@ Today I Learn.
 
 ## Summary
 
+- AWS
+  - [til-20221127](/src/til-20221127): AWS Hands-on for Begginers Serverless #1
 - [Bash Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20220702144802/)
 - [GCP Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20220702151015/)
 - [Git Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20221127091453/)
@@ -21,8 +23,8 @@ Today I Learn.
 - Machine Learning
   - [til-20220924](/src/til-20220924/): Stable Diffusion を利用した画像生成例。
 - MetaTrader
-  - [til-20221106](/src/til-20221106/): MT4の取引履歴をcsvで出力するスクリプト。
-  - [til-20221120](/src/til-20221120/): [til-20221106](/src/til-20221106/)で出力したcsvをDBに取り込むpythonスクリプト。
+  - [til-20221106](/src/til-20221106/): MT4 の取引履歴を csv で出力するスクリプト。
+  - [til-20221120](/src/til-20221120/): [til-20221106](/src/til-20221106/)で出力した csv を DB に取り込む python スクリプト。
 - Python
   - [PyTorch Tips](scrapbook-20221215132013)
   - [til-20220608](/src/til-20220608/): minimal python

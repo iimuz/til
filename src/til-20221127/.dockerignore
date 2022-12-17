@@ -1,0 +1,4 @@
+.mypy_cache/
+.venv/
+hands-on-serverless-2/
+sam-app-delete/
