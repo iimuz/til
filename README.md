@@ -26,7 +26,8 @@ Today I Learn.
   - [til-20221106](/src/til-20221106/): MT4 の取引履歴を csv で出力するスクリプト。
   - [til-20221120](/src/til-20221120/): [til-20221106](/src/til-20221106/)で出力した csv を DB に取り込む python スクリプト。
 - Python
-  - [PyTorch Tips](scrapbook-20221215132013)
+  - [Jupyter Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20221219094136/)
+  - [PyTorch Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20221215132013/)
   - [til-20220608](/src/til-20220608/): minimal python
   - [til-20220801](/src/til-20220801/): frontend: typescript + react.js + vega-lite, backend: fastapi + altair
 - [Scoop Tips](scrapbook-20221217120338)
