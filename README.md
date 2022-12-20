@@ -14,6 +14,7 @@ Today I Learn.
 - [Bash Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20220702144802/)
 - [GCP Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20220702151015/)
 - [Git Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20221127091453/)
+- [Homebrew Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20221218142420/)
 - Javascript, Typescript
   - [Javascript Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20220825214534/)
   - [Typescript Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20220825214849/)
