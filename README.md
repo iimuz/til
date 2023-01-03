@@ -12,6 +12,8 @@ Today I Learn.
 - AWS
   - [til-20221127](/src/til-20221127): AWS Hands-on for Begginers Serverless #1
 - [Bash Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20220702144802/)
+  - [til-20190215](/src/til-20190215/): GPUの接続を解除するスクリプト。
+- [Docker Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20230103171358/)
 - [GCP Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20220702151015/)
 - [Git Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20221127091453/)
 - [Homebrew Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20221218142420/)
