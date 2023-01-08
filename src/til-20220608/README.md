@@ -9,15 +9,16 @@ python のコードを書くときに利用する最小限の設定です。
 
 ## ファイル構成
 
-- `.gitignore`: [python 用の gitignore](https://github.com/github/gitignore/blob/main/Python.gitignore) です。
-- `.sample.env`: 環境変数のサンプルを記載します。利用時は `.env` に変更して利用します。
-- `LICENSE`: ライセンスを記載します。 MIT ライセンスを設定しています。
-- `setup.py`/`setup.cfg`: python バージョンなどを明記します。
-- `requirements.txt`: 利用するパッケージを記述します。
-- `README.md`: 本ドキュメントです。
-- `.vscode`: VSCode の基本設定を記述します。
-- `.devcontainer`: VSCode Remote Containers の設定を記述します。
-- `src`: 開発するスクリプトを格納します。
+- フォルダ
+  - `.devcontainer`: VSCode Remote Containers の設定を記述します。
+  - `.vscode`: VSCode の基本設定を記述します。
+  - `src`: 開発するスクリプトを格納します。
+- ファイル
+  - `.gitignore`: [python 用の gitignore](https://github.com/github/gitignore/blob/main/Python.gitignore) です。
+  - `.sample.env`: 環境変数のサンプルを記載します。利用時は `.env` に変更して利用します。
+  - `LICENSE`: ライセンスを記載します。 MIT ライセンスを設定しています。
+  - `pyproject.toml`/`setup.py`/`setup.cfg`: python バージョンなどを明記します。
+  - `README.md`: 本ドキュメントです。
 
 ## 実行方法
 
@@ -48,12 +49,12 @@ source .venv/bin/activate
 # or (windows)
 source .venv/Scripts/activate.ps1
 
-# install packages and freeze version
-pip install -r requirements.txt
-pip freeze > requirements-freeze.txt
+# install packages
+pip install -e .[dev,test]
 
-# recreate virtual env
-pip install -r requirements-freeze.txt
+# freeze version
+pip freeze > constraint.txt
+pip install -e .[dev,test] -c constraint.txt
 ```
 
 ## code style
