@@ -11,22 +11,24 @@
   "containerEnv": {},
   "remoteEnv": {},
   "extensions": [
-    // === docker ===
+    // === DOCKER ===
     "ms-azuretools.vscode-docker",
-    // === git ===
+    // === GIT ===
     "donjayamanne.githistory",
     "eamodio.gitlens",
-    // === markdown ===
+    // === MARKDOWN ===
     "bierner.markdown-preview-github-styles",
     "DavidAnson.vscode-markdownlint",
-    "lpubsppop01.vscode-auto-timestamp",  // frontmatterの時刻の自動更新
+    "lpubsppop01.vscode-auto-timestamp", // frontmatterの時刻の自動更新
     "esbenp.prettier-vscode",
     "shd101wyy.markdown-preview-enhanced",
-    // === python ===
+    // === PYTHON ===
     "ms-python.python",
     "njpwerner.autodocstring",
-    // === vscode ===
-    "alefragnani.bookmarks",
+    // === TOML ===
+    "be5invis.toml", // pyproject.toml用
+    // === VSCODE ===
+    "alefragnani.bookmarks"
   ],
   "settings": {}
 }
