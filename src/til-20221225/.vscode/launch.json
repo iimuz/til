@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug executable",
+      "cargo": {
+        "args": [
+          "build",
+          "--bin=minimal_rust",
+          "--package=minimal_rust",
+          "--manifest-path=Cargo.toml"
+        ],
+        "filter": {
+          "kind": "bin"
+        }
+      },
+      "args": []
+    }
+  ]
+}

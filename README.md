@@ -35,4 +35,6 @@ Today I Learn.
   - [PyTorch Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20221215132013/)
   - [til-20220608](/src/til-20220608/): minimal python
   - [til-20220801](/src/til-20220801/): frontend: typescript + react.js + vega-lite, backend: fastapi + altair
+- Rust
+  - [til-20221225](/src/til-20221225/): minimal rust
 - [Scoop Tips](scrapbook-20221217120338)
