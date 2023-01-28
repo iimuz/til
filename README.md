@@ -25,6 +25,7 @@ Today I Learn.
   - [til-20220604](/src/til-20220604/): minimal webpack + react.js + typescript
   - [til-20220605](/src/til-20220605/): react.js + heatmap
   - [til-20220801](/src/til-20220801/): frontend: react.js + vega-lite, backend: python + fastapi + altair
+- [Mac Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20230119041712/)
 - Machine Learning
   - [til-20220924](/src/til-20220924/): Stable Diffusion を利用した画像生成例。
 - MetaTrader
