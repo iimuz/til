@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
       target: production
       args:
-        USERNAME: $USER
+        USERNAME: $USER_NAME
         USER_UID: $USER_UID
         USER_GID: $USER_GID
     init: true
@@ -17,4 +17,4 @@ services:
         source: .
         target: $PWD
     command: python -h
-    user: $USER
+    user: $USER_NAME
