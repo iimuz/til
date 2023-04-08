@@ -1,0 +1,37 @@
+[project]
+authors = [{name = "iimuz", email = "iz.primary.story+github@gmail.com"}]
+description = "pdfからtextを抽出するスクリプト"
+license = {file = "LICENSE"}
+name = "pdf-to-text"
+readme = "README.md"
+requires-python = ">=3.10"
+urls = {repository = "https://github.com/iimuz/til/til-20230408"}
+version = "1.0.0"
+
+dependencies = [
+  "pymupdf",
+  "pydantic",
+  "tqdm",
+]
+
+[tools.setuptools.package-dir]
+pdf_to_text = "src"
+
+[project.optional-dependencies]
+dev = [
+  "black",
+  "flake8",
+  "flake8-black",
+  "flake8-bugbear",
+  "flake8-docstrings",
+  "flake8-isort",
+  "isort",
+  "mypy",
+]
+test = ["pytest"]
+
+[build-system]
+requires = ["setuptools>=63", "wheel"]
+
+[tool.isort]
+profile = "black"

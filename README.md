@@ -10,11 +10,11 @@ Today I Learn.
 ## Summary
 
 - Auto Hot Key
-  - [til-20200530](/src/til-20200530): AutoHotKeyを利用した簡易ツール。
+  - [til-20200530](/src/til-20200530): AutoHotKey を利用した簡易ツール。
 - AWS
   - [til-20221127](/src/til-20221127): AWS Hands-on for Begginers Serverless #1
 - [Bash Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20220702144802/)
-  - [til-20190215](/src/til-20190215/): GPUの接続を解除するスクリプト。
+  - [til-20190215](/src/til-20190215/): GPU の接続を解除するスクリプト。
 - [Docker Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20230103171358/)
 - [GCP Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20220702151015/)
 - [Git Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20221127091453/)
@@ -36,6 +36,7 @@ Today I Learn.
   - [PyTorch Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20221215132013/)
   - [til-20220608](/src/til-20220608/): minimal python
   - [til-20220801](/src/til-20220801/): frontend: typescript + react.js + vega-lite, backend: fastapi + altair
+  - [til-20230408](/src/til-20230408/): PDF からテキスト抽出するスクリプト。
 - Rust
   - [til-20221225](/src/til-20221225/): minimal rust
 - [Scoop Tips](scrapbook-20221217120338)
