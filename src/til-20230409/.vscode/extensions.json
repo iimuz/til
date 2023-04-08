@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+    // === docker ===
+    "ms-azuretools.vscode-docker",
+    // === markdown ===
+    "DavidAnson.vscode-markdownlint",
+    "lpubsppop01.vscode-auto-timestamp", // frontmatterの時刻の自動更新
+    "esbenp.prettier-vscode",
+    // === python ===
+    "ms-python.python",
+    "njpwerner.autodocstring"
+  ]
+}

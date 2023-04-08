@@ -1,0 +1,35 @@
+{
+  // editor
+  "editor.detectIndentation": true,
+  "editor.formatOnSave": true,
+  // workbench
+  "workbench.colorCustomizations": {
+    "titleBar.border": "#ffffff"
+  },
+  // auto time stamp
+  "lpubsppop01.autoTimeStamp.filenamePattern": ".md",
+  "lpubsppop01.autoTimeStamp.lineLimit": 5,
+  "lpubsppop01.autoTimeStamp.modifiedTimeStart": "lastmod: ",
+  "lpubsppop01.autoTimeStamp.momentFormat": "YYYY-MM-DD",
+  // markdown
+  "[markdown]": {
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+  // python
+  "autoDocstring.docstringFormat": "numpy",
+  "python.formatting.provider": "black",
+  "python.languageServer": "Pylance",
+  "python.linting.enabled": true,
+  "python.linting.flake8Enabled": true,
+  "python.linting.lintOnSave": true,
+  "python.linting.mypyEnabled": true,
+  "python.linting.pycodestyleEnabled": false,
+  "python.linting.pylintEnabled": false,
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.python",
+    "editor.insertSpaces": true,
+    "editor.tabSize": 4
+  }
+}
