@@ -1,0 +1,27 @@
+{
+  "name": "use-voicevox-core",
+  "dockerComposeFile": [
+    "../docker-compose.yml",
+    "docker-compose.extend.yml",
+    "docker-compose.local.yml"
+  ],
+  "workspaceFolder": "${localWorkspaceFolder}",
+  "service": "app",
+  "shutdownAction": "stopCompose",
+  "containerEnv": {},
+  "remoteEnv": {},
+  "extensions": [
+    // === DOCKER ===
+    "ms-azuretools.vscode-docker",
+    // === MARKDOWN ===
+    "DavidAnson.vscode-markdownlint",
+    "lpubsppop01.vscode-auto-timestamp", // frontmatterの時刻の自動更新
+    "esbenp.prettier-vscode",
+    // === PYTHON ===
+    "ms-python.python",
+    "njpwerner.autodocstring",
+    // === TOML ===
+    "be5invis.toml" // pyproject.toml用
+  ],
+  "settings": {}
+}

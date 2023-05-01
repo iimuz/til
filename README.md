@@ -36,6 +36,7 @@ Today I Learn.
   - [PyTorch Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20221215132013/)
   - [til-20220608](/src/til-20220608/): minimal python
   - [til-20220801](/src/til-20220801/): frontend: typescript + react.js + vega-lite, backend: fastapi + altair
+  - [til-20230407](/src/til-20230407/): voicevox core を利用して読み上げるスクリプト。
   - [til-20230408](/src/til-20230408/): PDF からテキスト抽出するスクリプト。
   - [til-20230409](/src/til-20230409/): epub からテキスト抽出するスクリプト。
 - Rust

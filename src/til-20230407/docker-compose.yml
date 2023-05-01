@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+      args:
+        USERNAME: $USER_NAME
+        USER_UID: $USER_UID
+        USER_GID: $USER_GID
+    init: true
+    working_dir: $PWD
+    volumes:
+      - type: bind
+        source: .
+        target: $PWD
+    command: python -h
+    user: $USER_NAME

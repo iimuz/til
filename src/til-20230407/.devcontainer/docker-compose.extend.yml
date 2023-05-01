@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  # python-packagesのボリュームマウントがrootになるため権限変更
+  # <https://github.com/docker/compose/issues/3270>
+  python-package-volume-init:
+    image: debian:bullseye-slim
+    user: root
+    volumes:
+      - type: volume
+        source: python-packages
+        target: /python-packages
+    command: chown -R ${USER_UID}:${USER_GID} /python-packages
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: vscode
+    cap_add:
+      - SYS_PTRACE
+    shm_size: 2GB
+    volumes:
+      - type: volume
+        source: python-packages
+        target: $PWD/.venv
+    depends_on:
+      python-package-volume-init:
+        condition: service_completed_successfully
+    command: sleep infinity
+
+volumes:
+  python-packages:
