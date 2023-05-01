@@ -1,0 +1,20 @@
+{
+  "recommendations": [
+    // === docker ===
+    "ms-azuretools.vscode-docker",
+    // === git ===
+    "donjayamanne.githistory",
+    "eamodio.gitlens",
+    // === markdown ===
+    "bierner.markdown-preview-github-styles",
+    "DavidAnson.vscode-markdownlint",
+    "lpubsppop01.vscode-auto-timestamp",  // frontmatterの時刻の自動更新
+    "esbenp.prettier-vscode",
+    "shd101wyy.markdown-preview-enhanced",
+    // === python ===
+    "ms-python.python",
+    "njpwerner.autodocstring",
+    // === vscode ===
+    "alefragnani.bookmarks",
+  ]
+}
