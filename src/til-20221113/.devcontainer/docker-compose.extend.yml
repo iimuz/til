@@ -1,0 +1,8 @@
+version: '3.8'
+
+services:
+  app:
+    cap_add:
+      - SYS_PTRACE
+    shm_size: 2GB
+    command: sleep infinity
