@@ -59,7 +59,7 @@ def _main() -> None:
         book = epub.read_epub(str(config.input))
         for item in book.get_items_of_type(ebooklib.ITEM_DOCUMENT):
             html_contents = item.get_body_content().decode()
-            md_contents = md(html_contents)
+            md_contents = md(html_contents, strip=["a", "img", "table"])
             f.write(md_contents)
 
 
