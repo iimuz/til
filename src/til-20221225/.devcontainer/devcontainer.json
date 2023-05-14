@@ -16,20 +16,13 @@
       "extensions": [
         // === DOCKER ===
         "ms-azuretools.vscode-docker",
-        // === GIT ===
-        "donjayamanne.githistory",
-        "eamodio.gitlens",
         // === MARKDOWN ===
-        "bierner.markdown-preview-github-styles",
         "DavidAnson.vscode-markdownlint",
         "lpubsppop01.vscode-auto-timestamp", // frontmatterの時刻の自動更新
         "esbenp.prettier-vscode",
-        "shd101wyy.markdown-preview-enhanced",
         // === RUST ===
         "rust-lang.rust-analyzer",
         "vadimcn.vscode-lldb", // debugのために必要
-        // === VSCODE ===
-        "alefragnani.bookmarks",
         // === TOML ===
         "be5invis.toml"  // Cargo.tomlなどのフォーマッターなど
       ]
