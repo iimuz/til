@@ -3,5 +3,6 @@ authors = ["iimuz <iz.primary.story+github@gmail.com>"]
 name = "minimal_rust"
 version = "0.1.0"
 
-[lib]
-path = "./src/lib/lib.rs"
+[[bin]]
+name = "main"
+path = "./src/main.rs"
