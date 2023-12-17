@@ -17,3 +17,7 @@ Today I Learn.
 - python: python に関するサンプルコードです。
 - r: R に関するサンプルコードです。
 - sql: SQL に関するサンプルコードです。
+
+## git
+
+- [git-mono-to-multi](https://github.com/iimuz/git-mono-to-multi): mono repo構成のリポジトリから特定フォルダ以下の履歴を抽出した別のリポジトリを作成するスクリプト.
