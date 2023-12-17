@@ -62,7 +62,7 @@ Today I Learn.
   - [git-mono-to-multi](https://github.com/iimuz/git-mono-to-multi): mono repo構成のリポジトリから特定フォルダ以下の履歴を抽出した別のリポジトリを作成するスクリプト.
 - [GCP Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20220702151015/)
 - Go
-  - [minimal-go](https://github.com/iimuz/minimla-go): Go用の最小構成テンプレート。
+  - [minimal-go](https://github.com/iimuz/minimal-go): Go用の最小構成テンプレート。
 - [Homebrew Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20221218142420/)
 - [Mac Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20230119041712/)
 - MetaTrader
