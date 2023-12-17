@@ -31,11 +31,14 @@ Today I Learn.
 ## Machine Learning
 
 - [diffusers-scripts](https://github.com/iimuz/diffusers-scripts): Diffusers を利用したスクリプト
+- [fast-chat-sample](https://github.com/iimuz/fast-chat-sample): FastChatを試すサンプル。
 - [local-llm-scripts](https://github.com/iimuz/local-llm-scripts): Localで動作するLLMを試すスクリプト
+- [nllb200-sample](https://github.com/iimuz/nllb200-sample): NLLB200のお試しを行うスクリプト。
 - [pyannotate-audio-sample](https://github.com/iimuz/pyannotate-audio-sample): pyannotate-audioの動作確認サンプル。
 - [pyannotate-audio-whisper-cpp](https://github.com/iimuz/pyannotate-audio-whisper-cpp): pyannotate-audioとWhisper.cppを利用した音声からの書き起こしスクリプト。
 - [stable-diffusion-colab](https://github.com/iimuz/stable-diffusion-colab): Google Colab 環境で Stable Diffusion を利用した画像生成例。
 - [stable-diffusion-webui-sample](https://github.com/iimuz/stable-diffusion-webui-sample): automatic1111/stable-diffusion-web-uiを利用するスクリプトやメモ。
+- [text-generation-web-ui-sample](https://github.com/iimuz/text-generation-web-ui-sample): Text Generation WebUIを試すサンプル。
 - [whisper-cpp-sample](https://github.com/iimuz/whisper-cpp-sample): Whisper.cppの動作確認。
 
 ## Python
@@ -49,9 +52,17 @@ Today I Learn.
 - [epub-to-text](https://github.com/iimuz/epub-to-text): epub からテキスト抽出するスクリプト。
 - [luigi-sample](https://github.com/iimuz/luigi-sample): luigiを利用したワークフローサンプルの動作確認。
 
+## Rust
+
+- [atcoder-rust](https://github.com/iimuz/atcoder-rust): AtCoderをRustで試すための環境。
+- [minimal-rust](https://github.com/iimuz/minimal-rust): minimal rust
+- [toggl-tools](https://github.com/iimuz/toggl-tools)
+
 ## Others
 
 - [autohotkey-tools](https://github.com/iimuz/autohotkey-tools): AutoHotKey を利用した簡易ツール。
+- AtCoder
+  - [atcoder-rust](https://github.com/iimuz/atcoder-rust): AtCoderをRustで試すための環境。
 - AWS
   - [aws-hands-on-for-begginers-serverless-v1](https://github.com/iimuz/aws-hands-on-for-begginers-serverless-v1): AWS Hands-on for Begginers Serverless #1
   - aws-scripts: AWS用のスクリプト集
@@ -68,7 +79,4 @@ Today I Learn.
 - MetaTrader
   - [mt4-to-csv](https://github.com/iimuz/mt4-to-csv): MT4 の取引履歴を csv で出力するスクリプト。
   - [mt4-csv-to-db](https://github.com/iimuz/mt4-csv-to-db): mt4-to-csvで出力した csv を DB に取り込む python スクリプト。
-- Rust
-  - [minimal-rust](https://github.com/iimuz/minimal-rust): minimal rust
-  - [toggl-tools](https://github.com/iimuz/toggl-tools): Togglの結果をまとめるツール。
 - [Scoop Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20221217120338/)
