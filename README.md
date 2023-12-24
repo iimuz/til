@@ -65,9 +65,11 @@ Today I Learn.
   - [atcoder-rust](https://github.com/iimuz/atcoder-rust): AtCoderをRustで試すための環境。
 - AWS
   - [aws-hands-on-for-begginers-serverless-v1](https://github.com/iimuz/aws-hands-on-for-begginers-serverless-v1): AWS Hands-on for Begginers Serverless #1
-  - aws-scripts: AWS用のスクリプト集
+  - [aws-scripts](https://github.com/iimuz/aws-scripts): AWS用のスクリプト集
 - [Bash Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20220702144802/)
   - [unlink-gpu](https://github.com/iimuz/unlink-gpu): GPU の接続を解除するスクリプト。
+- Discord
+  - [discord-sample](https://github.com/iimuz/discord-sample): Discord botのサンプルスクリプト。
 - [Docker Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20230103171358/)
 - [Git Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20221127091453/)
   - [git-mono-to-multi](https://github.com/iimuz/git-mono-to-multi): mono repo構成のリポジトリから特定フォルダ以下の履歴を抽出した別のリポジトリを作成するスクリプト.
