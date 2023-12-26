@@ -82,3 +82,4 @@ Today I Learn.
   - [mt4-to-csv](https://github.com/iimuz/mt4-to-csv): MT4 の取引履歴を csv で出力するスクリプト。
   - [mt4-csv-to-db](https://github.com/iimuz/mt4-csv-to-db): mt4-to-csvで出力した csv を DB に取り込む python スクリプト。
 - [Scoop Tips](https://iimuz.github.io/scrapbook/zettelkasten/scrapbook-20221217120338/)
+- [youtube-transcript-sample](https://github.com/iimuz/youtube-transcript-sample): YouTubeの文字起こしを取得するスクリプト。
