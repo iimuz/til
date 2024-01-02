@@ -51,6 +51,7 @@ Today I Learn.
 - [pdf-to-text](https://github.com/iimuz/pdf-to-text): PDF からテキスト抽出するスクリプト。
 - [epub-to-text](https://github.com/iimuz/epub-to-text): epub からテキスト抽出するスクリプト。
 - [luigi-sample](https://github.com/iimuz/luigi-sample): luigiを利用したワークフローサンプルの動作確認。
+- [toggl-tools-py](https://github.com/iimuz/toggl-tools-py): Togglのデータを整形するためのツール。
 
 ## Rust
 
